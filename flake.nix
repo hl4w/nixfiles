@@ -25,7 +25,7 @@
 
   outputs = { self, nixpkgs, home-manager, noctalia, noctalia-qs,  ... }@inputs:
     let
-      username = "kenzhv";
+      username = "silas";
       hostname = "nixos";
       specialArgs = { inherit username hostname; };
     in {

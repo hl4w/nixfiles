@@ -27,10 +27,7 @@
       fcitx5-pinyin-zhwiki             
       fcitx5-lua 
       librime
-      rime-ice
-
-      # 可选：皮肤、图标
-      fcitx5-fluent          
+      rime-ice     
     ];
     fcitx5.waylandFrontend = true;
   };
