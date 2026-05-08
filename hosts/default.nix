@@ -16,6 +16,8 @@
     ../modules/hyprland.nix
   ];
 
+  nix.pakage = pkgs.lix;
+  
   nix.settings = {
     #启用 flakes + nix
     experimental-features = [ "nix-command" "flakes" ];
