@@ -37,7 +37,9 @@
     kdePackages.kimageformats
     kdePackages.kdegraphics-thumbnailers
 
-    zip unzip rar
+    nemo  nemo-python nemo-preview  nemo-fileroller nemo-seahorse
+
+    zip unzip unrar
     qalculate-qt
 
     # ==============================

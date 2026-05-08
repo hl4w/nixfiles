@@ -3,9 +3,21 @@
 {
   programs.zsh = {
     enable = true;
+    enableCompletion = true;
+    autosuggestion.enable = true;
+    syntaxHighlighting.enable = true;
     oh-my-zsh = {
       enable = true;
-      plugins = [ "git" "docker" "python" "sudo" ];
+      plugins = [ "git" "docker" "python" "sudo" "fzf" "colored-man-pages" ];
+      theme = "agnoster";
+      
+      initExtra = ''
+        # 添加自定义别名
+        alias ls='eza --icons'
+        alias ll='eza -l --icons'
+        alias la='eza -la --icons'
+        alias tree='eza --tree --icons'
+      '';
     };
   };
 

@@ -11,7 +11,7 @@
     ../modules/gc.nix
     ../modules/chinese.nix
     ../modules/ai-robot.nix
-    #../modules/auto-upgrade.nix
+    ../modules/auto-upgrade.nix
     ../modules/virtualization.nix
     ../modules/hyprland.nix
   ];
