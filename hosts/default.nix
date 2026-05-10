@@ -17,7 +17,6 @@
   ];
 
   nix.package = pkgs.lix;
-  
   nix.settings = {
     #启用 flakes + nix
     experimental-features = [ "nix-command" "flakes" ];

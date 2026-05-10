@@ -45,6 +45,8 @@
   # USB自动挂载
   services.gvfs.enable = true;
 
+  virtualisation.vmware.guest.enable = true;
+
   environment.systemPackages = with pkgs; [
     kdePackages.bluedevil #blue tooths
     kdePackages.plasma-nm

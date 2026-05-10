@@ -27,7 +27,8 @@
       fcitx5-pinyin-zhwiki             
       fcitx5-lua 
       librime
-      rime-ice     
+      rime-ice
+      rime-data     
     ];
     fcitx5.waylandFrontend = true;
   };

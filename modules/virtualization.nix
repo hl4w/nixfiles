@@ -1,8 +1,6 @@
 {pkgs,  ...}: 
 
 {
-  virtualisation.vmware.guest.enable = true;
-
   # 只开启docker、podman其一
   virtualisation.docker = {
     enable = true;
