@@ -53,10 +53,9 @@ nixfiles/
 │   ├── noctalia.nix
 │   └── virtualization.nix
 ├── users/                 # User configurations
-│   ├── home.nix
-│   └── nixos.nix
-├── install.sh             # Installation script
-└── setup.sh               # Setup script
+    ├── home.nix
+    └── nixos.nix
+
 ```
 
 ## Key Components

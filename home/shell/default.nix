@@ -10,8 +10,8 @@
       enable = true;
       plugins = [ "git" "docker" "python" "sudo" "fzf" "colored-man-pages" ];
       theme = "agnoster";
-      
-      initExtra = ''
+
+      extraConfig = ''
         # 添加自定义别名
         alias ls='eza --icons'
         alias ll='eza -l --icons'

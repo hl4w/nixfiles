@@ -11,7 +11,6 @@
           src = pkgs.fetchgit {
             url = "https://github.com/Mintimate/oh-my-rime.git";
             rev = "main";
-            sha256 = lib.fakeSha256;
           };
         }
       ];

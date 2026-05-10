@@ -6,7 +6,7 @@
       # ==============================
     # 开发工具 & 编程环境
     # ==============================
-    vscodium  wtype  emacs-nox devenv  bazel 
+    vscodium  wtype  emacs-nox devenv
  
     kdePackages.kate
     #obsidian

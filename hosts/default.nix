@@ -11,12 +11,12 @@
     ../modules/gc.nix
     ../modules/chinese.nix
     ../modules/ai-robot.nix
-    ../modules/auto-upgrade.nix
+    #../modules/auto-upgrade.nix
     ../modules/virtualization.nix
     ../modules/hyprland.nix
   ];
 
-  nix.pakage = pkgs.lix;
+  nix.package = pkgs.lix;
   
   nix.settings = {
     #启用 flakes + nix
