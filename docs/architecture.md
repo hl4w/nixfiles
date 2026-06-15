@@ -88,12 +88,8 @@
 │   ├── wallpaper-watcher.sh # 壁纸变化监听器
 │   └── wallpaper-watcher_en.sh # 壁纸监听器（英文版本）
 ├── wallpapers/           # 壁纸图片目录
-│   ├── default.jpg       # 默认壁纸
-│   ├── hyprland.jpg
-│   ├── kath.jpg
-│   ├── nixos-2.jpeg
-│   ├── nixos-3.jpeg
-│   └── README.md
+│   ├── default.jpg       # 默认壁纸（中式深色主题）
+│   └── README.md         # 壁纸说明及完整壁纸仓库地址
 ├── templates/            # 主机模板
 │   └── host-template/
 │       └── configuration.nix
@@ -148,7 +144,7 @@
 | `shell.nix` | Zsh + Starship 提示符（支持 pywal 动态配色） |
 | `editor.nix` | Neovim、Emacs（配置了 LSP 服务器：nil_ls、clangd、gopls、pyright、rust_analyzer） |
 | `input.nix` | Fcitx5 + RIME（oh-my-rime 配置） |
-| `cli.nix` | CLI 工具集：eza、bat、fd、rg、fzf、yazi（文件管理器）、zoxide（智能导航）、fastfetch、btop、dust、duf、tokei、hyperfine、procs |
+| `cli.nix` | CLI 工具集：eza、bat、fd、rg、fzf、yazi（终端文件管理器，支持 zoxide 集成）、zoxide（智能目录导航）、fastfetch、btop、dust、duf、tokei、hyperfine、procs、starship |
 | `apps.nix` | GUI 应用（浏览器、办公、媒体） |
 | `dev-lsp.nix` | 开发工具和 LSP 服务器（C/C++: clangd/clang-tools/cmake/ninja/gdb/lldb；Go: go/gopls；Python: python3/pyright；Rust: rustc/rust-analyzer/rustfmt/cargo） |
 | `git.nix` | Git 全局配置 |

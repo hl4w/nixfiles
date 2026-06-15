@@ -88,12 +88,8 @@ This NixOS configuration follows a modular, host-specific structure that allows 
 │   ├── wallpaper-watcher.sh # Wallpaper change watcher
 │   └── wallpaper-watcher_en.sh # Wallpaper watcher (English)
 ├── wallpapers/           # Wallpaper images directory
-│   ├── default.jpg       # Default wallpaper
-│   ├── hyprland.jpg
-│   ├── kath.jpg
-│   ├── nixos-2.jpeg
-│   ├── nixos-3.jpeg
-│   └── README.md
+│   ├── default.jpg       # Default wallpaper (Chinese style dark theme)
+│   └── README.md         # Wallpaper documentation with full collection URL
 ├── templates/            # Host templates
 │   └── host-template/
 │       └── configuration.nix
@@ -148,7 +144,7 @@ This NixOS configuration follows a modular, host-specific structure that allows 
 | `shell.nix` | Zsh + Starship prompt (with pywal dynamic coloring) |
 | `editor.nix` | Neovim, Emacs (with LSP servers configured: nil_ls, clangd, gopls, pyright, rust_analyzer) |
 | `input.nix` | Fcitx5 + RIME (oh-my-rime configuration) |
-| `cli.nix` | CLI tools: eza, bat, fd, rg, fzf, yazi (file manager), zoxide (smart navigation), fastfetch, btop, dust, duf, tokei, hyperfine, procs |
+| `cli.nix` | CLI tools: eza, bat, fd, rg, fzf, yazi (terminal file manager with zoxide integration), zoxide (smart directory navigation), fastfetch, btop, dust, duf, tokei, hyperfine, procs, starship |
 | `apps.nix` | GUI applications (browser, office, media) |
 | `dev-lsp.nix` | Development tools and LSP servers (C/C++: clangd/clang-tools/cmake/ninja/gdb/lldb; Go: go/gopls; Python: python3/pyright; Rust: rustc/rust-analyzer/rustfmt/cargo) |
 | `git.nix` | Git global configuration |
