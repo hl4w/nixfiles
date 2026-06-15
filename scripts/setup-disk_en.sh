@@ -113,7 +113,7 @@ USERNAME="$3"
 
 # Show configuration summary
 info "=========================================="
-info "         NixOS Disk Setup Utility"
+info "      HL4W NixOS Disk Setup Utility"
 info "=========================================="
 echo
 info "Configuration parameters:"

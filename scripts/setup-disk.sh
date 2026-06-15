@@ -113,7 +113,7 @@ USERNAME="$3"
 
 # 显示配置摘要
 info "=========================================="
-info "         NixOS Disk Setup Utility"
+info "      HL4W NixOS Disk Setup Utility"
 info "=========================================="
 echo
 info "配置参数:"

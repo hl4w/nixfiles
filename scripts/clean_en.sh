@@ -35,6 +35,9 @@ error() {
 }
 
 confirm() {
+    if [ "$NON_INTERACTIVE" = "true" ]; then
+        return 0
+    fi
     read -p "$1 (y/N) " -n 1 -r
     echo
     [[ $REPLY =~ ^[Yy]$ ]]
@@ -87,7 +90,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 info "=========================================="
-info "         NixOS Cleanup Utility"
+info "       HL4W NixOS Cleanup Utility"
 info "=========================================="
 echo
 

@@ -129,7 +129,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 info "=========================================="
-info "       NixOS Configuration Installer"
+info "       HL4W NixOS Configuration Installer"
 info "=========================================="
 echo
 
@@ -320,19 +320,35 @@ fi
 echo "  GPU Type:      ${GPU_TYPE}"
 echo "------------------------------------------"
 
-info "Updating flake.nix username..."
+# =============================================
+# Configure flake.nix
+# =============================================
+info "Configuring flake.nix..."
+info "Updating username..."
 sed -i.bak "s/USERNAME = \"youruser\"/USERNAME = \"$USERNAME\"/g" flake.nix
 rm -f flake.nix.bak
 
+# =============================================
+# Create host configuration directory
+# =============================================
 info "Checking if host already exists..."
 if [ -d "hosts/$HOSTNAME" ]; then
     warn "Host $HOSTNAME already exists, will update configuration"
+    if confirm "Overwrite existing configuration?"; then
+        info "Backing up existing configuration..."
+        mv "hosts/$HOSTNAME" "hosts/${HOSTNAME}_backup_$(date +%Y%m%d_%H%M%S)"
+    else
+        error "User cancelled overwrite"
+    fi
 fi
 
 info "Creating host configuration directory..."
 mkdir -p "hosts/$HOSTNAME"
 
-info "Configuring host configuration.nix..."
+# =============================================
+# Generate host configuration.nix
+# =============================================
+info "Generating host configuration.nix..."
 cat > "hosts/$HOSTNAME/configuration.nix" << EOF
 { pkgs, ... }:
 
@@ -404,8 +420,17 @@ fi
 
 echo "}" >> "hosts/$HOSTNAME/configuration.nix"
 
+# =============================================
+# Create user Home Manager configuration
+# =============================================
 info "Creating user Home Manager configuration..."
 mkdir -p "home/hosts"
+
+# Check if host user config already exists
+if [ -f "home/hosts/$HOSTNAME.nix" ]; then
+    warn "User configuration $HOSTNAME.nix already exists, will update"
+fi
+
 cat > "home/hosts/$HOSTNAME.nix" << EOF
 { pkgs, config, inputs, ... }:
 
@@ -418,13 +443,16 @@ if [ "$HOST_TYPE_NAME" != "server" ]; then
     echo "    ../common/input.nix" >> "home/hosts/$HOSTNAME.nix"
     echo "    ../common/apps.nix" >> "home/hosts/$HOSTNAME.nix"
 fi
+
 # Import host-type specific user-level configuration
 echo "    ./$HOST_TYPE_NAME/default.nix" >> "home/hosts/$HOSTNAME.nix"
 
 echo "  ];" >> "home/hosts/$HOSTNAME.nix"
-
 echo "}" >> "home/hosts/$HOSTNAME.nix"
 
+# =============================================
+# Update user-related configurations
+# =============================================
 info "Updating Git configuration..."
 sed -i.bak "s/Your Name/$GIT_USERNAME/g" home/common/git.nix
 sed -i.bak "s/your.email@example.com/$GIT_EMAIL/g" home/common/git.nix
@@ -434,19 +462,39 @@ info "Updating hosts/common/default.nix user configuration..."
 sed -i.bak "s/youruser/$USERNAME/g" hosts/common/default.nix
 rm -f hosts/common/default.nix.bak
 
-info "Updating flake.nix to add new host..."
-if ! grep -q "$FLAKE_NAME = mkHost" flake.nix; then
-    sed -i.bak "/nixosConfigurations = {/a \\      $FLAKE_NAME = mkHost \"$HOSTNAME\";\\\n" flake.nix
-fi
-rm -f flake.nix.bak
-
-info "Updating virtualisation module..."
+info "Updating modules/services/virtualisation.nix..."
 sed -i.bak "s/youruser/$USERNAME/g" modules/services/virtualisation.nix
 rm -f modules/services/virtualisation.nix.bak
 
+# =============================================
+# Configure flake.nix host output
+# =============================================
+info "Configuring flake.nix to add new host..."
+
+# Check if host configuration already exists
+if grep -q "    $FLAKE_NAME = mkHost" flake.nix; then
+    warn "Host $FLAKE_NAME already exists in flake.nix"
+    if confirm "Update existing configuration?"; then
+        # Remove old config and re-add
+        sed -i.bak "/    $FLAKE_NAME = mkHost/d" flake.nix
+        sed -i.bak "/nixosConfigurations = {/a \\      $FLAKE_NAME = mkHost \"$HOSTNAME\";\\\n" flake.nix
+        rm -f flake.nix.bak
+    fi
+else
+    # Add new host configuration
+    sed -i.bak "/nixosConfigurations = {/a \\      $FLAKE_NAME = mkHost \"$HOSTNAME\";\\\n" flake.nix
+    rm -f flake.nix.bak
+fi
+
+# =============================================
+# Generate flake.lock
+# =============================================
 info "Generating flake.lock..."
 nix flake lock
 
+# =============================================
+# Generate hardware configuration
+# =============================================
 echo
 if confirm "Generate hardware configuration now? (requires sudo)"; then
     info "Generating hardware configuration..."
@@ -465,33 +513,76 @@ if confirm "Generate hardware configuration now? (requires sudo)"; then
     fi
 else
     info "Skipping automatic hardware configuration generation"
-    warn "Hardware configuration file has not been created!"
+    warn "⚠️ Hardware configuration file has not been created!"
     info "Please generate manually in NixOS installer:"
     info "  sudo nixos-generate-config --show-hardware-config > hosts/$HOSTNAME/hardware-configuration.nix"
 fi
 
+# =============================================
+# Verify configuration
+# =============================================
+echo
+if confirm "Verify configuration correctness?"; then
+    info "Verifying flake configuration..."
+    if nix flake check; then
+        info "✅ Flake configuration verified successfully"
+    else
+        warn "❌ Flake configuration verification failed, please check error messages"
+    fi
+fi
+
+# =============================================
+# Completion message
+# =============================================
 echo
 info "=========================================="
 info "         Configuration Complete!"
 info "=========================================="
 echo
-info "Next steps:"
+info "Project configured successfully. Use the following commands to update the system:"
 echo "------------------------------------------"
-echo "1. Generate hardware configuration (if not auto-generated):"
-echo "   sudo nixos-generate-config --show-hardware-config > hosts/$HOSTNAME/hardware-configuration.nix"
 echo ""
-echo "2. Edit hardware-configuration.nix, update disk UUIDs"
-echo "   vim hosts/$HOSTNAME/hardware-configuration.nix"
+echo "📦 System Update Commands:"
+echo "------------------------------------------"
+echo "# Update system after modifying modules/:"
+echo "  sudo nixos-rebuild switch --flake .#$FLAKE_NAME"
+echo ""
+echo "# Update user configuration after modifying home/:"
+echo "  home-manager switch --flake .#$USERNAME@$FLAKE_NAME"
+echo ""
+echo "# Update flake inputs (upgrade nixpkgs, etc.):"
+echo "  nix flake update"
+echo ""
+echo "# One-click update script (recommended):"
+echo "  ./scripts/update.sh"
+echo ""
+echo "🔧 Verification Commands:"
+echo "------------------------------------------"
+echo "# Check configuration syntax:"
+echo "  nix flake check"
+echo ""
+echo "# Test build (no deployment):"
+echo "  nix build .#$FLAKE_NAME"
+echo ""
+echo "# Rollback to previous generation:"
+echo "  sudo nixos-rebuild switch --rollback"
+echo ""
+echo "📝 Next Steps:"
+echo "------------------------------------------"
+echo "1. Ensure hardware configuration is generated:"
+echo "   hosts/$HOSTNAME/hardware-configuration.nix"
+echo ""
+echo "2. Edit hardware-configuration.nix and verify:"
 echo "   - Ensure root partition device points to correct disk/partition"
 echo "   - Check boot partition mount point"
 echo "   - Verify swap configuration"
 echo ""
-echo "3. Build configuration:"
-echo "   nix build .#$FLAKE_NAME"
-echo ""
-echo "4. Deploy system:"
+echo "3. Deploy system in NixOS installer:"
 echo "   sudo nixos-rebuild switch --flake .#$FLAKE_NAME"
 echo ""
-echo "5. Update Home Manager:"
+echo "4. Update Home Manager after deployment:"
 echo "   home-manager switch --flake .#$USERNAME@$FLAKE_NAME"
 echo "------------------------------------------"
+echo
+info "Note: After installation, you can modify files in modules/ or home/ directories,"
+info "then run 'sudo nixos-rebuild switch --flake .#$FLAKE_NAME' to apply changes!"

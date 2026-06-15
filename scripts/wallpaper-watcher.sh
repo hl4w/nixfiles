@@ -20,6 +20,11 @@ fi
 
 set -e
 
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
 # 配置变量
 WALLPAPER_DIR="${HOME}/.wallpapers"
 WAL_CACHE="${HOME}/.cache/wal"
@@ -28,11 +33,16 @@ WATCH_INTERVAL=2  # 检查间隔（秒）
 LAST_TRIGGER_TIME=0
 
 info() {
-    echo -e "\033[1;34m[WATCHER]\033[0m $1"
+    echo -e "${GREEN}[WATCHER]${NC} $1"
+}
+
+warn() {
+    echo -e "${YELLOW}[WATCHER WARN]${NC} $1"
 }
 
 error() {
-    echo -e "\033[1;31m[WATCHER ERROR]\033[0m $1" >&2
+    echo -e "${RED}[WATCHER ERROR]${NC} $1"
+    exit 1
 }
 
 # 获取当前壁纸路径
