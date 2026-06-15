@@ -152,11 +152,51 @@
 
 ## Flake 结构
 
-`flake.nix` 定义了：
+`flake.nix` 是项目的入口配置文件，定义了完整的构建环境：
 
-1. **输入**: nixpkgs-26.05、home-manager、hyprnix
-2. **nixConfig**: 中国镜像（中科大、清华、北外）用于二进制缓存
-3. **输出**: 每个主机的 NixOS 配置
+### 输入源 (inputs)
+
+| 输入 | URL | 说明 |
+|------|-----|------|
+| `nixpkgs` | `github:NixOS/nixpkgs/nixos-26.05` | NixOS 26.05 稳定版 |
+| `home-manager` | `github:nix-community/home-manager/release-26.05` | Home Manager，与 nixpkgs 版本同步 |
+| `hyprnix` | `github:hyprwm/hyprnix/main` | Hyprland 工具链，用于管理 Hyprland 配置 |
+
+### 全局配置 (nixConfig)
+
+- **二进制缓存源**: 配置中国镜像加速下载
+  - 中科大镜像（主）: `https://mirrors.ustc.edu.cn/nix-channels/store`
+  - 清华镜像: `https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store`
+  - 北外镜像: `https://mirrors.bfsu.edu.cn/nix-channels/store`
+  - 官方源（备用）: `https://cache.nixos.org`
+- **实验性功能**: 启用 `nix-command` 和 `flakes`
+- **存储优化**: 启用 `auto-optimise-store`
+
+### 主机配置生成器 (mkHost)
+
+`mkHost` 函数用于生成统一的主机配置：
+
+```nix
+mkHost = name: nixpkgs.lib.nixosSystem {
+  system = "x86_64-linux";
+  modules = [
+    ./hosts/${name}/configuration.nix  # 主机特定配置
+    home-manager.nixosModules.home-manager
+    {
+      home-manager.users.${USERNAME} = import ./home/hosts/${name}.nix;
+    }
+  ];
+  specialArgs = {
+    inherit inputs;
+    nixSubstituters = substituters;
+    nixTrustedPublicKeys = trusted-public-keys;
+  };
+};
+```
+
+### 输出 (outputs)
+
+- **nixosConfigurations**: 主机配置输出（由安装脚本动态生成）
 
 ### 添加新主机
 
