@@ -4,6 +4,36 @@
 
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。
 
+## [v0.0.3] - 2026-06-15
+
+### Added
+
+- **完善 CLI 工具集**: 新增更多现代化命令行工具
+  - `yazi` - 快速终端文件管理器（用 Rust 编写）
+  - `dust` - 磁盘使用分析工具
+  - `duf` - 磁盘空间查看工具
+  - `tokei` - 代码统计工具
+  - `hyperfine` - 命令性能测试工具
+  - `procs` - 增强版 ps 命令
+  - `zoxide` - 智能目录导航工具
+- **Yazi 配置集成**: 在 `home/common/cli.nix` 中配置 Yazi 文件管理器，支持 zoxide 集成
+- **Zoxide 导航**: 在 `home/common/cli.nix` 中启用 Zoxide 智能目录跳转
+- **壁纸仓库说明**: 在 `wallpapers/README.md` 中添加完整壁纸集合的下载地址 `https://github.com/hl4w/wallpaper.git`
+- **项目版本统一更新**: 更新所有文档文件中的版本号为 v0.0.3
+
+### Changed
+
+- **CLI 工具模块化**: 将 CLI 工具从 `apps.nix` 分离到独立的 `home/common/cli.nix` 模块，结构更清晰
+- **shell.nix 精简**: 移除与 CLI 模块重复的配置，保持职责分离
+- **文档内容更新**: 更新 README、架构文档、FAQ、迁移指南，反映最新的项目状态
+- **壁纸 README 更新**: 更新 `wallpapers/README.md` 中的文件列表，仅保留实际存在的 `default.jpg`
+
+### Fixed
+
+- **修复 Lix 配置**: 修正 `modules/system/default.nix` 中 Lix 的引用方式，使用 `pkgs.lix` 替代 `pkgs.lixPackageSets.stable.lix`
+- **修复目录结构文档**: 更新架构文档中的目录树，确保与实际文件结构一致
+- **修复壁纸 README**: 修正默认壁纸文件名从 `default.png` 为 `default.jpg`
+
 ## [v0.0.2] - 2026-06-14
 
 ### Added

@@ -2,6 +2,16 @@
 
 This directory contains wallpaper images for the NixOS configuration.
 
+## Full Wallpaper Collection
+
+For the complete wallpaper collection with more options, please clone the dedicated wallpaper repository:
+
+```bash
+git clone https://github.com/hl4w/wallpaper.git
+```
+
+After cloning, copy the desired wallpapers to this directory or symlink the repository to `~/.wallpapers/` for automatic integration with the pywal color system.
+
 ## Usage
 
 1. Add your wallpaper images to this directory (supports: .jpg, .jpeg, .png, .gif)
@@ -35,15 +45,11 @@ wp-list
 
 | File | Description |
 |------|-------------|
-| `default.jpg` | Default wallpaper (1920x1080) |
-| `hyprland.jpg` | Hyprland themed wallpaper |
-| `kath.jpg` | Abstract wallpaper |
-| `nixos-2.jpeg` | NixOS themed wallpaper |
-| `nixos-3.jpeg` | NixOS themed wallpaper |
+| `default.jpg` | Default wallpaper (Chinese style dark theme, 1920x1080) |
 
 ## Default Wallpaper
 
-The `default.png` file is used as the default wallpaper when no specific wallpaper is specified. It will be automatically applied during the first login.
+The `default.jpg` file is used as the default wallpaper when no specific wallpaper is specified. It will be automatically applied during the first login.
 
 **Style:** Chinese style / Dark theme
 - Features traditional Chinese elements

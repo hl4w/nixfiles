@@ -1,8 +1,8 @@
 # NixOS 配置 Flake 文件
 # 项目入口文件，定义输入和输出配置
-# Version: v0.0.2
+# Version: v0.0.3
 {
-  description = "NixOS configuration with Home Manager - Hyprland/Niri (v0.0.2)";
+  description = "NixOS configuration with Home Manager - Hyprland/Niri (v0.0.3)";
 
   # 共享配置变量（供系统和 flake 共同使用）
   let

@@ -66,11 +66,59 @@ chmod +x scripts/install.sh
 
 | 包类型 | 位置 | 示例 |
 |--------|------|------|
-| 系统包 | `modules/system/default.nix` | git, wget, curl |
-| 用户包 | `home/common/cli.nix` | fastfetch, btop, eza, bat, fzf |
-| 桌面包 | `home/common/apps.nix` | rofi, nemo, nemo-extensions, evince, eog, alacritty/kitty/foot（默认 foot） |
-| 开发包 | `home/common/dev-lsp.nix` | clangd, clang-tools, cmake |
+| 系统包 | `modules/system/default.nix` | git, wget, curl, tmux, zsh |
+| 用户包 | `home/common/cli.nix` | fastfetch, btop, eza, bat, fzf, fd, ripgrep, yazi, zoxide, dust, duf, tokei, hyperfine, procs |
+| 桌面包 | `home/common/apps.nix` | rofi, nemo, nemo-extensions, evince, eog, alacritty/kitty/foot（默认 foot）, vlc |
+| 开发包 | `home/common/dev-lsp.nix` | clangd, clang-tools, cmake, ninja, gdb, lldb, go, gopls, python3, pyright, rustc, rust-analyzer, rustfmt, cargo |
 | 办公包 | `home/common/apps.nix` | wps-office-cn, nextcloud-client |
+
+### 如何使用 Yazi 文件管理器？
+
+Yazi 是一个快速的终端文件管理器，已在 `home/common/cli.nix` 中配置：
+
+```bash
+# 启动 Yazi
+yazi
+
+# 基本操作
+# 方向键 / hjkl: 导航
+# Enter: 打开文件/目录
+# q: 退出
+# : 打开命令面板
+# Ctrl+G: 打开 shell（支持 zoxide 跳转）
+```
+
+### 如何使用 Zoxide 智能导航？
+
+Zoxide 已在 `home/common/cli.nix` 中配置：
+
+```bash
+# 跳转到包含关键字的目录
+z <keyword>
+
+# 交互式选择
+zi
+
+# 跳转到最近使用的目录
+z -
+
+# 添加目录到数据库
+z ~/projects/my-project
+```
+
+### 什么是 Lix？
+
+Lix 是 Nix 包管理器的高性能替代实现：
+
+- **优势**: 比原生 Nix 更快（特别是 eval 和 fetch 操作）
+- **兼容性**: 完全兼容 Nix 所有功能（flakes、nix-command 等）
+- **性能**: 使用 C++ 重写，性能更优
+
+验证安装：
+```bash
+nix --version
+# 输出: nix (Lix, like Nix) 2.x.x
+```
 
 ### 如何配置 Hyprland？
 

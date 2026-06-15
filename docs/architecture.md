@@ -1,8 +1,10 @@
 # 架构说明
 
+**Version: v0.0.3**
+
 ## 概述
 
-本 NixOS 配置采用模块化、主机特定的结构，允许从单个仓库管理多台机器。基于 NixOS 26.05，支持 Hyprland/Niri 窗口管理器。
+本 NixOS 配置采用模块化、主机特定的结构，允许从单个仓库管理多台机器。基于 NixOS 26.05，支持 Hyprland/Niri 窗口管理器，使用 Lix 作为高性能 Nix 实现。
 
 ## 目录结构
 
@@ -146,7 +148,7 @@
 | `shell.nix` | Zsh + Starship 提示符（支持 pywal 动态配色） |
 | `editor.nix` | Neovim、Emacs（配置了 LSP 服务器：nil_ls、clangd、gopls、pyright、rust_analyzer） |
 | `input.nix` | Fcitx5 + RIME（oh-my-rime 配置） |
-| `cli.nix` | eza、bat、fd、rg、fzf、ranger、vlc |
+| `cli.nix` | CLI 工具集：eza、bat、fd、rg、fzf、yazi（文件管理器）、zoxide（智能导航）、fastfetch、btop、dust、duf、tokei、hyperfine、procs |
 | `apps.nix` | GUI 应用（浏览器、办公、媒体） |
 | `dev-lsp.nix` | 开发工具和 LSP 服务器（C/C++: clangd/clang-tools/cmake/ninja/gdb/lldb；Go: go/gopls；Python: python3/pyright；Rust: rustc/rust-analyzer/rustfmt/cargo） |
 | `git.nix` | Git 全局配置 |
@@ -336,10 +338,10 @@ nixConfig = {
 
 | 级别 | 包 | 位置 |
 |------|------|------|
-| 系统 | git、wget、curl、nil | `modules/system/default.nix` |
-| 用户 | fastfetch, btop, eza, bat, fzf, fd, ripgrep, yazi, vlc | `home/common/cli.nix` |
-| 桌面 | rofi、nemo、nemo-extensions、evince、eog、alacritty/kitty/foot（默认 foot）、pywal | `home/common/apps.nix` |
-| 开发 | clangd、clang-tools、cmake、ninja、gdb、lldb | `home/common/dev-lsp.nix` |
+| 系统 | git、wget、curl、nil、tmux、zsh、tree、highlight、nixpkgs-fmt | `modules/system/default.nix` |
+| 用户 | fastfetch、btop、eza、bat、fzf、fd、ripgrep、yazi、zoxide、dust、duf、tokei、hyperfine、procs | `home/common/cli.nix` |
+| 桌面 | rofi、nemo、nemo-extensions、evince、eog、alacritty/kitty/foot（默认 foot）、pywal、vlc | `home/common/apps.nix` |
+| 开发 | clangd、clang-tools、cmake、ninja、gdb、lldb、go、gopls、python3、pyright、rustc、rust-analyzer、rustfmt、cargo | `home/common/dev-lsp.nix` |
 | 办公 | wps-office-cn、nextcloud-client | `home/common/apps.nix` |
 
 ### 字体配置

@@ -1,6 +1,6 @@
 # NixOS Configuration
 
-**Version: v0.0.2**
+**Version: v0.0.3**
 
 A modern NixOS 26.05 configuration repository using Nix Flakes + Home Manager to manage system and user environments across multiple machines.
 
@@ -25,6 +25,9 @@ A modern NixOS 26.05 configuration repository using Nix Flakes + Home Manager to
 - **Optimized Boot Configuration**: systemd-boot + Plymouth quiet boot with reduced logging
 - **Lix High-Performance Nix**: Uses Lix instead of native Nix for better performance
 - **Modular Audio Configuration**: Unified audio module (rtkit + PipeWire + PulseAudio compatibility)
+- **Spell Checker Support**: System-level nuspell engine with English dictionary support
+- **Chinese Mirror Acceleration**: Pre-configured with USTC, Tsinghua, BFSU mirrors for faster binary downloads
+- **Wallpaper Repository**: Full wallpaper collection available at `https://github.com/hl4w/wallpaper.git`
 
 ## Quick Start
 

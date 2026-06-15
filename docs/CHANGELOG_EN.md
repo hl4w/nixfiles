@@ -4,6 +4,36 @@ All significant project changes will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [v0.0.3] - 2026-06-15
+
+### Added
+
+- **Enhanced CLI Toolset**: Added more modern command-line tools
+  - `yazi` - Fast terminal file manager (written in Rust)
+  - `dust` - Disk usage analysis tool
+  - `duf` - Disk space viewer
+  - `tokei` - Code statistics tool
+  - `hyperfine` - Command performance testing tool
+  - `procs` - Enhanced ps command
+  - `zoxide` - Smart directory navigation tool
+- **Yazi Configuration Integration**: Configured Yazi file manager in `home/common/cli.nix` with zoxide integration
+- **Zoxide Navigation**: Enabled Zoxide smart directory jumping in `home/common/cli.nix`
+- **Wallpaper Repository**: Added full wallpaper collection download URL `https://github.com/hl4w/wallpaper.git` to `wallpapers/README.md`
+- **Project Version Update**: Updated version number to v0.0.3 across all documentation files
+
+### Changed
+
+- **CLI Tools Modularization**: Separated CLI tools from `apps.nix` into a dedicated `home/common/cli.nix` module for clearer structure
+- **shell.nix Streamlined**: Removed duplicate configurations with CLI module to maintain separation of concerns
+- **Documentation Updates**: Updated README, architecture docs, FAQ, and migration guide to reflect the latest project status
+- **Wallpaper README Updated**: Updated file list in `wallpapers/README.md` to only include actual existing `default.jpg`
+
+### Fixed
+
+- **Fixed Lix Configuration**: Corrected Lix reference in `modules/system/default.nix`, using `pkgs.lix` instead of `pkgs.lixPackageSets.stable.lix`
+- **Fixed Directory Structure Documentation**: Updated directory tree in architecture documentation to match actual file structure
+- **Fixed Wallpaper README**: Corrected default wallpaper filename from `default.png` to `default.jpg`
+
 ## [v0.0.2] - 2026-06-14
 
 ### Added

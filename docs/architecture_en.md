@@ -1,8 +1,10 @@
 # Architecture
 
+**Version: v0.0.3**
+
 ## Overview
 
-This NixOS configuration follows a modular, host-specific structure that allows managing multiple machines from a single repository. Based on NixOS 26.05 with Hyprland/Niri window managers.
+This NixOS configuration follows a modular, host-specific structure that allows managing multiple machines from a single repository. Based on NixOS 26.05 with Hyprland/Niri window managers, using Lix as the high-performance Nix implementation.
 
 ## Directory Structure
 
@@ -146,7 +148,7 @@ This NixOS configuration follows a modular, host-specific structure that allows 
 | `shell.nix` | Zsh + Starship prompt (with pywal dynamic coloring) |
 | `editor.nix` | Neovim, Emacs (with LSP servers configured: nil_ls, clangd, gopls, pyright, rust_analyzer) |
 | `input.nix` | Fcitx5 + RIME (oh-my-rime configuration) |
-| `cli.nix` | eza, bat, fd, rg, fzf, yazi (zoxide integration), fastfetch, btop, vlc |
+| `cli.nix` | CLI tools: eza, bat, fd, rg, fzf, yazi (file manager), zoxide (smart navigation), fastfetch, btop, dust, duf, tokei, hyperfine, procs |
 | `apps.nix` | GUI applications (browser, office, media) |
 | `dev-lsp.nix` | Development tools and LSP servers (C/C++: clangd/clang-tools/cmake/ninja/gdb/lldb; Go: go/gopls; Python: python3/pyright; Rust: rustc/rust-analyzer/rustfmt/cargo) |
 | `git.nix` | Git global configuration |
@@ -336,10 +338,10 @@ This configuration only supports Wayland/Xwayland, not pure X11:
 
 | Level | Packages | Location |
 |-------|----------|----------|
-| System | git, wget, curl, nil | `modules/system/default.nix` |
-| User | fastfetch, btop, eza, bat, fzf, fd, ripgrep, yazi, vlc | `home/common/cli.nix` |
-| Desktop | rofi, nemo, nemo-extensions, evince, eog, alacritty/kitty/foot (foot default), pywal | `home/common/apps.nix` |
-| Development | clangd, clang-tools, cmake, ninja, gdb, lldb | `home/common/dev-lsp.nix` |
+| System | git, wget, curl, nil, tmux, zsh, tree, highlight, nixpkgs-fmt | `modules/system/default.nix` |
+| User | fastfetch, btop, eza, bat, fzf, fd, ripgrep, yazi, zoxide, dust, duf, tokei, hyperfine, procs | `home/common/cli.nix` |
+| Desktop | rofi, nemo, nemo-extensions, evince, eog, alacritty/kitty/foot (foot default), pywal, vlc | `home/common/apps.nix` |
+| Development | clangd, clang-tools, cmake, ninja, gdb, lldb, go, gopls, python3, pyright, rustc, rust-analyzer, rustfmt, cargo | `home/common/dev-lsp.nix` |
 | Office | wps-office-cn, nextcloud-client | `home/common/apps.nix` |
 
 ### Font Configuration

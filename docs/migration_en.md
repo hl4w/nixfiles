@@ -162,11 +162,32 @@ Packages are now classified by level:
 
 | Level | Packages | Location |
 |-------|----------|----------|
-| System | git, wget, curl, nil | `modules/system/default.nix` |
-| User | fastfetch, btop, eza, bat, fzf, fd, ripgrep, yazi, vlc | `home/common/cli.nix` |
-| Desktop | rofi, nemo, nemo-extensions, evince, eog, alacritty/kitty/foot (foot default), pywal | `home/common/apps.nix` |
-| Development | clangd, clang-tools, cmake, ninja, gdb, lldb | `home/common/dev-lsp.nix` |
+| System | git, wget, curl, nil, tmux, zsh, tree, highlight, nixpkgs-fmt | `modules/system/default.nix` |
+| User | fastfetch, btop, eza, bat, fzf, fd, ripgrep, yazi, zoxide, dust, duf, tokei, hyperfine, procs | `home/common/cli.nix` |
+| Desktop | rofi, nemo, nemo-extensions, evince, eog, alacritty/kitty/foot (foot default), pywal, vlc | `home/common/apps.nix` |
+| Development | clangd, clang-tools, cmake, ninja, gdb, lldb, go, gopls, python3, pyright, rustc, rust-analyzer, rustfmt, cargo | `home/common/dev-lsp.nix` |
 | Office | wps-office-cn, nextcloud-client | `home/common/apps.nix` |
+
+### CLI Tools Migration
+
+If you were using custom CLI tool configurations, migrate to the new `home/common/cli.nix` module:
+
+1. **New Tools**: Yazi, Zoxide, dust, duf, tokei, hyperfine, procs are now included by default
+2. **Configuration Location**: CLI tools are now managed in `home/common/cli.nix`
+3. **Zoxide Integration**: Auto-configured for smart directory navigation
+4. **Yazi Integration**: Zoxide support enabled, use `z` command after pressing `Ctrl+G` to open shell
+
+### Lix Migration
+
+If you were using native Nix, this configuration has migrated to Lix:
+
+1. **Configuration Location**: `modules/system/default.nix`
+2. **Auto-override**: Uses overlay to ensure Nix-dependent tools also use Lix
+3. **Verification**:
+```bash
+nix --version
+# Output: nix (Lix, like Nix) 2.x.x
+```
 
 ## Display Changes
 

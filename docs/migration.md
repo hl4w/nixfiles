@@ -162,11 +162,32 @@ kdePackages.polkit-kde-agent-1
 
 | 级别 | 包 | 位置 |
 |------|------|------|
-| 系统 | git, wget, curl, nil | `modules/system/default.nix` |
-| 用户 | fastfetch, btop, eza, bat, fzf, fd, ripgrep, yazi, vlc | `home/common/cli.nix` |
-| 桌面 | rofi, nemo, nemo-extensions, evince, eog, alacritty/kitty/foot（默认 foot）, pywal | `home/common/apps.nix` |
-| 开发 | clangd, clang-tools, cmake, ninja, gdb, lldb | `home/common/dev-lsp.nix` |
+| 系统 | git, wget, curl, nil, tmux, zsh, tree, highlight, nixpkgs-fmt | `modules/system/default.nix` |
+| 用户 | fastfetch, btop, eza, bat, fzf, fd, ripgrep, yazi, zoxide, dust, duf, tokei, hyperfine, procs | `home/common/cli.nix` |
+| 桌面 | rofi, nemo, nemo-extensions, evince, eog, alacritty/kitty/foot（默认 foot）, pywal, vlc | `home/common/apps.nix` |
+| 开发 | clangd, clang-tools, cmake, ninja, gdb, lldb, go, gopls, python3, pyright, rustc, rust-analyzer, rustfmt, cargo | `home/common/dev-lsp.nix` |
 | 办公 | wps-office-cn, nextcloud-client | `home/common/apps.nix` |
+
+### CLI 工具迁移
+
+如果您之前使用自定义 CLI 工具配置，请迁移到新的 `home/common/cli.nix` 模块：
+
+1. **新增工具**: Yazi、Zoxide、dust、duf、tokei、hyperfine、procs 已默认包含
+2. **配置位置**: CLI 工具现在统一在 `home/common/cli.nix` 中管理
+3. **Zoxide 集成**: 已自动配置，支持智能目录导航
+4. **Yazi 集成**: 已配置 Zoxide 支持，按 `Ctrl+G` 打开 shell 后可用 `z` 命令跳转
+
+### Lix 迁移
+
+如果您之前使用原生 Nix，本配置已迁移到 Lix：
+
+1. **配置位置**: `modules/system/default.nix`
+2. **自动覆盖**: 使用 overlay 确保依赖 Nix 的工具也使用 Lix
+3. **验证**:
+```bash
+nix --version
+# 输出: nix (Lix, like Nix) 2.x.x
+```
 
 ## 显示变更
 

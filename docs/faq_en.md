@@ -66,11 +66,59 @@ Edit `home/common/shell.nix` for shared shell configuration or create host-speci
 
 | Package Type | Location | Example |
 |--------------|----------|---------|
-| System packages | `modules/system/default.nix` | git, wget, curl |
-| User packages | `home/common/cli.nix` | fastfetch, btop, eza, bat, fzf |
-| Desktop packages | `home/common/apps.nix` | rofi, nemo, nemo-extensions, evince, eog, alacritty/kitty/foot (foot default) |
-| Development packages | `home/common/dev-lsp.nix` | clangd, clang-tools, cmake |
+| System packages | `modules/system/default.nix` | git, wget, curl, tmux, zsh |
+| User packages | `home/common/cli.nix` | fastfetch, btop, eza, bat, fzf, fd, ripgrep, yazi, zoxide, dust, duf, tokei, hyperfine, procs |
+| Desktop packages | `home/common/apps.nix` | rofi, nemo, nemo-extensions, evince, eog, alacritty/kitty/foot (foot default), vlc |
+| Development packages | `home/common/dev-lsp.nix` | clangd, clang-tools, cmake, ninja, gdb, lldb, go, gopls, python3, pyright, rustc, rust-analyzer, rustfmt, cargo |
 | Office packages | `home/common/apps.nix` | wps-office-cn, nextcloud-client |
+
+### How do I use Yazi file manager?
+
+Yazi is a fast terminal file manager configured in `home/common/cli.nix`:
+
+```bash
+# Launch Yazi
+yazi
+
+# Basic operations
+# Arrow keys / hjkl: Navigate
+# Enter: Open file/directory
+# q: Quit
+# : Open command panel
+# Ctrl+G: Open shell (supports zoxide jump)
+```
+
+### How do I use Zoxide smart navigation?
+
+Zoxide is configured in `home/common/cli.nix`:
+
+```bash
+# Jump to directory containing keyword
+z <keyword>
+
+# Interactive selection
+zi
+
+# Jump to previous directory
+z -
+
+# Add directory to database
+z ~/projects/my-project
+```
+
+### What is Lix?
+
+Lix is a high-performance alternative implementation of the Nix package manager:
+
+- **Advantages**: Faster than native Nix (especially for eval and fetch operations)
+- **Compatibility**: Fully compatible with all Nix features (flakes, nix-command, etc.)
+- **Performance**: Rewritten in C++ for better performance
+
+Verify installation:
+```bash
+nix --version
+# Output: nix (Lix, like Nix) 2.x.x
+```
 
 ### How do I configure Hyprland?
 

@@ -1,6 +1,6 @@
 # NixOS Configuration
 
-**Version: v0.0.2**
+**Version: v0.0.3**
 
 基于 NixOS 26.05 的现代化配置仓库，使用 Nix Flakes + Home Manager 管理多台机器的系统与用户环境。
 
@@ -25,6 +25,9 @@
 - **优化启动配置**: systemd-boot + Plymouth 静默启动，减少启动日志输出
 - **Lix 高性能 Nix**: 使用 Lix 替代原生 Nix，性能更优
 - **模块化音频配置**: 统一的音频模块（rtkit + PipeWire + PulseAudio 兼容性）
+- **拼写检查支持**: 系统级安装 nuspell 引擎，支持英语拼写检查
+- **中国镜像加速**: 默认配置中科大、清华、北外镜像，加速二进制包下载
+- **壁纸仓库**: 提供完整壁纸集合下载地址 `https://github.com/hl4w/wallpaper.git`
 
 ## 快速开始
 
