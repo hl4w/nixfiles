@@ -129,7 +129,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 info "=========================================="
-info "       NixOS Configuration Installer"
+info "       HL4W NixOS Configuration Installer"
 info "=========================================="
 echo
 
@@ -320,19 +320,35 @@ fi
 echo "  GPU 类型：     ${GPU_TYPE}"
 echo "------------------------------------------"
 
-info "更新 flake.nix 用户名..."
+# =============================================
+# 配置 flake.nix
+# =============================================
+info "配置 flake.nix..."
+info "更新用户名..."
 sed -i.bak "s/USERNAME = \"youruser\"/USERNAME = \"$USERNAME\"/g" flake.nix
 rm -f flake.nix.bak
 
+# =============================================
+# 创建主机配置目录
+# =============================================
 info "检查主机是否已存在..."
 if [ -d "hosts/$HOSTNAME" ]; then
     warn "主机 $HOSTNAME 已存在，将更新配置"
+    if confirm "是否覆盖现有配置？"; then
+        info "备份现有配置..."
+        mv "hosts/$HOSTNAME" "hosts/${HOSTNAME}_backup_$(date +%Y%m%d_%H%M%S)"
+    else
+        error "用户取消覆盖配置"
+    fi
 fi
 
 info "创建主机配置目录..."
 mkdir -p "hosts/$HOSTNAME"
 
-info "配置主机 configuration.nix..."
+# =============================================
+# 生成主机 configuration.nix
+# =============================================
+info "生成主机 configuration.nix..."
 cat > "hosts/$HOSTNAME/configuration.nix" << EOF
 { pkgs, ... }:
 
@@ -404,8 +420,17 @@ fi
 
 echo "}" >> "hosts/$HOSTNAME/configuration.nix"
 
+# =============================================
+# 创建用户 Home Manager 配置
+# =============================================
 info "创建用户 Home Manager 配置..."
 mkdir -p "home/hosts"
+
+# 检查是否已存在主机用户配置
+if [ -f "home/hosts/$HOSTNAME.nix" ]; then
+    warn "用户配置 $HOSTNAME.nix 已存在，将更新"
+fi
+
 cat > "home/hosts/$HOSTNAME.nix" << EOF
 { pkgs, config, inputs, ... }:
 
@@ -418,13 +443,16 @@ if [ "$HOST_TYPE_NAME" != "server" ]; then
     echo "    ../common/input.nix" >> "home/hosts/$HOSTNAME.nix"
     echo "    ../common/apps.nix" >> "home/hosts/$HOSTNAME.nix"
 fi
+
 # 导入主机类型特定的用户级配置
 echo "    ./$HOST_TYPE_NAME/default.nix" >> "home/hosts/$HOSTNAME.nix"
 
 echo "  ];" >> "home/hosts/$HOSTNAME.nix"
-
 echo "}" >> "home/hosts/$HOSTNAME.nix"
 
+# =============================================
+# 更新用户相关配置
+# =============================================
 info "更新 Git 配置..."
 sed -i.bak "s/Your Name/$GIT_USERNAME/g" home/common/git.nix
 sed -i.bak "s/your.email@example.com/$GIT_EMAIL/g" home/common/git.nix
@@ -434,19 +462,39 @@ info "更新 hosts/common/default.nix 用户配置..."
 sed -i.bak "s/youruser/$USERNAME/g" hosts/common/default.nix
 rm -f hosts/common/default.nix.bak
 
-info "更新 flake.nix 添加新主机..."
-if ! grep -q "$FLAKE_NAME = mkHost" flake.nix; then
-    sed -i.bak "/nixosConfigurations = {/a \\      $FLAKE_NAME = mkHost \"$HOSTNAME\";\\\n" flake.nix
-fi
-rm -f flake.nix.bak
-
-info "更新 virtualisation 模块..."
+info "更新 modules/services/virtualisation.nix..."
 sed -i.bak "s/youruser/$USERNAME/g" modules/services/virtualisation.nix
 rm -f modules/services/virtualisation.nix.bak
 
+# =============================================
+# 配置 flake.nix 主机输出
+# =============================================
+info "配置 flake.nix 添加新主机..."
+
+# 先检查是否已存在该主机配置
+if grep -q "    $FLAKE_NAME = mkHost" flake.nix; then
+    warn "主机 $FLAKE_NAME 已存在于 flake.nix 中"
+    if confirm "是否更新现有配置？"; then
+        # 删除旧配置并重新添加
+        sed -i.bak "/    $FLAKE_NAME = mkHost/d" flake.nix
+        sed -i.bak "/nixosConfigurations = {/a \\      $FLAKE_NAME = mkHost \"$HOSTNAME\";\\\n" flake.nix
+        rm -f flake.nix.bak
+    fi
+else
+    # 添加新主机配置
+    sed -i.bak "/nixosConfigurations = {/a \\      $FLAKE_NAME = mkHost \"$HOSTNAME\";\\\n" flake.nix
+    rm -f flake.nix.bak
+fi
+
+# =============================================
+# 生成 flake.lock
+# =============================================
 info "生成 flake.lock..."
 nix flake lock
 
+# =============================================
+# 生成硬件配置
+# =============================================
 echo
 if confirm "是否立即生成硬件配置？(需要 sudo 权限)"; then
     info "生成硬件配置..."
@@ -470,28 +518,71 @@ else
     info "  sudo nixos-generate-config --show-hardware-config > hosts/$HOSTNAME/hardware-configuration.nix"
 fi
 
+# =============================================
+# 验证配置
+# =============================================
+echo
+if confirm "是否验证配置是否正确？"; then
+    info "验证 flake 配置..."
+    if nix flake check; then
+        info "✅ flake 配置验证通过"
+    else
+        warn "❌ flake 配置验证失败，请检查错误信息"
+    fi
+fi
+
+# =============================================
+# 完成信息
+# =============================================
 echo
 info "=========================================="
 info "         配置完成!"
 info "=========================================="
 echo
-info "下一步操作:"
+info "项目已配置完成，可以使用以下命令更新系统:"
 echo "------------------------------------------"
-echo "1. 生成硬件配置（如未自动生成）:"
-echo "   sudo nixos-generate-config --show-hardware-config > hosts/$HOSTNAME/hardware-configuration.nix"
 echo ""
-echo "2. 编辑 hardware-configuration.nix，更新磁盘 UUID"
-echo "   vim hosts/$HOSTNAME/hardware-configuration.nix"
-echo "   - 确保根分区 device 指向正确的磁盘/分区"
-echo "   - 检查 boot 分区挂载点"
-echo "   - 确认 swap 配置正确"
+echo "📦 系统更新命令:"
+echo "------------------------------------------"
+echo "# 修改 modules/ 目录后更新系统:"
+echo "  sudo nixos-rebuild switch --flake .#$FLAKE_NAME"
 echo ""
-echo "3. 构建配置:"
-echo "   nix build .#$FLAKE_NAME"
+echo "# 修改 home/ 目录后更新用户配置:"
+echo "  home-manager switch --flake .#$USERNAME@$FLAKE_NAME"
 echo ""
-echo "4. 部署系统:"
+echo "# 更新 flake 依赖（升级 nixpkgs 等）:"
+echo "  nix flake update"
+echo ""
+echo "# 一键更新脚本（推荐）:"
+echo "  ./scripts/update.sh"
+echo ""
+echo "🔧 验证命令:"
+echo "------------------------------------------"
+echo "# 检查配置语法:"
+echo "  nix flake check"
+echo ""
+echo "# 测试构建（不部署）:"
+echo "  nix build .#$FLAKE_NAME"
+echo ""
+echo "# 回滚到上一代:"
+echo "  sudo nixos-rebuild switch --rollback"
+echo ""
+echo "📝 后续步骤:"
+echo "------------------------------------------"
+echo "1. 确保硬件配置已生成:"
+echo "   hosts/$HOSTNAME/hardware-configuration.nix"
+echo ""
+echo "2. 编辑 hardware-configuration.nix，确认:"
+echo "   - 根分区 device 指向正确的磁盘/分区"
+echo "   - boot 分区挂载点正确"
+echo "   - swap 配置正确"
+echo ""
+echo "3. 在 NixOS 安装介质中部署系统:"
 echo "   sudo nixos-rebuild switch --flake .#$FLAKE_NAME"
 echo ""
-echo "5. 更新 Home Manager:"
+echo "4. 部署后更新 Home Manager:"
 echo "   home-manager switch --flake .#$USERNAME@$FLAKE_NAME"
 echo "------------------------------------------"
+echo
+info "提示: 安装完成后，您可以随时修改 modules/ 或 home/ 目录中的文件,"
+info "然后运行 'sudo nixos-rebuild switch --flake .#$FLAKE_NAME' 来应用更改!"
