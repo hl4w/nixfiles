@@ -4,6 +4,25 @@
 
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。
 
+## [v0.0.4] - 2026-06-15
+
+### Added
+
+- **脚本标准化**: 统一所有 shell 脚本的结构和风格
+  - 添加一致的颜色变量 (RED, GREEN, YELLOW, NC)
+  - 标准化日志函数 (`info()`, `warn()`, `error()`)
+  - 添加 `confirm()` 函数支持非交互式模式
+  - 添加 `usage()` 函数显示帮助信息
+  - 为所有脚本添加 HL4W 品牌标识
+- **update.sh 增强**: 添加主机名参数支持，可指定目标主机进行构建
+- **setup-direnv.sh 增强**: 添加自动 Shell 类型检测，支持 bash/zsh/fish
+- **脚本中英文同步**: 确保所有中英文脚本版本功能完全一致
+
+### Changed
+
+- **install.sh/install_en.sh 同步**: 更新英文版本以匹配中文版本的所有改进（主机备份、flake 验证、更新命令说明）
+- **clean.sh/clean_en.sh 优化**: 更新 confirm 函数支持非交互式模式
+
 ## [v0.0.3] - 2026-06-15
 
 ### Added

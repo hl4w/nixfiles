@@ -4,6 +4,25 @@ All significant project changes will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [v0.0.4] - 2026-06-15
+
+### Added
+
+- **Script Standardization**: Unified structure and style across all shell scripts
+  - Added consistent color variables (RED, GREEN, YELLOW, NC)
+  - Standardized logging functions (`info()`, `warn()`, `error()`)
+  - Added `confirm()` function with non-interactive mode support
+  - Added `usage()` function for displaying help information
+  - Added HL4W branding to all scripts
+- **update.sh Enhancement**: Added hostname parameter support for specifying target host for build
+- **setup-direnv.sh Enhancement**: Added automatic Shell type detection, supporting bash/zsh/fish
+- **Script Synchronization**: Ensured all Chinese and English script versions have identical functionality
+
+### Changed
+
+- **install.sh/install_en.sh Synchronization**: Updated English version to match all improvements from Chinese version (host backup, flake validation, update command documentation)
+- **clean.sh/clean_en.sh Optimization**: Updated confirm function with non-interactive mode support
+
 ## [v0.0.3] - 2026-06-15
 
 ### Added
