@@ -172,10 +172,31 @@ kdePackages.polkit-kde-agent-1
 
 如果您之前使用自定义 CLI 工具配置，请迁移到新的 `home/common/cli.nix` 模块：
 
-1. **新增工具**: Yazi、Zoxide、dust、duf、tokei、hyperfine、procs 已默认包含
+1. **新增工具**: Yazi、Zoxide、dust、duf、tokei、hyperfine、procs、starship 已默认包含
 2. **配置位置**: CLI 工具现在统一在 `home/common/cli.nix` 中管理
-3. **Zoxide 集成**: 已自动配置，支持智能目录导航
+3. **Zoxide 集成**: 已自动配置，支持智能目录导航（`z` 命令跳转）
 4. **Yazi 集成**: 已配置 Zoxide 支持，按 `Ctrl+G` 打开 shell 后可用 `z` 命令跳转
+5. **FZF 集成**: 已在 `home/common/cli.nix` 中配置，支持 Zsh 集成
+
+**CLI 工具说明**:
+
+| 工具 | 功能 | 替代 |
+|------|------|------|
+| `eza` | 增强版 ls | `ls` |
+| `bat` | 增强版 cat（语法高亮） | `cat` |
+| `fd` | 快速文件查找 | `find` |
+| `rg` (ripgrep) | 快速文本搜索 | `grep` |
+| `fzf` | 模糊搜索 | - |
+| `yazi` | 终端文件管理器 | `ranger`, `nnn` |
+| `zoxide` | 智能目录导航 | `cd` |
+| `fastfetch` | 系统信息展示 | `neofetch` |
+| `btop` | 系统资源监控 | `htop` |
+| `dust` | 磁盘使用分析 | `du` |
+| `duf` | 磁盘空间查看 | `df` |
+| `tokei` | 代码统计 | `cloc` |
+| `hyperfine` | 命令性能测试 | - |
+| `procs` | 增强版进程查看 | `ps` |
+| `starship` | 跨 Shell 提示符 | - |
 
 ### Lix 迁移
 

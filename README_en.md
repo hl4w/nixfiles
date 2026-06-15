@@ -21,7 +21,7 @@ A modern NixOS 26.05 configuration repository using Nix Flakes + Home Manager to
 - **Flexible Desktop Configuration**: Dynamic window manager (Hyprland/Niri) and desktop shell (DMS/Noctalia) selection [(Architecture)](docs/architecture.md)
 - **Multi-language Development Support**: Complete development environment for Go, Python, Rust, and C/C++ with LSP support [(Architecture)](docs/architecture.md)
 - **NixOS 26.05 Compatibility**: Uses kdePackages for KDE package version compatibility, hardware.graphics (NixOS 24.11+) replaces hardware.opengl
-- **Modern System Tools**: btop (system monitoring), fastfetch (system info display), yazi (file management) replacing traditional tools
+- **Modern CLI Toolset**: eza, bat, fd, rg, fzf, yazi (terminal file manager), zoxide (smart navigation), fastfetch, btop, dust, duf, tokei, hyperfine, procs replacing traditional tools
 - **Optimized Boot Configuration**: systemd-boot + Plymouth quiet boot with reduced logging
 - **Lix High-Performance Nix**: Uses Lix instead of native Nix for better performance
 - **Modular Audio Configuration**: Unified audio module (rtkit + PipeWire + PulseAudio compatibility)

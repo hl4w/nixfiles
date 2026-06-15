@@ -159,7 +159,7 @@
 | 输入 | URL | 说明 |
 |------|-----|------|
 | `nixpkgs` | `github:NixOS/nixpkgs/nixos-26.05` | NixOS 26.05 稳定版 |
-| `home-manager` | `github:nix-community/home-manager/release-26.05` | Home Manager，与 nixpkgs 版本同步 |
+| `home-manager` | `github:nix-community/home-manager/release-26.05` | Home Manager 与 nixpkgs 版本同步 |
 | `hyprnix` | `github:hyprwm/hyprnix/main` | Hyprland 工具链，用于管理 Hyprland 配置 |
 
 ### 全局配置 (nixConfig)

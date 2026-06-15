@@ -21,7 +21,7 @@
 - **灵活桌面配置**: 支持动态选择窗口管理器（Hyprland/Niri）、桌面 Shell（DMS/Noctalia）和 polkit 代理（KDE/Hyprland）组合 [(架构文档)](docs/architecture.md)
 - **多语言开发支持**: Go、Python、Rust、C/C++ 完整开发环境，包含 LSP 支持 [(架构文档)](docs/architecture.md)
 - **NixOS 26.05 兼容**: 使用 kdePackages 确保 KDE 包版本兼容性，hardware.graphics (NixOS 24.11+) 替代 hardware.opengl
-- **现代化系统工具**: btop（系统监控）、fastfetch（系统信息展示）、yazi（文件管理）替代传统工具
+- **现代化 CLI 工具集**: eza、bat、fd、rg、fzf、yazi（终端文件管理器）、zoxide（智能导航）、fastfetch、btop、dust、duf、tokei、hyperfine、procs 替代传统工具
 - **优化启动配置**: systemd-boot + Plymouth 静默启动，减少启动日志输出
 - **Lix 高性能 Nix**: 使用 Lix 替代原生 Nix，性能更优
 - **模块化音频配置**: 统一的音频模块（rtkit + PipeWire + PulseAudio 兼容性）

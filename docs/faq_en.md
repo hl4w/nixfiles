@@ -110,14 +110,89 @@ z ~/projects/my-project
 
 Lix is a high-performance alternative implementation of the Nix package manager:
 
-- **Advantages**: Faster than native Nix (especially for eval and fetch operations)
-- **Compatibility**: Fully compatible with all Nix features (flakes, nix-command, etc.)
-- **Performance**: Rewritten in C++ for better performance
+- **Advantages**: Faster than native Nix (performance improvement up to 2-3x for eval and fetch operations)
+- **Compatibility**: Fully compatible with all Nix features (flakes, nix-command, nix-shell, etc.)
+- **Performance**: Rewritten in C++ with better memory efficiency
+- **Configuration**: Auto-configured via overlay in `modules/system/default.nix`
 
 Verify installation:
 ```bash
 nix --version
 # Output: nix (Lix, like Nix) 2.x.x
+```
+
+### How do I use dust for disk usage analysis?
+
+```bash
+# Check current directory disk usage
+dust
+
+# Check specific directory
+dust ~/projects
+
+# Show file sizes
+dust -s
+
+# Sort by size
+dust -X
+```
+
+### How do I use duf to view disk space?
+
+```bash
+# View all disks
+duf
+
+# View specific device
+duf /dev/nvme0n1p2
+
+# JSON output
+duf --json
+```
+
+### How do I use tokei for code statistics?
+
+```bash
+# Count code in current directory
+tokei
+
+# Exclude directories
+tokei --exclude "node_modules"
+
+# JSON output
+tokei --json
+
+# Only count specific languages
+tokei --types Rust,Go,Python
+```
+
+### How do I use hyperfine for command performance testing?
+
+```bash
+# Compare two commands
+hyperfine "ls -la" "eza -la"
+
+# Multiple runs
+hyperfine --runs 10 "my-command"
+
+# Warmup runs
+hyperfine --warmup 3 "my-command"
+```
+
+### How do I use procs to view processes?
+
+```bash
+# View all processes
+procs
+
+# Search for process
+procs firefox
+
+# Tree view
+procs --tree
+
+# Detailed information
+procs -l
 ```
 
 ### How do I configure Hyprland?

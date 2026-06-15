@@ -110,14 +110,89 @@ z ~/projects/my-project
 
 Lix 是 Nix 包管理器的高性能替代实现：
 
-- **优势**: 比原生 Nix 更快（特别是 eval 和 fetch 操作）
-- **兼容性**: 完全兼容 Nix 所有功能（flakes、nix-command 等）
-- **性能**: 使用 C++ 重写，性能更优
+- **优势**: 比原生 Nix 更快（特别是 eval 和 fetch 操作，性能提升可达 2-3 倍）
+- **兼容性**: 完全兼容 Nix 所有功能（flakes、nix-command、nix-shell 等）
+- **性能**: 使用 C++ 重写，内存效率更高
+- **配置**: 在 `modules/system/default.nix` 中通过 overlay 自动配置
 
 验证安装：
 ```bash
 nix --version
 # 输出: nix (Lix, like Nix) 2.x.x
+```
+
+### 如何使用 dust 分析磁盘使用？
+
+```bash
+# 查看当前目录磁盘使用
+dust
+
+# 查看指定目录
+dust ~/projects
+
+# 显示文件大小
+dust -s
+
+# 按大小排序
+dust -X
+```
+
+### 如何使用 duf 查看磁盘空间？
+
+```bash
+# 查看所有磁盘
+duf
+
+# 查看指定设备
+duf /dev/nvme0n1p2
+
+# JSON 输出
+duf --json
+```
+
+### 如何使用 tokei 统计代码？
+
+```bash
+# 统计当前目录代码
+tokei
+
+# 排除目录
+tokei --exclude "node_modules"
+
+# 输出 JSON 格式
+tokei --json
+
+# 只统计特定语言
+tokei --types Rust,Go,Python
+```
+
+### 如何使用 hyperfine 测试命令性能？
+
+```bash
+# 比较两个命令
+hyperfine "ls -la" "eza -la"
+
+# 多次运行
+hyperfine --runs 10 "my-command"
+
+# 预热运行
+hyperfine --warmup 3 "my-command"
+```
+
+### 如何使用 procs 查看进程？
+
+```bash
+# 查看所有进程
+procs
+
+# 搜索进程
+procs firefox
+
+# 树形视图
+procs --tree
+
+# 详细信息
+procs -l
 ```
 
 ### 如何配置 Hyprland？

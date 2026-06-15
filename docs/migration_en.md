@@ -172,10 +172,31 @@ Packages are now classified by level:
 
 If you were using custom CLI tool configurations, migrate to the new `home/common/cli.nix` module:
 
-1. **New Tools**: Yazi, Zoxide, dust, duf, tokei, hyperfine, procs are now included by default
+1. **New Tools**: Yazi, Zoxide, dust, duf, tokei, hyperfine, procs, starship are now included by default
 2. **Configuration Location**: CLI tools are now managed in `home/common/cli.nix`
-3. **Zoxide Integration**: Auto-configured for smart directory navigation
+3. **Zoxide Integration**: Auto-configured for smart directory navigation (`z` command)
 4. **Yazi Integration**: Zoxide support enabled, use `z` command after pressing `Ctrl+G` to open shell
+5. **FZF Integration**: Configured in `home/common/cli.nix` with Zsh integration
+
+**CLI Tools Overview**:
+
+| Tool | Description | Replacement For |
+|------|-------------|-----------------|
+| `eza` | Enhanced ls | `ls` |
+| `bat` | Enhanced cat (syntax highlighting) | `cat` |
+| `fd` | Fast file finder | `find` |
+| `rg` (ripgrep) | Fast text search | `grep` |
+| `fzf` | Fuzzy search | - |
+| `yazi` | Terminal file manager | `ranger`, `nnn` |
+| `zoxide` | Smart directory navigation | `cd` |
+| `fastfetch` | System info display | `neofetch` |
+| `btop` | System resource monitor | `htop` |
+| `dust` | Disk usage analysis | `du` |
+| `duf` | Disk space viewer | `df` |
+| `tokei` | Code statistics | `cloc` |
+| `hyperfine` | Command performance testing | - |
+| `procs` | Enhanced process viewer | `ps` |
+| `starship` | Cross-shell prompt | - |
 
 ### Lix Migration
 
