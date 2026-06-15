@@ -1,8 +1,8 @@
 # NixOS Configuration
 
-**Version: v0.0.3**
+**Version: v0.0.4**
 
-**HL4W** - 基于 NixOS 26.05 的现代化配置仓库，使用 Nix Flakes + Home Manager 管理多台机器的系统与用户环境。
+**HL4W (Hack Linux for Workflow)** - 基于 NixOS 26.05 的现代化配置仓库，为 Hyprland 和 Niri 提供深度优化的桌面套件，原生兼容 Noctalia 和 DMS Shell。使用 Nix Flakes + Home Manager 统一管理多台设备的系统与用户环境。
 
 ## 特性
 
