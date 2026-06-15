@@ -2,7 +2,7 @@
 
 **Version: v0.0.3**
 
-基于 NixOS 26.05 的现代化配置仓库，使用 Nix Flakes + Home Manager 管理多台机器的系统与用户环境。
+**HL4W** - 基于 NixOS 26.05 的现代化配置仓库，使用 Nix Flakes + Home Manager 管理多台机器的系统与用户环境。
 
 ## 特性
 

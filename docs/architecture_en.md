@@ -1,10 +1,10 @@
-# Architecture
+# HL4W Architecture
 
 **Version: v0.0.3**
 
 ## Overview
 
-This NixOS configuration follows a modular, host-specific structure that allows managing multiple machines from a single repository. Based on NixOS 26.05 with Hyprland/Niri window managers, using Lix as the high-performance Nix implementation.
+HL4W NixOS configuration follows a modular, host-specific structure that allows managing multiple machines from a single repository. Based on NixOS 26.05 with Hyprland/Niri window managers, using Lix as the high-performance Nix implementation.
 
 ## Directory Structure
 

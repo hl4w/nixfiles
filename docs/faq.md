@@ -1,10 +1,10 @@
-# FAQ
+# HL4W FAQ
 
 ## 通用
 
 ### 这是什么配置？
 
-这是一个 NixOS 26.05 配置仓库，使用 Nix Flakes 和 Home Manager 在多台机器上管理系统和用户配置。它支持 Hyprland 和 Niri 窗口管理器，仅使用 Wayland 显示。
+HL4W 是一个 NixOS 26.05 配置仓库，使用 Nix Flakes 和 Home Manager 在多台机器上管理系统和用户配置。它支持 Hyprland 和 Niri 窗口管理器，仅使用 Wayland 显示。
 
 ### 为什么使用 Flakes？
 

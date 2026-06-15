@@ -1,4 +1,4 @@
-# Changelog
+# HL4W Changelog
 
 All significant project changes will be documented in this file.
 

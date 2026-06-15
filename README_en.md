@@ -2,7 +2,7 @@
 
 **Version: v0.0.3**
 
-A modern NixOS 26.05 configuration repository using Nix Flakes + Home Manager to manage system and user environments across multiple machines.
+**HL4W** - Modern NixOS 26.05 configuration repository using Nix Flakes + Home Manager to manage system and user environments across multiple machines.
 
 ## Features
 

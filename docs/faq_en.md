@@ -1,10 +1,10 @@
-# FAQ
+# HL4W FAQ
 
 ## General
 
 ### What is this configuration?
 
-This is a NixOS 26.05 configuration repository that uses Nix Flakes and Home Manager to manage system and user configurations across multiple machines. It supports Hyprland and Niri window managers with Wayland-only display.
+HL4W is a NixOS 26.05 configuration repository that uses Nix Flakes and Home Manager to manage system and user configurations across multiple machines. It supports Hyprland and Niri window managers, using Wayland only.
 
 ### Why use Flakes?
 
