@@ -498,16 +498,46 @@ Secrets are managed using `agenix`. Encrypted files are stored in `secrets/` and
 
 ## Build Process
 
+### Initial Installation
+
 ```bash
-# Build configuration
-nix build .#host-name
-
-# Deploy to system
-sudo nixos-rebuild switch --flake .#host-name
-
-# Deploy user config only
-home-manager switch --flake .#user@host-name
-
-# Use installation script
+# Use installation script for initial installation
 ./scripts/install.sh
+```
+
+### System Updates
+
+After installation, if you modify any Nix modules, you can directly update the system using the following commands:
+
+```bash
+# Update system (use after modifying modules/ directory)
+sudo nixos-rebuild switch --flake .#<hostname>
+
+# Update Home Manager user configuration (use after modifying home/ directory)
+home-manager switch --flake .#<username>@<hostname>
+
+# Update flake inputs (upgrade dependency versions like nixpkgs)
+nix flake update
+
+# One-click update using script (includes flake update and system rebuild)
+./scripts/update.sh
+```
+
+### Verification and Rollback
+
+```bash
+# Check configuration syntax
+nix flake check
+
+# Test build (no deployment)
+nix build .#<hostname>
+
+# Preview changes
+nixos-rebuild dry-activate --flake .#<hostname>
+
+# Rollback to previous generation
+sudo nixos-rebuild switch --rollback
+
+# Clean old generations
+./scripts/clean.sh
 ```

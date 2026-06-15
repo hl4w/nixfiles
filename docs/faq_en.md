@@ -393,15 +393,66 @@ UEFI boot with systemd-boot is configured in `modules/boot/default.nix`:
 
 ### How do I update the system?
 
+After installation, if you modify any Nix modules, you can directly update the system using the following commands:
+
 ```bash
-# Update flake inputs
+# Update system (use after modifying modules/)
+sudo nixos-rebuild switch --flake .#<hostname>
+
+# Update Home Manager user configuration (use after modifying home/)
+home-manager switch --flake .#<username>@<hostname>
+
+# Update flake inputs (upgrade dependency versions like nixpkgs)
 nix flake update
 
-# Rebuild system
-sudo nixos-rebuild switch --flake .#hostname
-
-# Or use the update script
+# Or use the update script (one-click flake update and system rebuild)
 ./scripts/update.sh
+```
+
+### How do I apply changes after modifying modules?
+
+**Modify system modules** (`modules/` directory):
+```bash
+sudo nixos-rebuild switch --flake .#<hostname>
+```
+
+**Modify user configuration** (`home/` directory):
+```bash
+home-manager switch --flake .#<username>@<hostname>
+```
+
+**Update both system and user configuration**:
+```bash
+./scripts/update.sh
+```
+
+### How do I verify configuration before deployment?
+
+```bash
+# Check configuration syntax (fast)
+nix flake check
+
+# Test build (no deployment)
+nix build .#<hostname>
+
+# Preview changes
+nixos-rebuild dry-activate --flake .#<hostname>
+```
+
+### How do I rollback after update?
+
+```bash
+# List system generations
+sudo nixos-rebuild list-generations
+
+# Rollback to previous generation
+sudo nixos-rebuild switch --rollback
+
+# Or rollback to specific generation
+sudo nixos-rebuild switch --generation <number>
+
+# Home Manager rollback
+home-manager rollback
 ```
 
 ### How do I clean old generations?

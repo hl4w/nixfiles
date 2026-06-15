@@ -498,16 +498,46 @@ nixConfig = {
 
 ## 构建流程
 
+### 初始安装
+
 ```bash
-# 构建配置
-nix build .#host-name
-
-# 部署到系统
-sudo nixos-rebuild switch --flake .#host-name
-
-# 仅部署用户配置
-home-manager switch --flake .#user@host-name
-
-# 使用安装脚本
+# 使用安装脚本进行初始安装
 ./scripts/install.sh
+```
+
+### 系统更新
+
+安装完成后，如果修改了任何 Nix 模块，可以直接使用以下命令更新系统：
+
+```bash
+# 更新系统（修改 modules/ 目录后使用）
+sudo nixos-rebuild switch --flake .#<hostname>
+
+# 更新 Home Manager 用户配置（修改 home/ 目录后使用）
+home-manager switch --flake .#<username>@<hostname>
+
+# 更新 flake 输入（升级依赖版本如 nixpkgs）
+nix flake update
+
+# 使用脚本一键更新（包含 flake update 和系统重建）
+./scripts/update.sh
+```
+
+### 验证与回滚
+
+```bash
+# 检查配置语法
+nix flake check
+
+# 测试构建（不部署）
+nix build .#<hostname>
+
+# 预览差异
+nixos-rebuild dry-activate --flake .#<hostname>
+
+# 回滚到上一个代次
+sudo nixos-rebuild switch --rollback
+
+# 清理旧代次
+./scripts/clean.sh
 ```

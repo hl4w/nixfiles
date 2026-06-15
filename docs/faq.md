@@ -393,15 +393,66 @@ UEFI 启动与 systemd-boot 在 `modules/boot/default.nix` 中配置：
 
 ### 如何更新系统？
 
+安装完成后，如果修改了任何 Nix 模块，可以直接使用以下命令更新系统：
+
 ```bash
-# 更新 flake 输入
+# 更新系统（修改 modules/ 后使用）
+sudo nixos-rebuild switch --flake .#<hostname>
+
+# 更新 Home Manager 用户配置（修改 home/ 后使用）
+home-manager switch --flake .#<username>@<hostname>
+
+# 更新 flake 输入（升级依赖版本如 nixpkgs）
 nix flake update
 
-# 重建系统
-sudo nixos-rebuild switch --flake .#hostname
-
-# 或使用更新脚本
+# 或使用更新脚本（一键完成 flake update 和系统重建）
 ./scripts/update.sh
+```
+
+### 修改模块后如何应用更改？
+
+**修改系统模块** (`modules/` 目录)：
+```bash
+sudo nixos-rebuild switch --flake .#<hostname>
+```
+
+**修改用户配置** (`home/` 目录)：
+```bash
+home-manager switch --flake .#<username>@<hostname>
+```
+
+**同时更新系统和用户配置**：
+```bash
+./scripts/update.sh
+```
+
+### 如何在部署前验证配置？
+
+```bash
+# 检查配置语法（快速）
+nix flake check
+
+# 测试构建（不部署）
+nix build .#<hostname>
+
+# 预览差异
+nixos-rebuild dry-activate --flake .#<hostname>
+```
+
+### 更新后如何回滚？
+
+```bash
+# 查看系统代次
+sudo nixos-rebuild list-generations
+
+# 回滚到上一个代次
+sudo nixos-rebuild switch --rollback
+
+# 或指定回滚到特定代次
+sudo nixos-rebuild switch --generation <number>
+
+# Home Manager 回滚
+home-manager rollback
 ```
 
 ### 如何清理旧代次？

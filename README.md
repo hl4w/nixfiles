@@ -130,19 +130,38 @@ home-manager switch --flake .#<username>@<hostname>
 
 ## 管理命令
 
+### 系统更新
+
+安装完成后，如果修改了任何 Nix 模块，可以直接使用以下命令更新系统：
+
 ```bash
-# 更新 flake
+# 直接更新系统（推荐）
+sudo nixos-rebuild switch --flake .#<hostname>
+
+# 更新 Home Manager 用户配置
+home-manager switch --flake .#<username>@<hostname>
+
+# 更新 flake 输入（升级依赖版本）
 nix flake update
 
-# 更新系统
+# 使用脚本一键更新（包含 flake update 和系统重建）
 ./scripts/update.sh
 
 # 清理旧版本
 ./scripts/clean.sh
 
-# 检查配置
+# 检查配置（不执行构建）
 nix flake check
+
+# 测试构建（不部署）
+nix build .#<hostname>
 ```
+
+**说明**:
+- 修改 `modules/` 目录下的系统模块后，运行 `sudo nixos-rebuild switch --flake .#<hostname>` 即可应用更改
+- 修改 `home/` 目录下的用户配置后，运行 `home-manager switch --flake .#<username>@<hostname>` 即可应用更改
+- 使用 `nix flake update` 更新所有输入依赖（nixpkgs、home-manager 等）
+- 建议在部署前使用 `nix flake check` 或 `nix build .#<hostname>` 验证配置正确性
 
 [(脚本使用说明)](docs/architecture.md)
 

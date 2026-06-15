@@ -130,19 +130,38 @@ See `docs/` directory for detailed documentation:
 
 ## Management Commands
 
+### System Updates
+
+After installation, if you modify any Nix modules, you can directly update the system using the following commands:
+
 ```bash
-# Update flake
+# Update system directly (recommended)
+sudo nixos-rebuild switch --flake .#<hostname>
+
+# Update Home Manager user configuration
+home-manager switch --flake .#<username>@<hostname>
+
+# Update flake inputs (upgrade dependency versions)
 nix flake update
 
-# Update system
+# One-click update using script (includes flake update and system rebuild)
 ./scripts/update.sh
 
 # Clean old generations
 ./scripts/clean.sh
 
-# Check configuration
+# Check configuration (no build)
 nix flake check
+
+# Test build (no deployment)
+nix build .#<hostname>
 ```
+
+**Notes**:
+- After modifying system modules in `modules/`, run `sudo nixos-rebuild switch --flake .#<hostname>` to apply changes
+- After modifying user configurations in `home/`, run `home-manager switch --flake .#<username>@<hostname>` to apply changes
+- Use `nix flake update` to update all input dependencies (nixpkgs, home-manager, etc.)
+- It's recommended to verify configuration correctness using `nix flake check` or `nix build .#<hostname>` before deployment
 
 [(Script Usage Documentation)](docs/architecture.md)
 
