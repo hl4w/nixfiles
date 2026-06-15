@@ -1,0 +1,22 @@
+# Nix
+result
+result-*
+*.swp
+*.swo
+flake.lock
+.idea/
+.vscode/
+
+# Secrets
+secrets/*.age
+secrets/*.key
+!secrets/README.md
+!secrets/example.age
+
+# Temporary files
+*.tmp
+*.log
+
+# Direnv
+.direnv/
+.envrc.local
