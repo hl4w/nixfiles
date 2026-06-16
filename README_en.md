@@ -1,6 +1,6 @@
 # HL4W（Hack Linux for Workflow） - Nixfiles for NixOS
 
-**Version: v0.0.4**
+**Version: v0.0.5**
 
 A modern configuration repository built on NixOS 26.05, featuring a deeply optimized Hyprland & Niri desktop suite with native compatibility for Noctalia & DMS Shell desktop components. Powered by Nix Flakes and Home Manager, it unifies system and user environment management across multiple devices.
 

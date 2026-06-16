@@ -19,7 +19,7 @@ cp -r ~/.local/share ~/.local/share.backup
 ```bash
 # 克隆仓库
 git clone <repo-url>
-cd nixfiles26
+cd nixfiles
 
 # 运行安装脚本
 chmod +x scripts/install.sh

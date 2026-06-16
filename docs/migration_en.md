@@ -19,7 +19,7 @@ cp -r ~/.local/share ~/.local/share.backup
 ```bash
 # Clone repository
 git clone <repo-url>
-cd nixfiles26
+cd nixfiles
 
 # Run installation script
 chmod +x scripts/install.sh

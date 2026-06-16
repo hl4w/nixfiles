@@ -1,6 +1,6 @@
 # HL4W Architecture
 
-**Version: v0.0.3**
+**Version: v0.0.5**
 
 ## Overview
 

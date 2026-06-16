@@ -4,6 +4,20 @@
 
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。
 
+## [v0.0.5] - 2026-06-16
+
+### Added
+
+- **GPL v3.0 许可证更新**: 验证并确认项目使用完整的 GNU General Public License v3.0
+- **文档版本统一**: 更新所有文档文件版本号为 v0.0.5
+  - `flake.nix` - Flake 入口文件版本更新
+  - `docs/architecture.md` - 架构文档版本更新
+  - `docs/architecture_en.md` - 架构文档（英文）版本更新
+
+### Changed
+
+- **许可证验证**: 确认 LICENSE 文件内容符合 GNU GPL v3.0 标准文本
+
 ## [v0.0.4] - 2026-06-15
 
 ### Added
