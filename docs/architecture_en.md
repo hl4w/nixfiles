@@ -141,7 +141,7 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 
 | Module | Description |
 |--------|-------------|
-| `shell.nix` | Zsh + Starship prompt (with pywal dynamic coloring) |
+| `shell.nix` | Bash + Zsh + Starship prompt (with pywal dynamic coloring) |
 | `editor.nix` | Neovim, Emacs (with LSP servers configured: nil_ls, clangd, gopls, pyright, rust_analyzer) |
 | `input.nix` | Fcitx5 + RIME (oh-my-rime configuration) |
 | `cli.nix` | CLI tools: eza, bat, fd, rg, fzf, yazi (terminal file manager with zoxide integration), zoxide (smart directory navigation), fastfetch, btop, dust, duf, tokei, hyperfine, procs, starship |

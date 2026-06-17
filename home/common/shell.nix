@@ -5,6 +5,28 @@
   home.file.".wallpapers".source = ./../../wallpapers;
   home.file.".wallpapers".recursive = true;
   
+  # Bash 配置
+  programs.bash = {
+    enable = true;
+    initExtra = ''
+      export PATH="$HOME/.local/bin:$PATH"
+      export EDITOR="nvim"
+      export VISUAL="nvim"
+      
+      # pywal 颜色初始化 - 从壁纸提取的配色
+      if [ -f "$HOME/.cache/wal/colors.sh" ]; then
+          source "$HOME/.cache/wal/colors.sh"
+      fi
+      
+      # 壁纸取色命令别名
+      alias wp-color='${pkgs.writeScript "wallpaper-color" (builtins.readFile ./../../scripts/wallpaper-color.sh)}'
+      alias wp-random='${pkgs.writeScript "wallpaper-color" (builtins.readFile ./../../scripts/wallpaper-color.sh)} -d'
+      alias wp-apply='${pkgs.writeScript "wallpaper-color" (builtins.readFile ./../../scripts/wallpaper-color.sh)} -a'
+      alias wp-list='${pkgs.writeScript "wallpaper-color" (builtins.readFile ./../../scripts/wallpaper-color.sh)} -l'
+    '';
+  };
+
+  # Zsh 配置
   programs.zsh = {
     enable = true;
     oh-my-zsh = {
@@ -32,6 +54,7 @@
 
   programs.starship = {
     enable = true;
+    enableBashIntegration = true;
     enableZshIntegration = true;
     settings = {
       # 使用 pywal 生成的配色（颜色会在运行时替换）

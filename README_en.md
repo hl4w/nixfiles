@@ -172,5 +172,3 @@ Having issues? Check [(FAQ)](docs/faq.md)
 ## License
 
 GNU General Public License v3.0
-
-**Author: Silas Zhang (2026)**

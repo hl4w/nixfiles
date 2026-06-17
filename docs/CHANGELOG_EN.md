@@ -5,18 +5,20 @@ All significant project changes will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [v0.0.5] - 2026-06-16
-
 ### Added
-
-- **GPL v3.0 License Update**: Verified and confirmed project uses complete GNU General Public License v3.0
-- **Documentation Version Unification**: Updated version numbers to v0.0.5 across all documentation files
+- **GPL v3.0 License Update**: Verified and confirmed the project uses the complete GNU General Public License v3.0
+- **Documentation Version Unification**: Updated all documentation files to version v0.0.5
   - `flake.nix` - Flake entry file version update
   - `docs/architecture.md` - Architecture documentation version update
   - `docs/architecture_en.md` - Architecture documentation (English) version update
-
+- **Author Information**: Added author information "Author: Silas Zhang (2026)" to README documentation and all script files
+- **Bash Shell Support**: Added complete Bash configuration support
+  - System-level Bash installation and enablement (`modules/system/default.nix`)
+  - User-level Bash configuration (`home/common/shell.nix`)
+  - Starship prompt integration with Bash
+  - Bash and Zsh share the same environment variables and alias configuration
 ### Changed
-
-- **License Verification**: Confirmed LICENSE file content matches GNU GPL v3.0 standard text
+- **License Verification**: Confirmed LICENSE file content complies with GNU GPL v3.0 standard text
 
 ## [v0.0.4] - 2026-06-15
 

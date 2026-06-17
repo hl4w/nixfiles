@@ -14,6 +14,7 @@
     wget         # 命令行下载工具
     curl         # 命令行下载工具
     tmux         # 终端复用工具
+    bash         # Bash shell
     zsh          # Z shell
     tree         # 目录树显示
     highlight    # 代码语法高亮
@@ -22,6 +23,7 @@
   ];
 
   # 启用系统级程序配置
+  programs.bash.enable = true;   # 启用 Bash 配置支持
   programs.zsh.enable = true;   # 启用 Zsh 配置支持
   programs.git.enable = true;   # 启用 Git 配置支持
 
