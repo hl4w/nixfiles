@@ -1,4 +1,5 @@
 #!/bin/sh
+# Author: Silas Zhang (2026)
 # shellcheck shell=bash
 # 壁纸取色配色脚本
 # 当壁纸更换时自动提取颜色并应用到终端、Shell、编辑器等

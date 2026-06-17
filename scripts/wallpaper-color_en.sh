@@ -1,4 +1,5 @@
 #!/bin/sh
+# Author: Silas Zhang (2026)
 # shellcheck shell=bash
 # Wallpaper color extraction script
 # Automatically extracts colors from wallpaper and applies to terminal, shell, editor, etc.

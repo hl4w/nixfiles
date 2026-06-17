@@ -1,4 +1,5 @@
 #!/bin/sh
+# Author: Silas Zhang (2026)
 # shellcheck shell=bash
 # NixOS compatibility: /usr/bin/env may not exist in installer environment
 if [ -z "$BASH_VERSION" ]; then

@@ -172,3 +172,5 @@ nix build .#<hostname>
 ## 许可证
 
 GNU General Public License v3.0
+
+**Author: Silas Zhang (2026)**

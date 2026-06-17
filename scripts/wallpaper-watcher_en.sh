@@ -1,4 +1,5 @@
 #!/bin/sh
+# Author: Silas Zhang (2026)
 # shellcheck shell=bash
 # Wallpaper change watcher
 # Automatically triggers color scheme update when wallpaper file changes

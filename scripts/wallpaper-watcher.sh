@@ -1,4 +1,5 @@
 #!/bin/sh
+# Author: Silas Zhang (2026)
 # shellcheck shell=bash
 # 壁纸变化监听器
 # 当壁纸文件变化时自动触发配色更新
