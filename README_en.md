@@ -6,7 +6,7 @@ A modern configuration repository built on NixOS 26.05, featuring a deeply optim
 
 ## Features
 
-- **Hyprland** / **Niri**: Wayland window managers [(Details)](docs/architecture.md)
+- **Hyprland** / **Niri**: Wayland window managers [(Details)](docs/architecture.md) [(Shortcuts)](docs/shortcuts_en.md)
 - **Modular Architecture**: Clear directory structure for easy extension and maintenance [(Architecture)](docs/architecture.md)
 - **Multi-host Support**: Unified management for desktop, laptop, and server [(Architecture)](docs/architecture.md)
 - **GPU Auto-Detection**: Automatically identifies NVIDIA/AMD/Intel GPUs during installation, intelligently configures drivers and kernel parameters [(Architecture)](docs/architecture.md)

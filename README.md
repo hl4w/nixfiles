@@ -6,7 +6,7 @@
 
 ## 特性
 
-- **Hyprland** / **Niri**: Wayland 窗口管理器 [(详细说明)](docs/architecture.md)
+- **Hyprland** / **Niri**: Wayland 窗口管理器 [(详细说明)](docs/architecture.md) [(快捷键)](docs/shortcuts.md)
 - **模块化架构**: 清晰的目录结构，易于扩展和维护 [(架构文档)](docs/architecture.md)
 - **多主机支持**: 桌面、笔记本、服务器统一管理 [(架构文档)](docs/architecture.md)
 - **GPU 自动检测**: 安装时自动识别 NVIDIA/AMD/Intel 显卡，智能配置驱动和内核参数 [(架构文档)](docs/architecture.md)

@@ -101,7 +101,9 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 │   ├── faq.md            # FAQ
 │   ├── faq_en.md         # FAQ (English)
 │   ├── migration.md      # Migration guide
-│   └── migration_en.md   # Migration guide (English)
+│   ├── migration_en.md   # Migration guide (English)
+│   ├── shortcuts.md      # Keyboard shortcuts reference
+│   └── shortcuts_en.md   # Keyboard shortcuts reference (English)
 ├── flake.nix             # Flake entry point
 ├── flake.lock            # Locked versions
 ├── README.md             # Project overview (Chinese)
@@ -149,6 +151,21 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 | `dev-lsp.nix` | Development tools and LSP servers (C/C++: clangd/clang-tools/cmake/ninja/gdb/lldb; Go: go/gopls; Python: python3/pyright; Rust: rustc/rust-analyzer/rustfmt/cargo) |
 | `git.nix` | Git global configuration |
 | `wallpaper-watcher.nix` | Wallpaper change watcher user service (auto-update colors) |
+
+### Documentation (`docs/`)
+
+| Document | Description |
+|----------|-------------|
+| `architecture.md` | Architecture documentation |
+| `architecture_en.md` | Architecture documentation (English) |
+| `CHANGELOG.md` | Change log |
+| `CHANGELOG_EN.md` | Change log (English) |
+| `faq.md` | FAQ |
+| `faq_en.md` | FAQ (English) |
+| `migration.md` | Migration guide |
+| `migration_en.md` | Migration guide (English) |
+| `shortcuts.md` | Hyprland/Niri keyboard shortcuts reference |
+| `shortcuts_en.md` | Hyprland/Niri keyboard shortcuts reference (English) |
 
 ## Flake Structure
 

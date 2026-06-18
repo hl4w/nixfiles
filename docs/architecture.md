@@ -101,7 +101,9 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 │   ├── faq.md            # 常见问题
 │   ├── faq_en.md         # 常见问题（英文）
 │   ├── migration.md      # 迁移指南
-│   └── migration_en.md   # 迁移指南（英文）
+│   ├── migration_en.md   # 迁移指南（英文）
+│   ├── shortcuts.md      # 快捷键参考
+│   └── shortcuts_en.md   # 快捷键参考（英文）
 ├── flake.nix             # Flake 入口点
 ├── flake.lock            # 锁定版本
 ├── README.md             # 项目概述（中文）
@@ -149,6 +151,21 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 | `dev-lsp.nix` | 开发工具和 LSP 服务器（C/C++: clangd/clang-tools/cmake/ninja/gdb/lldb；Go: go/gopls；Python: python3/pyright；Rust: rustc/rust-analyzer/rustfmt/cargo） |
 | `git.nix` | Git 全局配置 |
 | `wallpaper-watcher.nix` | 壁纸变化监听器用户服务（自动更新配色） |
+
+### 文档 (`docs/`)
+
+| 文档 | 描述 |
+|------|------|
+| `architecture.md` | 架构说明 |
+| `architecture_en.md` | 架构说明（英文） |
+| `CHANGELOG.md` | 变更日志 |
+| `CHANGELOG_EN.md` | 变更日志（英文） |
+| `faq.md` | 常见问题 |
+| `faq_en.md` | 常见问题（英文） |
+| `migration.md` | 迁移指南 |
+| `migration_en.md` | 迁移指南（英文） |
+| `shortcuts.md` | Hyprland/Niri 快捷键参考 |
+| `shortcuts_en.md` | Hyprland/Niri 快捷键参考（英文） |
 
 ## Flake 结构
 
