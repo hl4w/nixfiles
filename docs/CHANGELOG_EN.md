@@ -17,6 +17,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - User-level Bash configuration (`home/common/shell.nix`)
   - Starship prompt integration with Bash
   - Bash and Zsh share the same environment variables and alias configuration
+- **Repository Name Update**: Changed repository name from `nixfiles26` to `nixfiles`
+- **Repository URL Update**: Added dual repository URLs for Gitee and GitHub
+  - Chinese users: `https://gitee.com/hl4w/nixfiles.git`
+  - International users: `https://github.com/hl4w/nixfiles.git`
+- **Keyboard Shortcuts Documentation**: Created Hyprland/Niri keyboard shortcuts reference documentation
+  - `docs/shortcuts.md` - Chinese shortcuts documentation
+  - `docs/shortcuts_en.md` - English shortcuts documentation
+- **Firefox Shortcut**: Added `Super+B` to open Firefox browser
+- **Unified Application Shortcuts**: Unified application shortcuts configuration between Hyprland and Niri
+  - `Super+R` - Application launcher (Rofi)
+  - `Super+Return` - Terminal (Foot)
+  - `Super+E` - File manager (Nemo)
+  - `Super+B` - Firefox browser
+  - `Super+Q` - Close window
+  - `Super+C` - VS Code
+  - `Super+P` - Power menu (Rofi)
+  - `Super+Shift+Q` - Quit window manager
 ### Changed
 - **License Verification**: Confirmed LICENSE file content complies with GNU GPL v3.0 standard text
 

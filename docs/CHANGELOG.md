@@ -17,6 +17,23 @@
   - 用户级 Bash 配置 (`home/common/shell.nix`)
   - Starship 提示符集成 Bash
   - Bash 和 Zsh 共享相同的环境变量和别名配置
+- **仓库名称更新**: 将仓库名称从 `nixfiles26` 改为 `nixfiles`
+- **仓库 URL 更新**: 添加 Gitee 和 GitHub 双仓库地址
+  - 国内用户: `https://gitee.com/hl4w/nixfiles.git`
+  - 国外用户: `https://github.com/hl4w/nixfiles.git`
+- **快捷键文档**: 创建 Hyprland/Niri 快捷键参考文档
+  - `docs/shortcuts.md` - 中文快捷键文档
+  - `docs/shortcuts_en.md` - 英文快捷键文档
+- **Firefox 快捷键**: 添加 `Super+B` 打开 Firefox 浏览器
+- **统一应用程序快捷键**: 统一 Hyprland 和 Niri 的应用程序快捷键配置
+  - `Super+R` - 应用启动器 (Rofi)
+  - `Super+Return` - 终端 (Foot)
+  - `Super+E` - 文件管理器 (Nemo)
+  - `Super+B` - Firefox 浏览器
+  - `Super+Q` - 关闭窗口
+  - `Super+C` - VS Code
+  - `Super+P` - 电源菜单 (Rofi)
+  - `Super+Shift+Q` - 退出窗口管理器
 ### Changed
 - **许可证验证**: 确认 LICENSE 文件内容符合 GNU GPL v3.0 标准文本
 

@@ -1,4 +1,4 @@
-# HL4W（Hack Linux for Workflow） - Nixfiles for NixOS
+# HL4W NixOS Configuration
 
 **Version: v0.0.5**
 
