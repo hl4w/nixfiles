@@ -80,7 +80,7 @@ This document details the keyboard shortcuts for Hyprland and Niri window manage
 
 | Shortcut | Function |
 |----------|----------|
-| `Super` | Open application launcher (Rofi) |
+| `Super + R` | Open application launcher (Rofi) |
 | `Super + Return` | Open terminal (Foot) |
 | `Super + E` | Open file manager (Nemo) |
 | `Super + B` | Open Firefox browser |

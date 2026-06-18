@@ -80,7 +80,7 @@
 
 | 快捷键 | 功能 |
 |--------|------|
-| `Super` | 打开应用启动器（Rofi） |
+| `Super + R` | 打开应用启动器（Rofi） |
 | `Super + Return` | 打开终端（Foot） |
 | `Super + E` | 打开文件管理器（Nemo） |
 | `Super + B` | 打开 Firefox 浏览器 |

@@ -30,7 +30,7 @@
 
       # 键盘快捷键
       keybindings = {
-        "Super" = "spawn rofi -show drun";  # Super 键打开应用启动器
+        "Super+R" = "spawn rofi -show drun";  # 打开应用启动器
         "Super+Return" = "spawn foot";      # 打开终端（foot）
         "Super+E" = "spawn nemo";           # 打开文件管理器
         "Super+B" = "spawn firefox";        # 打开 Firefox 浏览器
