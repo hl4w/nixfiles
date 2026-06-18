@@ -28,8 +28,11 @@ Flakes 提供可重现的构建、更好的依赖管理，以及更清晰的 Nix
 
 ```bash
 # 克隆仓库
-git clone <repo-url>
-cd nixfiles26
+# 国内用户推荐使用 Gitee 镜像：
+git clone https://gitee.com/hl4w/nixfiles.git
+# 国外用户使用 GitHub：
+# git clone https://github.com/hl4w/nixfiles.git
+cd nixfiles
 
 # 运行安装脚本
 chmod +x scripts/install.sh

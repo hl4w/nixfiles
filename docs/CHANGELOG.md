@@ -1,4 +1,4 @@
-# HL4W Changelog
+# HL4W NixOS Configuration Changelog
 
 所有重要的项目变更都将记录在此文件中。
 

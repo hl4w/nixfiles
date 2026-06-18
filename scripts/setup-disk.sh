@@ -59,7 +59,7 @@ usage() {
 # 默认值
 NON_INTERACTIVE=false
 USE_ENCRYPTION=true
-REPO_URL="https://git.hl4w.com/hl4w/nixfiles26.git"
+REPO_URL="https://gitee.com/hl4w/nixfiles.git"
 HOST_TYPE=""
 WINDOW_MANAGER=""
 DESKTOP_SHELL=""

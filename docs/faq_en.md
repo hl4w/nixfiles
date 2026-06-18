@@ -28,8 +28,11 @@ Flakes provide reproducible builds, better dependency management, and a cleaner 
 
 ```bash
 # Clone repository
-git clone <repo-url>
-cd nixfiles26
+# Chinese users recommended to use Gitee mirror:
+git clone https://gitee.com/hl4w/nixfiles.git
+# International users use GitHub:
+# git clone https://github.com/hl4w/nixfiles.git
+cd nixfiles
 
 # Run installation script
 chmod +x scripts/install.sh

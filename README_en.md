@@ -35,8 +35,11 @@ A modern configuration repository built on NixOS 26.05, featuring a deeply optim
 
 ```bash
 # Clone repository
-git clone <repo-url>
-cd nixfiles26
+# Chinese users recommended to use Gitee mirror:
+git clone https://gitee.com/hl4w/nixfiles.git
+# International users use GitHub:
+# git clone https://github.com/hl4w/nixfiles.git
+cd nixfiles
 
 # Run installation script
 chmod +x scripts/install.sh
@@ -47,8 +50,11 @@ chmod +x scripts/install.sh
 
 ```bash
 # 1. Clone repository
-git clone <repo-url>
-cd nixfiles26
+# Chinese users recommended to use Gitee mirror:
+git clone https://gitee.com/hl4w/nixfiles.git
+# International users use GitHub:
+# git clone https://github.com/hl4w/nixfiles.git
+cd nixfiles
 
 # 2. Create host configuration directory (copy template)
 cp -r templates/host-template hosts/<hostname>

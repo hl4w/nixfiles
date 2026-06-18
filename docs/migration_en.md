@@ -18,7 +18,10 @@ cp -r ~/.local/share ~/.local/share.backup
 
 ```bash
 # Clone repository
-git clone <repo-url>
+# Chinese users recommended to use Gitee mirror:
+git clone https://gitee.com/hl4w/nixfiles.git
+# International users use GitHub:
+# git clone https://github.com/hl4w/nixfiles.git
 cd nixfiles
 
 # Run installation script

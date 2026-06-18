@@ -18,7 +18,10 @@ cp -r ~/.local/share ~/.local/share.backup
 
 ```bash
 # 克隆仓库
-git clone <repo-url>
+# 国内用户推荐使用 Gitee 镜像：
+git clone https://gitee.com/hl4w/nixfiles.git
+# 国外用户使用 GitHub：
+# git clone https://github.com/hl4w/nixfiles.git
 cd nixfiles
 
 # 运行安装脚本
