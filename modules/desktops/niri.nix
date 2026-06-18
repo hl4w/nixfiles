@@ -33,6 +33,7 @@
         "Super" = "spawn rofi -show drun";  # Super 键打开应用启动器
         "Super+Return" = "spawn foot"; # 打开终端（foot）
         "Super+E" = "spawn nemo";           # 打开文件管理器
+        "Super+B" = "spawn firefox";        # 打开 Firefox 浏览器
         "Super+W" = "close-window";         # 关闭窗口
         "Super+Shift+Q" = "quit";           # 退出 Niri
       };
