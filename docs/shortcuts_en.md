@@ -17,7 +17,7 @@ This document details the keyboard shortcuts for Hyprland and Niri window manage
 | `Super + R` | Open application launcher (Rofi) |
 | `Super + Return` | Open terminal (Foot) |
 | `Super + C` | Open VS Code |
-| `Super + W` | Open Firefox browser |
+| `Super + B` | Open Firefox browser |
 | `Super + P` | Open power menu (Rofi) |
 
 ### Window Focus Movement
@@ -83,7 +83,7 @@ This document details the keyboard shortcuts for Hyprland and Niri window manage
 | `Super` | Open application launcher (Rofi) |
 | `Super + Return` | Open terminal (Foot) |
 | `Super + E` | Open file manager (Nemo) |
-| `Super + W` | Open Firefox browser |
+| `Super + B` | Open Firefox browser |
 | `Super + Q` | Close window |
 | `Super + C` | Open VS Code |
 | `Super + P` | Open power menu (Rofi) |

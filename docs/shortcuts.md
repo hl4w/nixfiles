@@ -17,7 +17,7 @@
 | `Super + R` | 打开应用启动器（Rofi） |
 | `Super + Return` | 打开终端（Foot） |
 | `Super + C` | 打开 VS Code |
-| `Super + W` | 打开 Firefox 浏览器 |
+| `Super + B` | 打开 Firefox 浏览器 |
 | `Super + P` | 打开电源菜单（Rofi） |
 
 ### 窗口焦点移动
@@ -83,7 +83,7 @@
 | `Super` | 打开应用启动器（Rofi） |
 | `Super + Return` | 打开终端（Foot） |
 | `Super + E` | 打开文件管理器（Nemo） |
-| `Super + W` | 打开 Firefox 浏览器 |
+| `Super + B` | 打开 Firefox 浏览器 |
 | `Super + Q` | 关闭窗口 |
 | `Super + C` | 打开 VS Code |
 | `Super + P` | 打开电源菜单（Rofi） |
