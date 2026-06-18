@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Author: Silas Zhang (2026)
 # shellcheck shell=bash
 # 壁纸取色配色脚本

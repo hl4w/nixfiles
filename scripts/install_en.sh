@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Author: Silas Zhang (2026)
 # shellcheck shell=bash
 # NixOS compatibility: /usr/bin/env may not exist in installer environment
