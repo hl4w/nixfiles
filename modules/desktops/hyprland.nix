@@ -85,7 +85,7 @@
       "SUPER,E" = "exec nemo";               # 打开文件管理器
       "SUPER,R" = "exec rofi -show drun";    # 打开应用启动器
       "SUPER,RETURN" = "exec foot";          # 打开终端（foot）
-      "SUPER,C" = "exec code";               # 打开 VS Code
+      "SUPER,C" = "exec codium";             # 打开 VSCodium
       "SUPER,B" = "exec firefox";            # 打开 Firefox 浏览器
       "SUPER,P" = "exec rofi -show powermenu"; # 打开电源菜单
       "SUPER,H" = "movefocus left";          # 焦点左移

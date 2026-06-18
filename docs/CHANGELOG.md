@@ -31,9 +31,13 @@
   - `Super+E` - 文件管理器 (Nemo)
   - `Super+B` - Firefox 浏览器
   - `Super+Q` - 关闭窗口
-  - `Super+C` - VS Code
+  - `Super+C` - VSCodium
   - `Super+P` - 电源菜单 (Rofi)
   - `Super+Shift+Q` - 退出窗口管理器
+- **VSCodium 支持**: 添加 VSCodium（开源版 VS Code）作为默认编辑器
+  - 用户级安装 `vscodium` 包 (`home/common/apps.nix`)
+  - 快捷键 `Super+C` 打开 VSCodium
+- **脚本 Shebang 更新**: 将所有 sh 脚本的 shebang 从 `#!/bin/sh` 更新为 `#!/usr/bin/env bash`，确保 bash 语法正确执行
 ### Changed
 - **许可证验证**: 确认 LICENSE 文件内容符合 GNU GPL v3.0 标准文本
 

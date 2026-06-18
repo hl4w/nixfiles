@@ -31,9 +31,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - `Super+E` - File manager (Nemo)
   - `Super+B` - Firefox browser
   - `Super+Q` - Close window
-  - `Super+C` - VS Code
+  - `Super+C` - VSCodium
   - `Super+P` - Power menu (Rofi)
   - `Super+Shift+Q` - Quit window manager
+- **VSCodium Support**: Added VSCodium (open-source VS Code) as the default editor
+  - User-level `vscodium` package installation (`home/common/apps.nix`)
+  - Shortcut `Super+C` to open VSCodium
+- **Script Shebang Update**: Updated all sh script shebangs from `#!/bin/sh` to `#!/usr/bin/env bash` to ensure proper bash syntax execution
 ### Changed
 - **License Verification**: Confirmed LICENSE file content complies with GNU GPL v3.0 standard text
 

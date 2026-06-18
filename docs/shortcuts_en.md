@@ -16,7 +16,7 @@ This document details the keyboard shortcuts for Hyprland and Niri window manage
 | `Super + E` | Open file manager (Nemo) |
 | `Super + R` | Open application launcher (Rofi) |
 | `Super + Return` | Open terminal (Foot) |
-| `Super + C` | Open VS Code |
+| `Super + C` | Open VSCodium |
 | `Super + B` | Open Firefox browser |
 | `Super + P` | Open power menu (Rofi) |
 
@@ -85,7 +85,7 @@ This document details the keyboard shortcuts for Hyprland and Niri window manage
 | `Super + E` | Open file manager (Nemo) |
 | `Super + B` | Open Firefox browser |
 | `Super + Q` | Close window |
-| `Super + C` | Open VS Code |
+| `Super + C` | Open VSCodium |
 | `Super + P` | Open power menu (Rofi) |
 | `Super + Shift + Q` | Quit Niri |
 

@@ -16,7 +16,7 @@
 | `Super + E` | 打开文件管理器（Nemo） |
 | `Super + R` | 打开应用启动器（Rofi） |
 | `Super + Return` | 打开终端（Foot） |
-| `Super + C` | 打开 VS Code |
+| `Super + C` | 打开 VSCodium |
 | `Super + B` | 打开 Firefox 浏览器 |
 | `Super + P` | 打开电源菜单（Rofi） |
 
@@ -85,7 +85,7 @@
 | `Super + E` | 打开文件管理器（Nemo） |
 | `Super + B` | 打开 Firefox 浏览器 |
 | `Super + Q` | 关闭窗口 |
-| `Super + C` | 打开 VS Code |
+| `Super + C` | 打开 VSCodium |
 | `Super + P` | 打开电源菜单（Rofi） |
 | `Super + Shift + Q` | 退出 Niri |
 

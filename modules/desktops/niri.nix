@@ -35,7 +35,7 @@
         "Super+E" = "spawn nemo";           # 打开文件管理器
         "Super+B" = "spawn firefox";        # 打开 Firefox 浏览器
         "Super+Q" = "close-window";         # 关闭窗口
-        "Super+C" = "spawn code";           # 打开 VS Code
+        "Super+C" = "spawn codium";           # 打开 VSCodium
         "Super+P" = "spawn rofi -show powermenu"; # 打开电源菜单
         "Super+Shift+Q" = "quit";           # 退出 Niri
       };
