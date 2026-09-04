@@ -40,6 +40,16 @@
 - **脚本 Shebang 更新**: 将所有 sh 脚本的 shebang 从 `#!/bin/sh` 更新为 `#!/usr/bin/env bash`，确保 bash 语法正确执行
 ### Changed
 - **许可证验证**: 确认 LICENSE 文件内容符合 GNU GPL v3.0 标准文本
+### Fixed
+- **修复 install.sh 中 FLAKE_NAME 未加引号导致 nix 语法错误**：`scripts/install.sh` 与 `scripts/install_en.sh` 在向 `flake.nix` 的 `nixosConfigurations` 块插入主机条目时，生成的属性名未用双引号包裹（如 `my-desktop-config = mkHost "my-desktop";`）。Nix 会将含连字符的裸属性名解析为减法运算（`my - desktop - config`），导致 `nix flake check` 与 `nixos-rebuild` 失败。现已改为 `"${FLAKE_NAME}" = mkHost "${HOSTNAME}";`
+- **修复 install.sh 中 sed 替换的脆弱性**：
+  - 新增 `sed_escape_replacement()` 辅助函数，转义替换字符串中的 `\`、`&`、`/`，避免用户名/邮箱/主机名含元字符时破坏 sed 替换
+  - Git 用户名、邮箱、flake.nix 用户名的 sed 替换改为精确字段匹配（如 `userName = "Your Name"`），并增加占位符存在性检查，实现幂等运行：重复执行时不再静默无操作，而是输出 `warn` 提示
+  - 将 `sed_escape_replacement()` 定义前移至 helper 函数区，避免其在首次使用处之后才定义
+- **修复 install.sh 中 flake.nix 主机条目插入逻辑**：
+  - 用 `awk index()` 精确匹配 `nixosConfigurations = {` 行后插入，替代转义复杂、跨 sed 版本行为不一致的 `a \\...\\\n` 写法
+  - `grep` 检测改为 `grep -qF` 固定字符串匹配，消除 4 空格 vs 6 空格的缩进不一致问题
+  - 新增插入后验证步骤：插入失败时立即 `error` 终止，而非静默继续
 
 ## [v0.0.4] - 2026-06-15
 

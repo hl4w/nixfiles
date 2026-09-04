@@ -35,6 +35,12 @@ error() {
     exit 1
 }
 
+# 转义 sed 替换字符串中的特殊字符（/ & \）
+# 避免用户名、邮箱、主机名等包含元字符时破坏 sed 替换
+sed_escape_replacement() {
+    printf '%s' "$1" | sed -e 's/[\\&/]/\\&/g'
+}
+
 confirm() {
     if [ "$NON_INTERACTIVE" = "true" ]; then
         return 0
@@ -326,8 +332,14 @@ echo "------------------------------------------"
 # =============================================
 info "配置 flake.nix..."
 info "更新用户名..."
-sed -i.bak "s/USERNAME = \"youruser\"/USERNAME = \"$USERNAME\"/g" flake.nix
-rm -f flake.nix.bak
+USERNAME_ESC=$(sed_escape_replacement "$USERNAME")
+if grep -q 'USERNAME = "youruser"' flake.nix; then
+    sed -i.bak "s/USERNAME = \"youruser\"/USERNAME = \"$USERNAME_ESC\"/g" flake.nix
+    rm -f flake.nix.bak
+    info "flake.nix 用户名已更新: $USERNAME"
+else
+    warn "flake.nix 中未找到 'youruser' 占位符，可能已被替换。跳过用户名更新。"
+fi
 
 # =============================================
 # 创建主机配置目录
@@ -454,10 +466,32 @@ echo "}" >> "home/hosts/$HOSTNAME.nix"
 # =============================================
 # 更新用户相关配置
 # =============================================
+
 info "更新 Git 配置..."
-sed -i.bak "s/Your Name/$GIT_USERNAME/g" home/common/git.nix
-sed -i.bak "s/your.email@example.com/$GIT_EMAIL/g" home/common/git.nix
-rm -f home/common/git.nix.bak
+
+GIT_USERNAME_ESC=$(sed_escape_replacement "$GIT_USERNAME")
+GIT_EMAIL_ESC=$(sed_escape_replacement "$GIT_EMAIL")
+
+# 检查并替换 git.nix 中的 Git 用户名占位符
+# 使用精确模式（含字段名 userName）避免误匹配，并支持幂等运行
+if grep -q 'userName = "Your Name"' home/common/git.nix; then
+    sed -i.bak "s/userName = \"Your Name\"/userName = \"$GIT_USERNAME_ESC\"/" home/common/git.nix
+    rm -f home/common/git.nix.bak
+    info "Git 用户名已更新: $GIT_USERNAME"
+else
+    warn "git.nix 中未找到 'Your Name' 占位符，可能已被替换。跳过用户名更新。"
+    warn "如需修改 Git 用户名，请手动编辑 home/common/git.nix 中的 userName 字段"
+fi
+
+# 检查并替换 git.nix 中的 Git 邮箱占位符
+if grep -q 'userEmail = "your.email@example.com"' home/common/git.nix; then
+    sed -i.bak "s/userEmail = \"your.email@example.com\"/userEmail = \"$GIT_EMAIL_ESC\"/" home/common/git.nix
+    rm -f home/common/git.nix.bak
+    info "Git 邮箱已更新: $GIT_EMAIL"
+else
+    warn "git.nix 中未找到 'your.email@example.com' 占位符，可能已被替换。跳过邮箱更新。"
+    warn "如需修改 Git 邮箱，请手动编辑 home/common/git.nix 中的 userEmail 字段"
+fi
 
 info "更新 hosts/common/default.nix 用户配置..."
 sed -i.bak "s/youruser/$USERNAME/g" hosts/common/default.nix
@@ -472,19 +506,34 @@ rm -f modules/services/virtualisation.nix.bak
 # =============================================
 info "配置 flake.nix 添加新主机..."
 
-# 先检查是否已存在该主机配置
-if grep -q "    $FLAKE_NAME = mkHost" flake.nix; then
+# FLAKE_NAME 作为 nix 属性名必须加引号
+# 否则含连字符的名称（如 my-desktop）会被 nix 解析为减法运算，导致语法错误
+FLAKE_ENTRY="      \"${FLAKE_NAME}\" = mkHost \"${HOSTNAME}\";"
+
+# 检查是否已存在该主机配置（使用引号包裹的属性名精确匹配）
+if grep -qF "\"${FLAKE_NAME}\" = mkHost" flake.nix; then
     warn "主机 $FLAKE_NAME 已存在于 flake.nix 中"
     if confirm "是否更新现有配置？"; then
-        # 删除旧配置并重新添加
-        sed -i.bak "/    $FLAKE_NAME = mkHost/d" flake.nix
-        sed -i.bak "/nixosConfigurations = {/a \\      $FLAKE_NAME = mkHost \"$HOSTNAME\";\\\n" flake.nix
+        # 删除旧配置行
+        sed -i.bak "/\"${FLAKE_NAME}\" = mkHost/d" flake.nix
         rm -f flake.nix.bak
+        # 插入新配置行（使用 awk 避免 sed 'a' 命令的跨版本兼容性问题）
+        awk -v entry="$FLAKE_ENTRY" 'index($0, "nixosConfigurations = {") {print; print entry; next} {print}' flake.nix > flake.nix.tmp && mv flake.nix.tmp flake.nix
+        info "主机配置已更新: \"${FLAKE_NAME}\" = mkHost \"${HOSTNAME}\""
+    else
+        error "用户取消更新配置"
     fi
 else
     # 添加新主机配置
-    sed -i.bak "/nixosConfigurations = {/a \\      $FLAKE_NAME = mkHost \"$HOSTNAME\";\\\n" flake.nix
-    rm -f flake.nix.bak
+    awk -v entry="$FLAKE_ENTRY" 'index($0, "nixosConfigurations = {") {print; print entry; next} {print}' flake.nix > flake.nix.tmp && mv flake.nix.tmp flake.nix
+    info "已添加主机配置: \"${FLAKE_NAME}\" = mkHost \"${HOSTNAME}\""
+fi
+
+# 验证插入是否成功
+if grep -qF "\"${FLAKE_NAME}\" = mkHost" flake.nix; then
+    info "flake.nix 主机配置验证成功"
+else
+    error "flake.nix 主机配置插入失败，请手动检查 flake.nix 中的 nixosConfigurations 块"
 fi
 
 # =============================================

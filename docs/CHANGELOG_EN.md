@@ -40,6 +40,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Script Shebang Update**: Updated all sh script shebangs from `#!/bin/sh` to `#!/usr/bin/env bash` to ensure proper bash syntax execution
 ### Changed
 - **License Verification**: Confirmed LICENSE file content complies with GNU GPL v3.0 standard text
+### Fixed
+- **Fixed FLAKE_NAME not quoted causing nix syntax error in install.sh**: `scripts/install.sh` and `scripts/install_en.sh` inserted host entries into the `nixosConfigurations` block of `flake.nix` with unquoted attribute names (e.g. `my-desktop-config = mkHost "my-desktop";`). Nix parses unquoted attribute names containing hyphens as subtraction (`my - desktop - config`), causing `nix flake check` and `nixos-rebuild` to fail. Now generates `"${FLAKE_NAME}" = mkHost "${HOSTNAME}";` instead
+- **Fixed fragile sed substitution in install.sh**:
+  - Added `sed_escape_replacement()` helper to escape `\`, `&`, `/` in replacement strings, preventing sed breakage when username/email/hostname contain metacharacters
+  - sed substitutions for Git username, email, and flake.nix username now use precise field-level patterns (e.g. `userName = "Your Name"`) with placeholder existence checks for idempotent runs: repeated execution no longer silently does nothing but emits a `warn` notice
+  - Moved `sed_escape_replacement()` definition to the helper functions area, preventing it from being defined after its first use
+- **Fixed flake.nix host entry insertion logic in install.sh**:
+  - Replaced the `a \\...\\\n` sed append command (complex escaping, inconsistent across sed versions) with `awk index()` matching the `nixosConfigurations = {` line for precise insertion
+  - Switched `grep` detection to `grep -qF` fixed-string matching, eliminating the 4-space vs 6-space indentation mismatch
+  - Added post-insertion verification: fails fast with `error` instead of silently continuing on insertion failure
 
 ## [v0.0.4] - 2026-06-15
 

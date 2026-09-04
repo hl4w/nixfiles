@@ -35,6 +35,12 @@ error() {
     exit 1
 }
 
+# Escape sed replacement special characters (/ & \)
+# Prevents sed substitution breakage when username/email/hostname contain metacharacters
+sed_escape_replacement() {
+    printf '%s' "$1" | sed -e 's/[\\&/]/\\&/g'
+}
+
 confirm() {
     if [ "$NON_INTERACTIVE" = "true" ]; then
         return 0
@@ -326,8 +332,14 @@ echo "------------------------------------------"
 # =============================================
 info "Configuring flake.nix..."
 info "Updating username..."
-sed -i.bak "s/USERNAME = \"youruser\"/USERNAME = \"$USERNAME\"/g" flake.nix
-rm -f flake.nix.bak
+USERNAME_ESC=$(sed_escape_replacement "$USERNAME")
+if grep -q 'USERNAME = "youruser"' flake.nix; then
+    sed -i.bak "s/USERNAME = \"youruser\"/USERNAME = \"$USERNAME_ESC\"/g" flake.nix
+    rm -f flake.nix.bak
+    info "flake.nix username updated: $USERNAME"
+else
+    warn "Placeholder 'youruser' not found in flake.nix, likely already replaced. Skipping username update."
+fi
 
 # =============================================
 # Create host configuration directory
@@ -454,10 +466,32 @@ echo "}" >> "home/hosts/$HOSTNAME.nix"
 # =============================================
 # Update user-related configurations
 # =============================================
+
 info "Updating Git configuration..."
-sed -i.bak "s/Your Name/$GIT_USERNAME/g" home/common/git.nix
-sed -i.bak "s/your.email@example.com/$GIT_EMAIL/g" home/common/git.nix
-rm -f home/common/git.nix.bak
+
+GIT_USERNAME_ESC=$(sed_escape_replacement "$GIT_USERNAME")
+GIT_EMAIL_ESC=$(sed_escape_replacement "$GIT_EMAIL")
+
+# Check and replace the Git username placeholder in git.nix
+# Uses a precise pattern (with field name userName) to avoid mismatches and support idempotent runs
+if grep -q 'userName = "Your Name"' home/common/git.nix; then
+    sed -i.bak "s/userName = \"Your Name\"/userName = \"$GIT_USERNAME_ESC\"/" home/common/git.nix
+    rm -f home/common/git.nix.bak
+    info "Git username updated: $GIT_USERNAME"
+else
+    warn "Placeholder 'Your Name' not found in git.nix, likely already replaced. Skipping username update."
+    warn "To change the Git username, manually edit the userName field in home/common/git.nix"
+fi
+
+# Check and replace the Git email placeholder in git.nix
+if grep -q 'userEmail = "your.email@example.com"' home/common/git.nix; then
+    sed -i.bak "s/userEmail = \"your.email@example.com\"/userEmail = \"$GIT_EMAIL_ESC\"/" home/common/git.nix
+    rm -f home/common/git.nix.bak
+    info "Git email updated: $GIT_EMAIL"
+else
+    warn "Placeholder 'your.email@example.com' not found in git.nix, likely already replaced. Skipping email update."
+    warn "To change the Git email, manually edit the userEmail field in home/common/git.nix"
+fi
 
 info "Updating hosts/common/default.nix user configuration..."
 sed -i.bak "s/youruser/$USERNAME/g" hosts/common/default.nix
@@ -472,19 +506,34 @@ rm -f modules/services/virtualisation.nix.bak
 # =============================================
 info "Configuring flake.nix to add new host..."
 
-# Check if host configuration already exists
-if grep -q "    $FLAKE_NAME = mkHost" flake.nix; then
+# FLAKE_NAME must be quoted as a nix attribute name
+# Otherwise names with hyphens (e.g. my-desktop) are parsed as subtraction, causing a syntax error
+FLAKE_ENTRY="      \"${FLAKE_NAME}\" = mkHost \"${HOSTNAME}\";"
+
+# Check if host configuration already exists (match the quoted attribute name exactly)
+if grep -qF "\"${FLAKE_NAME}\" = mkHost" flake.nix; then
     warn "Host $FLAKE_NAME already exists in flake.nix"
     if confirm "Update existing configuration?"; then
-        # Remove old config and re-add
-        sed -i.bak "/    $FLAKE_NAME = mkHost/d" flake.nix
-        sed -i.bak "/nixosConfigurations = {/a \\      $FLAKE_NAME = mkHost \"$HOSTNAME\";\\\n" flake.nix
+        # Remove the old config line
+        sed -i.bak "/\"${FLAKE_NAME}\" = mkHost/d" flake.nix
         rm -f flake.nix.bak
+        # Insert the new config line (using awk to avoid cross-version issues with sed 'a' command)
+        awk -v entry="$FLAKE_ENTRY" 'index($0, "nixosConfigurations = {") {print; print entry; next} {print}' flake.nix > flake.nix.tmp && mv flake.nix.tmp flake.nix
+        info "Host configuration updated: \"${FLAKE_NAME}\" = mkHost \"${HOSTNAME}\""
+    else
+        error "User cancelled configuration update"
     fi
 else
     # Add new host configuration
-    sed -i.bak "/nixosConfigurations = {/a \\      $FLAKE_NAME = mkHost \"$HOSTNAME\";\\\n" flake.nix
-    rm -f flake.nix.bak
+    awk -v entry="$FLAKE_ENTRY" 'index($0, "nixosConfigurations = {") {print; print entry; next} {print}' flake.nix > flake.nix.tmp && mv flake.nix.tmp flake.nix
+    info "Added host configuration: \"${FLAKE_NAME}\" = mkHost \"${HOSTNAME}\""
+fi
+
+# Verify the insertion succeeded
+if grep -qF "\"${FLAKE_NAME}\" = mkHost" flake.nix; then
+    info "flake.nix host configuration verified successfully"
+else
+    error "flake.nix host configuration insertion failed, please manually check the nixosConfigurations block in flake.nix"
 fi
 
 # =============================================
