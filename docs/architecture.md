@@ -393,7 +393,7 @@ nixConfig = {
 |------|------|------|
 | 系统 | git、wget、curl、nil、tmux、zsh、tree、highlight、nixpkgs-fmt | `modules/system/default.nix` |
 | 用户 | fastfetch、btop、eza、bat、fzf、fd、ripgrep、yazi、zoxide、dust、duf、tokei、hyperfine、procs | `home/common/cli.nix` |
-| 桌面 | rofi、nemo、nemo-extensions、evince、eog、alacritty/kitty/foot（默认 foot）、pywal、vlc | `home/common/apps.nix` |
+| 桌面 | rofi、nemo、nemo-extensions、evince、loupe、alacritty/kitty/foot（默认 foot）、pywal、vlc | `home/common/apps.nix` |
 | 开发 | clangd、clang-tools、cmake、ninja、gdb、lldb、go、gopls、python3、pyright、rustc、rust-analyzer、rustfmt、cargo | `home/common/dev-lsp.nix` |
 | 办公 | wps-office-cn、nextcloud-client | `home/common/apps.nix` |
 

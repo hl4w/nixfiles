@@ -40,6 +40,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Script Shebang Update**: Updated all sh script shebangs from `#!/bin/sh` to `#!/usr/bin/env bash` to ensure proper bash syntax execution
 ### Changed
 - **License Verification**: Confirmed LICENSE file content complies with GNU GPL v3.0 standard text
+- **Image viewer replacement**: Replaced `eog` (Eye of GNOME, GTK3) with `loupe` (official GNOME successor, GTK4/LibAdwaita, Wayland-native) in `home/common/apps.nix`; visually consistent with evince/nemo and supports HEIF/AVIF/JPEG XL. Architecture, FAQ, and migration docs (both languages) updated accordingly
 ### Fixed
 - **Fixed FLAKE_NAME not quoted causing nix syntax error in install.sh**: `scripts/install.sh` and `scripts/install_en.sh` inserted host entries into the `nixosConfigurations` block of `flake.nix` with unquoted attribute names (e.g. `my-desktop-config = mkHost "my-desktop";`). Nix parses unquoted attribute names containing hyphens as subtraction (`my - desktop - config`), causing `nix flake check` and `nixos-rebuild` to fail. Now generates `"${FLAKE_NAME}" = mkHost "${HOSTNAME}";` instead
 - **Fixed fragile sed substitution in install.sh**:

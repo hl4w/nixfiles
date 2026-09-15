@@ -71,7 +71,7 @@ chmod +x scripts/install.sh
 |--------|------|------|
 | 系统包 | `modules/system/default.nix` | git, wget, curl, tmux, zsh |
 | 用户包 | `home/common/cli.nix` | fastfetch, btop, eza, bat, fzf, fd, ripgrep, yazi, zoxide, dust, duf, tokei, hyperfine, procs |
-| 桌面包 | `home/common/apps.nix` | rofi, nemo, nemo-extensions, evince, eog, alacritty/kitty/foot（默认 foot）, vlc |
+| 桌面包 | `home/common/apps.nix` | rofi, nemo, nemo-extensions, evince, loupe, alacritty/kitty/foot（默认 foot）, vlc |
 | 开发包 | `home/common/dev-lsp.nix` | clangd, clang-tools, cmake, ninja, gdb, lldb, go, gopls, python3, pyright, rustc, rust-analyzer, rustfmt, cargo |
 | 办公包 | `home/common/apps.nix` | wps-office-cn, nextcloud-client |
 

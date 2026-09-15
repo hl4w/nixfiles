@@ -393,7 +393,7 @@ This configuration only supports Wayland/Xwayland, not pure X11:
 |-------|----------|----------|
 | System | git, wget, curl, nil, tmux, zsh, tree, highlight, nixpkgs-fmt | `modules/system/default.nix` |
 | User | fastfetch, btop, eza, bat, fzf, fd, ripgrep, yazi, zoxide, dust, duf, tokei, hyperfine, procs | `home/common/cli.nix` |
-| Desktop | rofi, nemo, nemo-extensions, evince, eog, alacritty/kitty/foot (foot default), pywal, vlc | `home/common/apps.nix` |
+| Desktop | rofi, nemo, nemo-extensions, evince, loupe, alacritty/kitty/foot (foot default), pywal, vlc | `home/common/apps.nix` |
 | Development | clangd, clang-tools, cmake, ninja, gdb, lldb, go, gopls, python3, pyright, rustc, rust-analyzer, rustfmt, cargo | `home/common/dev-lsp.nix` |
 | Office | wps-office-cn, nextcloud-client | `home/common/apps.nix` |
 

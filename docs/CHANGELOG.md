@@ -40,6 +40,7 @@
 - **脚本 Shebang 更新**: 将所有 sh 脚本的 shebang 从 `#!/bin/sh` 更新为 `#!/usr/bin/env bash`，确保 bash 语法正确执行
 ### Changed
 - **许可证验证**: 确认 LICENSE 文件内容符合 GNU GPL v3.0 标准文本
+- **图片查看器替换**: 将 `home/common/apps.nix` 中的 `eog`（Eye of GNOME，GTK3）替换为 `loupe`（GNOME 官方继任者，GTK4/LibAdwaita，Wayland 原生），与 evince/nemo 风格统一，支持 HEIF/AVIF/JPEG XL；同步更新 architecture、faq、migration 中英文档
 ### Fixed
 - **修复 install.sh 中 FLAKE_NAME 未加引号导致 nix 语法错误**：`scripts/install.sh` 与 `scripts/install_en.sh` 在向 `flake.nix` 的 `nixosConfigurations` 块插入主机条目时，生成的属性名未用双引号包裹（如 `my-desktop-config = mkHost "my-desktop";`）。Nix 会将含连字符的裸属性名解析为减法运算（`my - desktop - config`），导致 `nix flake check` 与 `nixos-rebuild` 失败。现已改为 `"${FLAKE_NAME}" = mkHost "${HOSTNAME}";`
 - **修复 install.sh 中 sed 替换的脆弱性**：

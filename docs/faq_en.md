@@ -71,7 +71,7 @@ Edit `home/common/shell.nix` for shared shell configuration or create host-speci
 |--------------|----------|---------|
 | System packages | `modules/system/default.nix` | git, wget, curl, tmux, zsh |
 | User packages | `home/common/cli.nix` | fastfetch, btop, eza, bat, fzf, fd, ripgrep, yazi, zoxide, dust, duf, tokei, hyperfine, procs |
-| Desktop packages | `home/common/apps.nix` | rofi, nemo, nemo-extensions, evince, eog, alacritty/kitty/foot (foot default), vlc |
+| Desktop packages | `home/common/apps.nix` | rofi, nemo, nemo-extensions, evince, loupe, alacritty/kitty/foot (foot default), vlc |
 | Development packages | `home/common/dev-lsp.nix` | clangd, clang-tools, cmake, ninja, gdb, lldb, go, gopls, python3, pyright, rustc, rust-analyzer, rustfmt, cargo |
 | Office packages | `home/common/apps.nix` | wps-office-cn, nextcloud-client |
 
