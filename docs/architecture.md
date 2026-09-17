@@ -18,7 +18,7 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 │   ├── desktop/          # 桌面配置（由 install.sh 生成）
 │   │   └── configuration.nix  # 系统级配置
 │   ├── laptop/           # 笔记本配置（由 install.sh 生成）
-│   │   └── configuration.nix  # 系统级配置
+│   │   └── configuration.nix  # 系统级配置（VPN 插件、WiFi 省电、电源管理）
 │   └── server/           # 服务器配置（由 install.sh 生成）
 │       └── configuration.nix
 ├── modules/              # 可复用的系统模块
@@ -63,7 +63,7 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 │       ├── desktop/       # 桌面用户配置
 │       │   └── default.nix  # 桌面特定软件包（游戏、创作工具）
 │       ├── laptop/        # 笔记本用户配置
-│       │   └── default.nix  # 笔记本特定软件包（VPN、电源管理）
+│       │   └── default.nix  # 笔记本特定软件包（电源管理；VPN 插件在系统级 hosts/laptop/）
 │       ├── server/        # 服务器用户配置
 │       │   └── default.nix  # 服务器特定配置
 │       ├── desktop.nix    # 桌面入口（导入 common + desktop/default.nix）

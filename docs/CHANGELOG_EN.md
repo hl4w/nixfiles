@@ -41,6 +41,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 - **License Verification**: Confirmed LICENSE file content complies with GNU GPL v3.0 standard text
 - **Image viewer replacement**: Replaced `eog` (Eye of GNOME, GTK3) with `loupe` (official GNOME successor, GTK4/LibAdwaita, Wayland-native) in `home/common/apps.nix`; visually consistent with evince/nemo and supports HEIF/AVIF/JPEG XL. Architecture, FAQ, and migration docs (both languages) updated accordingly
+- **NetworkManager tooling optimization (NixOS 26.05)**:
+  - Moved VPN plugins from `home/hosts/laptop/default.nix` (user-level `home.packages`) to `hosts/laptop/configuration.nix` via `networking.networkmanager.plugins`, since the NM daemon runs as root and can only load system-level plugins
+  - Added `networkmanager-openvpn` (most common VPN protocol)
+  - Enabled `networking.networkmanager.wifi.powersave = true` (laptop WiFi power saving, officially recommended by NixOS)
+  - Confirmed `nmcli`/`nmtui` are auto-installed with `networking.networkmanager.enable = true`, no separate declaration needed
+- **oh-my-rime input method config framework refactor**: Changed oh-my-rime from `home.packages` (not a nixpkgs package, causes evaluation error) to a flake input (`github:Mintimate/oh-my-rime/main`); deploys schema/dict/lua files via symlinks to `~/.local/share/fcitx5/rime/` using `home.file`; uses `default.custom.yaml` to override `schema_list` and lets RIME auto-generate the writable `installation.yaml`
+- **Added Fcitx5 Catppuccin theme**: Added `catppuccin-fcitx5` to `fcitx5.addons` in `modules/input-method/default.nix`, configured `Theme=catppuccin-mocha-mauve` via `~/.config/fcitx5/conf/classicui.conf` through `home.file`; supports 4 flavors (latte/frappe/macchiato/mocha) × 14 accent colors
 ### Fixed
 - **Fixed FLAKE_NAME not quoted causing nix syntax error in install.sh**: `scripts/install.sh` and `scripts/install_en.sh` inserted host entries into the `nixosConfigurations` block of `flake.nix` with unquoted attribute names (e.g. `my-desktop-config = mkHost "my-desktop";`). Nix parses unquoted attribute names containing hyphens as subtraction (`my - desktop - config`), causing `nix flake check` and `nixos-rebuild` to fail. Now generates `"${FLAKE_NAME}" = mkHost "${HOSTNAME}";` instead
 - **Fixed fragile sed substitution in install.sh**:
@@ -51,7 +58,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Replaced the `a \\...\\\n` sed append command (complex escaping, inconsistent across sed versions) with `awk index()` matching the `nixosConfigurations = {` line for precise insertion
   - Switched `grep` detection to `grep -qF` fixed-string matching, eliminating the 4-space vs 6-space indentation mismatch
   - Added post-insertion verification: fails fast with `error` instead of silently continuing on insertion failure
-
+- **Fixed NetworkManager DNS option path in network.nix**: `services.networkmanager.dns` does not exist in NixOS; the correct path is `networking.networkmanager.dns`, meaning the DNS management setting was not taking effect. Corrected to `networking.networkmanager.dns = "systemd-resolved"`
+- **Fixed oh-my-rime fetch and configuration errors in input.nix**:
+  - `home.packages = [ oh-my-rime ]`: oh-my-rime is not a nixpkgs package, causing Nix evaluation error
+  - `fetchFromGitHub { owner = "lotem"; rev = "master"; sha256 = fakeSha256 }`: actual repo is `Mintimate/oh-my-rime` with default branch `main`, and `fakeSha256` is a dev placeholder that fails to build
+  - `schema_list` in `installation.yaml` referenced `luna_pinyin_simp`, `flypy`, `bopomofo` which do not exist in oh-my-rime (actual schemes: `rime_mint`, `rime_mint_flypy`, etc.)
+  - `__patch` referenced `default.custom.yaml`, `luna_pinyin.custom.yaml`, `key_bindings.custom.yaml` etc. which do not exist in the oh-my-rime repo
+  - Config files were written to `~/.config/rime/` via `xdg.configFile."rime/..."`, but fcitx5-rime's actual data directory is `~/.local/share/fcitx5/rime/`
 ## [v0.0.4] - 2026-06-15
 
 ### Added

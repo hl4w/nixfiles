@@ -17,6 +17,7 @@
           qt6Packages.fcitx5-chinese-addons # 中文输入法扩展（拼音、五笔等）
           fcitx5-gtk                       # GTK 应用支持
           qt6Packages.fcitx5-qt           # Qt6 应用支持（NixOS 26.05）
+          catppuccin-fcitx5               # Catppuccin 配色主题（latte/frappe/macchiato/mocha）
         ];
       };
     };

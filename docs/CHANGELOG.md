@@ -41,6 +41,13 @@
 ### Changed
 - **许可证验证**: 确认 LICENSE 文件内容符合 GNU GPL v3.0 标准文本
 - **图片查看器替换**: 将 `home/common/apps.nix` 中的 `eog`（Eye of GNOME，GTK3）替换为 `loupe`（GNOME 官方继任者，GTK4/LibAdwaita，Wayland 原生），与 evince/nemo 风格统一，支持 HEIF/AVIF/JPEG XL；同步更新 architecture、faq、migration 中英文档
+- **NetworkManager 工具优化（NixOS 26.05）**：
+  - 将 VPN 插件从 `home/hosts/laptop/default.nix`（用户级 `home.packages`）移至 `hosts/laptop/configuration.nix` 的 `networking.networkmanager.plugins`，因为 NM 守护进程以 root 运行，只能加载系统级插件
+  - 新增 `networkmanager-openvpn`（最常见的 VPN 协议）
+  - 启用 `networking.networkmanager.wifi.powersave = true`（笔记本 WiFi 省电，NixOS 官方推荐）
+  - 确认 `nmcli`/`nmtui` 随 `networking.networkmanager.enable = true` 自动安装，无需单独声明
+- **oh-my-rime 输入法配置框架重构**：将 oh-my-rime 从 `home.packages`（非 nixpkgs 包，会导致求值错误）改为 flake input（`github:Mintimate/oh-my-rime/main`），通过 `home.file` 将 schema/dict/lua 文件符号链接部署到 `~/.local/share/fcitx5/rime/`；用 `default.custom.yaml` 覆盖 `schema_list` 指定启用方案，让 RIME 自动生成可写的 `installation.yaml`
+- **新增 Fcitx5 Catppuccin 主题**：在 `modules/input-method/default.nix` 的 `fcitx5.addons` 中添加 `catppuccin-fcitx5` 包，通过 `home.file` 写 `~/.config/fcitx5/conf/classicui.conf` 设置 `Theme=catppuccin-mocha-mauve`；支持 4 种 flavor（latte/frappe/macchiato/mocha）× 14 种 accent 配色
 ### Fixed
 - **修复 install.sh 中 FLAKE_NAME 未加引号导致 nix 语法错误**：`scripts/install.sh` 与 `scripts/install_en.sh` 在向 `flake.nix` 的 `nixosConfigurations` 块插入主机条目时，生成的属性名未用双引号包裹（如 `my-desktop-config = mkHost "my-desktop";`）。Nix 会将含连字符的裸属性名解析为减法运算（`my - desktop - config`），导致 `nix flake check` 与 `nixos-rebuild` 失败。现已改为 `"${FLAKE_NAME}" = mkHost "${HOSTNAME}";`
 - **修复 install.sh 中 sed 替换的脆弱性**：
@@ -51,7 +58,13 @@
   - 用 `awk index()` 精确匹配 `nixosConfigurations = {` 行后插入，替代转义复杂、跨 sed 版本行为不一致的 `a \\...\\\n` 写法
   - `grep` 检测改为 `grep -qF` 固定字符串匹配，消除 4 空格 vs 6 空格的缩进不一致问题
   - 新增插入后验证步骤：插入失败时立即 `error` 终止，而非静默继续
-
+- **修复 network.nix 中 NetworkManager DNS 选项路径错误**：`services.networkmanager.dns` 在 NixOS 中不存在，实际选项路径为 `networking.networkmanager.dns`，导致 DNS 管理设置未生效。已修正为 `networking.networkmanager.dns = "systemd-resolved"`
+- **修复 input.nix 中 oh-my-rime 无法拉取及配置错误**：
+  - `home.packages = [ oh-my-rime ]`：oh-my-rime 不是 nixpkgs 包，导致 Nix 求值错误
+  - `fetchFromGitHub { owner = "lotem"; rev = "master"; sha256 = fakeSha256 }`：仓库实际为 `Mintimate/oh-my-rime`，默认分支为 `main`，且 `fakeSha256` 为开发占位符无法构建
+  - `installation.yaml` 中 `schema_list` 引用的 `luna_pinyin_simp`、`flypy`、`bopomofo` 在 oh-my-rime 仓库中不存在（实际方案为 `rime_mint`、`rime_mint_flypy` 等）
+  - `__patch` 引用的 `default.custom.yaml`、`luna_pinyin.custom.yaml`、`key_bindings.custom.yaml` 等文件在 oh-my-rime 仓库中不存在
+  - 配置文件通过 `xdg.configFile."rime/..."` 写入 `~/.config/rime/`，但 fcitx5-rime 实际数据目录为 `~/.local/share/fcitx5/rime/`
 ## [v0.0.4] - 2026-06-15
 
 ### Added

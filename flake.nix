@@ -41,6 +41,13 @@
     
     # Hyprland 工具链（用于管理 Hyprland 配置）
     hyprnix.url = "github:hyprwm/hyprnix/main";
+
+    # oh-my-rime RIME 输入法配置框架（薄荷拼音）
+    # 仓库: https://github.com/Mintimate/oh-my-rime
+    oh-my-rime = {
+      url = "github:Mintimate/oh-my-rime/main";
+      flake = false;  # 非 flake 仓库，仅作为源码输入
+    };
   };
 
   # Flake 输出配置
