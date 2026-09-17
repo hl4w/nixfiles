@@ -124,7 +124,7 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 | `services/virtualisation.nix` | Docker and Libvirt configuration (optional) |
 | `boot/default.nix` | UEFI boot with systemd-boot, keep 3 boot entries, quiet boot parameters |
 | `boot/plymouth.nix` | Plymouth boot animation configuration (with systemd initrd) |
-| `input-method/default.nix` | Fcitx5 + RIME input method (Wayland only) |
+| `input-method/default.nix` | Fcitx5 + RIME input method (Wayland only) with Catppuccin theme |
 | `desktops/desktop.nix` | Desktop environment configuration module (dynamic window manager and shell selection) |
 | `desktops/hyprland.nix` | Hyprland (Lua syntax via hyprnix) |
 | `desktops/niri.nix` | Niri window manager |

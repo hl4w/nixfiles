@@ -208,9 +208,20 @@ Edit `modules/desktops/niri.nix` for system-level configuration.
 
 ### How do I configure input method (Chinese)?
 
-The configuration uses Fcitx5 + RIME with oh-my-rime preset:
-- System level: `modules/input-method/default.nix`
-- User level: `home/common/input.nix`
+The configuration uses Fcitx5 + RIME with oh-my-rime (Mint Pinyin) preset:
+- System level: `modules/input-method/default.nix` (Fcitx5 engine, RIME addon, Catppuccin theme package)
+- User level: `home/common/input.nix` (oh-my-rime framework deployment, schema list, theme settings)
+
+**oh-my-rime configuration mechanism**:
+- oh-my-rime is fetched as a flake input (`github:Mintimate/oh-my-rime/main`)
+- schema/dict/lua files are symlinked to `~/.local/share/fcitx5/rime/` via `home.file`
+- `default.custom.yaml` overrides `schema_list` to specify enabled schemes (default: rime_mint, rime_mint_flypy, terra_pinyin, stroke)
+
+**Catppuccin theme switching**:
+Modify the `Theme` value in `classicui.conf` within `home/common/input.nix`, format: `catppuccin-{flavor}-{accent}`:
+- flavor: `latte` (light), `frappe`, `macchiato`, `mocha` (dark)
+- accent: `rosewater`, `flamingo`, `pink`, `mauve`, `red`, `maroon`, `peach`, `yellow`, `green`, `teal`, `sky`, `sapphire`, `blue`, `lavender`
+- Restart fcitx5 with `fcitx5 -r` to apply changes
 
 ### How do I use the wallpaper auto-color feature?
 

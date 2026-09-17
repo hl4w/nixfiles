@@ -10,7 +10,7 @@
 - **模块化架构**: 清晰的目录结构，易于扩展和维护 [(架构文档)](docs/architecture.md)
 - **多主机支持**: 桌面、笔记本、服务器统一管理 [(架构文档)](docs/architecture.md)
 - **GPU 自动检测**: 安装时自动识别 NVIDIA/AMD/Intel 显卡，智能配置驱动和内核参数 [(架构文档)](docs/architecture.md)
-- **主题统一**: GTK/Qt/Hyprland/Niri/Shell/SDDM 统一配色 [(架构文档)](docs/architecture.md)
+- **主题统一**: GTK/Qt/Hyprland/Niri/Shell/SDDM/Fcitx5 统一配色（Catppuccin）[(架构文档)](docs/architecture.md)
 - **壁纸自动取色**: 使用 pywal 从壁纸提取颜色 [(架构文档)](docs/architecture.md)
 - **日夜主题切换**: 自动根据时间切换深浅风格 [(架构文档)](docs/architecture.md)
 - **WPS Office CN**: 中国版办公套件，中文支持更好 [(架构文档)](docs/architecture.md)
@@ -26,6 +26,7 @@
 - **Lix 高性能 Nix**: 使用 Lix 替代原生 Nix，性能更优
 - **模块化音频配置**: 统一的音频模块（rtkit + PipeWire + PulseAudio 兼容性）
 - **拼写检查支持**: 系统级安装 nuspell 引擎，支持英语拼写检查
+- **中文输入法**: Fcitx5 + RIME 集成 oh-my-rime（薄荷拼音）配置框架，支持拼音、双拼、地球拼音等方案 [(架构文档)](docs/architecture.md)
 - **中国镜像加速**: 默认配置中科大、清华、北外镜像，加速二进制包下载
 - **壁纸仓库**: 提供完整壁纸集合下载地址 `https://github.com/hl4w/wallpaper.git`
 
@@ -56,25 +57,28 @@ git clone https://gitee.com/hl4w/nixfiles.git
 # git clone https://github.com/hl4w/nixfiles.git
 cd nixfiles
 
-# 2. 创建主机配置目录（复制模板）
+# 2. 生成 flake.lock（锁定依赖版本，含 oh-my-rime 输入法框架）
+nix flake update
+
+# 3. 创建主机配置目录（复制模板）
 cp -r templates/host-template hosts/<hostname>
 
-# 3. 生成硬件配置
+# 4. 生成硬件配置
 nixos-generate-config --show-hardware-config > hosts/<hostname>/hardware-configuration.nix
 
-# 4. 编辑 flake.nix，在 nixosConfigurations 中添加主机条目
+# 5. 编辑 flake.nix，在 nixosConfigurations 中添加主机条目
 # my-hostname = mkHost "my-hostname";
 
-# 5. 创建 Home Manager 用户配置
+# 6. 创建 Home Manager 用户配置
 touch home/hosts/<hostname>.nix
 
-# 6. 构建配置
+# 7. 构建配置
 nix build .#<hostname>
 
-# 7. 部署系统
+# 8. 部署系统
 sudo nixos-rebuild switch --flake .#<hostname>
 
-# 8. 更新用户配置
+# 9. 更新用户配置
 home-manager switch --flake .#<username>@<hostname>
 ```
 
@@ -108,7 +112,7 @@ home-manager switch --flake .#<username>@<hostname>
 │   ├── boot/                 # 启动相关配置
 │   ├── desktops/             # 桌面环境配置（Hyprland、Niri、主题）
 │   ├── hardware/             # 硬件相关配置
-│   ├── input-method/         # 输入法配置（Fcitx5 + RIME）
+│   ├── input-method/         # 输入法配置（Fcitx5 + RIME + oh-my-rime + Catppuccin）
 │   ├── services/             # 服务配置（网络、安全、虚拟化）
 │   └── system/               # 系统基础配置（字体、用户、环境变量）
 ├── home/                     # Home Manager 用户配置（用户级）
@@ -123,8 +127,7 @@ home-manager switch --flake .#<username>@<hostname>
 ├── wallpapers/               # 壁纸文件
 ├── docs/                     # 文档
 ├── secrets/                  # 敏感配置（不纳入版本控制）
-├── flake.nix                 # 入口配置
-└── flake.lock                # 版本锁定
+└── flake.nix                 # 入口配置（首次构建前需运行 nix flake update 生成 flake.lock）
 ```
 
 ### 配置层级说明

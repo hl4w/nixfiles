@@ -10,7 +10,7 @@ A modern configuration repository built on NixOS 26.05, featuring a deeply optim
 - **Modular Architecture**: Clear directory structure for easy extension and maintenance [(Architecture)](docs/architecture.md)
 - **Multi-host Support**: Unified management for desktop, laptop, and server [(Architecture)](docs/architecture.md)
 - **GPU Auto-Detection**: Automatically identifies NVIDIA/AMD/Intel GPUs during installation, intelligently configures drivers and kernel parameters [(Architecture)](docs/architecture.md)
-- **Unified Theming**: Consistent GTK/Qt/Hyprland/Niri/Shell/SDDM color schemes [(Architecture)](docs/architecture.md)
+- **Unified Theming**: Consistent GTK/Qt/Hyprland/Niri/Shell/SDDM/Fcitx5 color schemes (Catppuccin) [(Architecture)](docs/architecture.md)
 - **Wallpaper Auto-color**: Uses pywal to extract colors from wallpaper [(Architecture)](docs/architecture.md)
 - **Day/Night Theme Switching**: Automatic light/dark theme switching based on time [(Architecture)](docs/architecture.md)
 - **WPS Office CN**: Chinese version office suite with better Chinese support [(Architecture)](docs/architecture.md)
@@ -26,6 +26,7 @@ A modern configuration repository built on NixOS 26.05, featuring a deeply optim
 - **Lix High-Performance Nix**: Uses Lix instead of native Nix for better performance
 - **Modular Audio Configuration**: Unified audio module (rtkit + PipeWire + PulseAudio compatibility)
 - **Spell Checker Support**: System-level nuspell engine with English dictionary support
+- **Chinese Input Method**: Fcitx5 + RIME with oh-my-rime (Mint Pinyin) config framework, supporting pinyin, double pinyin, terra pinyin, etc. [(Architecture)](docs/architecture.md)
 - **Chinese Mirror Acceleration**: Pre-configured with USTC, Tsinghua, BFSU mirrors for faster binary downloads
 - **Wallpaper Repository**: Full wallpaper collection available at `https://github.com/hl4w/wallpaper.git`
 
@@ -56,25 +57,28 @@ git clone https://gitee.com/hl4w/nixfiles.git
 # git clone https://github.com/hl4w/nixfiles.git
 cd nixfiles
 
-# 2. Create host configuration directory (copy template)
+# 2. Generate flake.lock (lock dependency versions, including oh-my-rime input method framework)
+nix flake update
+
+# 3. Create host configuration directory (copy template)
 cp -r templates/host-template hosts/<hostname>
 
-# 3. Generate hardware configuration
+# 4. Generate hardware configuration
 nixos-generate-config --show-hardware-config > hosts/<hostname>/hardware-configuration.nix
 
-# 4. Edit flake.nix, add host entry in nixosConfigurations
+# 5. Edit flake.nix, add host entry in nixosConfigurations
 # my-hostname = mkHost "my-hostname";
 
-# 5. Create Home Manager user configuration
+# 6. Create Home Manager user configuration
 touch home/hosts/<hostname>.nix
 
-# 6. Build configuration
+# 7. Build configuration
 nix build .#<hostname>
 
-# 7. Deploy system
+# 8. Deploy system
 sudo nixos-rebuild switch --flake .#<hostname>
 
-# 8. Update user configuration
+# 9. Update user configuration
 home-manager switch --flake .#<username>@<hostname>
 ```
 
@@ -108,7 +112,7 @@ See `docs/` directory for detailed documentation:
 │   ├── boot/                 # Boot-related configurations
 │   ├── desktops/             # Desktop environment configs (Hyprland, Niri, themes)
 │   ├── hardware/             # Hardware configurations
-│   ├── input-method/         # Input method configuration (Fcitx5 + RIME)
+│   ├── input-method/         # Input method config (Fcitx5 + RIME + oh-my-rime + Catppuccin)
 │   ├── services/             # Service configurations (network, security, virtualization)
 │   └── system/               # System base configurations (fonts, users, env vars)
 ├── home/                     # Home Manager user configurations (user-level)
@@ -123,8 +127,7 @@ See `docs/` directory for detailed documentation:
 ├── wallpapers/               # Wallpaper files
 ├── docs/                     # Documentation
 ├── secrets/                  # Sensitive configurations (not version controlled)
-├── flake.nix                 # Entry point configuration
-└── flake.lock                # Version lockfile
+└── flake.nix                 # Entry point (run `nix flake update` to generate flake.lock before first build)
 ```
 
 ### Configuration Layers

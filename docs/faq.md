@@ -208,9 +208,20 @@ procs -l
 
 ### 如何配置输入法（中文）？
 
-配置使用 Fcitx5 + RIME 搭配 oh-my-rime 预设：
-- 系统级：`modules/input-method/default.nix`
-- 用户级：`home/common/input.nix`
+配置使用 Fcitx5 + RIME 搭配 oh-my-rime（薄荷拼音）预设：
+- 系统级：`modules/input-method/default.nix`（Fcitx5 引擎、RIME 插件、Catppuccin 主题包）
+- 用户级：`home/common/input.nix`（oh-my-rime 配置框架部署、方案列表、主题设置）
+
+**oh-my-rime 配置机制**：
+- oh-my-rime 作为 flake input（`github:Mintimate/oh-my-rime/main`）拉取
+- 通过 `home.file` 将 schema/dict/lua 文件符号链接到 `~/.local/share/fcitx5/rime/`
+- 用 `default.custom.yaml` 覆盖 `schema_list` 指定启用的方案（默认 rime_mint、rime_mint_flypy、terra_pinyin、stroke）
+
+**Catppuccin 主题切换**：
+修改 `home/common/input.nix` 中 `classicui.conf` 的 `Theme` 值，格式为 `catppuccin-{flavor}-{accent}`：
+- flavor：`latte`（亮）、`frappe`、`macchiato`、`mocha`（暗）
+- accent：`rosewater`、`flamingo`、`pink`、`mauve`、`red`、`maroon`、`peach`、`yellow`、`green`、`teal`、`sky`、`sapphire`、`blue`、`lavender`
+- 切换后执行 `fcitx5 -r` 重启 fcitx5 生效
 
 ### 如何使用壁纸自动取色功能？
 

@@ -124,7 +124,7 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 | `services/virtualisation.nix` | Docker 和 Libvirt 配置（可选） |
 | `boot/default.nix` | UEFI 启动，使用 systemd-boot，保留 3 个启动项，静默启动参数 |
 | `boot/plymouth.nix` | Plymouth 启动动画配置（配合 systemd initrd） |
-| `input-method/default.nix` | Fcitx5 + RIME 输入法（仅 Wayland） |
+| `input-method/default.nix` | Fcitx5 + RIME 输入法（仅 Wayland），含 Catppuccin 主题 |
 | `desktops/desktop.nix` | 桌面环境配置模块（动态选择窗口管理器和桌面 shell） |
 | `desktops/hyprland.nix` | Hyprland（通过 hyprnix 使用 Lua 语法） |
 | `desktops/niri.nix` | Niri 窗口管理器 |
