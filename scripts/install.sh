@@ -455,6 +455,17 @@ EOF
 if [ "$HOST_TYPE_NAME" != "server" ]; then
     echo "    ../common/input.nix" >> "home/hosts/$HOSTNAME.nix"
     echo "    ../common/apps.nix" >> "home/hosts/$HOSTNAME.nix"
+    # 导入用户级主题（GTK/XDG 图标/WM 配色）
+    echo "    ../common/unified-theme.nix" >> "home/hosts/$HOSTNAME.nix"
+    # 根据选择的窗口管理器导入对应配置
+    case $WINDOW_MANAGER in
+        hyprland)
+            echo "    ../common/hyprland.nix" >> "home/hosts/$HOSTNAME.nix"
+            ;;
+        niri)
+            echo "    ../common/niri.nix" >> "home/hosts/$HOSTNAME.nix"
+            ;;
+    esac
 fi
 
 # 导入主机类型特定的用户级配置

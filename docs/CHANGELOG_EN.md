@@ -6,37 +6,47 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 ### Fixed
+- **Fixed NixOS vs Home Manager module boundary confusion (critical)**:
+  - `wayland.windowManager.hyprland` / `wayland.windowManager.niri` are Home Manager modules, not available in NixOS system config → Refactor: NixOS layer uses `programs.hyprland`/`programs.niri` for installation; detailed config moved to `home/common/hyprland.nix`/`niri.nix`
+  - `gtk.*` / `xdg.iconTheme` are Home Manager options → moved from `modules/desktops/unified-theme.nix` to `home/common/unified-theme.nix`; system layer keeps only `qt`/`services.sddm`/`environment.*`
+  - NixOS `qt` module only supports `enable`/`platformTheme`/`style`; removed non-existent `qt.iconTheme`/`qt.font`
 - **Removed non-existent NixOS options (critical)**:
-  - Deleted `security.pam.enableSSS = false` — this option does not exist in NixOS, causes evaluation errors
-  - Deleted `security.faillock.enable = true` — this option does not exist in NixOS (faillock requires custom `security.pam` rules)
-- **Removed non-existent NixOS module options**:
-  - Deleted `programs.noctalia-shell.enable` / `programs.dms-shell.enable` — noctalia-shell and dms-shell are Wayland shell packages, not NixOS module options
+  - Deleted `security.pam.enableSSS = false`
+  - Deleted `security.faillock.enable = true`
+  - Deleted `programs.noctalia-shell.enable` / `programs.dms-shell.enable` (packages, not module options)
+- **Fixed Nix syntax error (critical)**:
+  - `services.display-manager` → `services.displayManager` (hyphen is not a valid Nix identifier; parsed as subtraction)
 - **Hyprland 0.55 (NixOS 26.05) compatibility**:
-  - Migrated from hyprnix flake to native NixOS `wayland.windowManager.hyprland` module
-  - Added `configType = "hyprlang"` (Hyprland 0.55+ defaults to Lua config; explicit declaration needed for hyprlang format)
-  - `misc.xwayland = true` → `xwayland.enable = true` (0.55+ standalone declaration)
-  - Removed hyprland-plugins (package names changed in 0.55+)
-  - Removed standalone `xwayland` package (auto-installed by module)
-  - Fixed unified-theme.nix: `config.hyprland.settings.decoration` → `config.wayland.windowManager.hyprland.settings.decoration`
+  - Removed `hyprnix` flake input, using native NixOS module
+  - Added `configType = "hyprlang"` (0.55+ defaults to Lua)
+  - `misc.xwayland = true` → `xwayland.enable = true`
+  - Removed deprecated `hyprland-plugins.*` and standalone `xwayland` package
+  - `kb_layout = "us,cn"` → `"us"` ("cn" is not a valid XKB layout; Chinese handled by fcitx5)
+- **Home Manager 26.05 compatibility**:
+  - Added `home.stateVersion = "26.05"` (HM 26.05 has no default; must be set explicitly)
+  - `gtk.gtk4.theme` no longer mirrors `gtk.theme` by default; explicitly set `Adwaita-dark`
+  - Fixed `gtk.theme.package`: `adwaita-icon-theme` (icon package) → `gnome-themes-extra` (Adwaita theme package)
+- **Fixed deprecated/removed package names**:
+  - `noto-fonts-cjk` → `noto-fonts-cjk-sans` + `noto-fonts-cjk-serif`
+  - Removed non-existent `noto-fonts-emoji` (kept `noto-fonts-color-emoji`)
+- **Fixed Home Manager option location error**:
+  - `programs.yazi.shell.enableZoxideIntegration` → `programs.yazi.settings.shell.enableZoxideIntegration` (HM yazi module has no top-level shell option)
+- **Fixed install.sh generated Home Manager config**:
+  - Added imports for `unified-theme.nix` and the selected WM module (`hyprland.nix`/`niri.nix`)
 - **Fcitx5 vs oh-my-rime conflict fix**:
-  - Removed system-level `rime-data-*` packages (oh-my-rime flake input provides all schema/dict files)
+  - Removed system-level `rime-data-*` packages
 - **wallpaper-watcher.nix invalid options**:
-  - Removed `systemd.user.enable = true` and `systemd.user.services.wallpaper-watcher.enable = true` (Home Manager `Install.WantedBy` handles enablement)
-- **virtualisation.nix hardcoded values**:
-  - Removed `users.users.youruser.extraGroups` docker/libvirt groups (unified in hosts/common/default.nix; libvirt made optional via `lib.mkDefault false`)
-- **security.nix invalid firewall rules**:
-  - Removed `allowedUDPPorts = [ 80 443 ]` (HTTP/HTTPS use TCP only)
-- **nvidia.nix optimization**:
-  - Removed standalone `nvidia-settings` package (included in nvidia driver package)
+  - Removed `systemd.user.enable = true`
+- **Cleanup invalid config**:
+  - Removed `allowedUDPPorts = [ 80 443 ]` (HTTP/HTTPS are TCP only)
+  - Removed standalone `nvidia-settings` (included in driver)
 
 ### Changed
-- **Flake simplification**:
-  - Removed `hyprnix` flake input (NixOS 26.05 native Hyprland module fully supports it)
-- **Unified user group declarations**:
-  - Moved `video`/`audio`/`docker` groups to `hosts/common/default.nix` (previously scattered across desktop-common.nix and virtualisation.nix)
-  - Cleaned up `hosts/common/desktop-common.nix` (no independent config left)
-- **Unified terminal floating rules**:
-  - Added `foot` terminal floating rule to Hyprland windowrulev2 (matches foot default terminal)
+- **Architecture refactor**: WM detailed config moved from NixOS system layer to Home Manager user layer, conforming to NixOS native module boundaries
+- **Flake simplification**: Removed `hyprnix` flake input
+- **Unified user group declarations**: `video`/`audio`/`docker` groups in `hosts/common/default.nix`
+- **Unified terminal floating rules**: Added `foot` terminal floating rule to Hyprland windowrulev2
+- **Updated architecture docs**: `architecture.md` and `architecture_en.md` synced with module boundary refactor
 
 ## [v0.0.5] - 2026-06-16
 ### Added

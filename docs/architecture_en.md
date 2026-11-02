@@ -31,14 +31,14 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 │   │   ├── mouse.nix       # Mouse side button configuration
 │   │   ├── nvidia.nix
 │   │   └── sound.nix       # Audio configuration
-│   ├── desktops/         # Desktop environment configurations
+│   ├── desktops/         # Desktop environment configurations (NixOS system-level)
 │   │   ├── desktop.nix    # Desktop configuration module (dynamic WM/shell selection)
-│   │   ├── hyprland.nix   # Hyprland window manager (Lua config via hyprnix)
-│   │   ├── niri.nix       # Niri window manager
+│   │   ├── hyprland.nix   # Hyprland (programs.hyprland, system-level install)
+│   │   ├── niri.nix       # Niri (programs.niri, system-level install)
 │   │   ├── sddm.nix       # SDDM (Wayland only)
 │   │   ├── shell-dms.nix  # DMS-Shell (lightweight)
 │   │   ├── shell-noctalia.nix   # Noctalia-Shell (modern)
-│   │   └── unified-theme.nix    # GTK/Qt/Hyprland/Niri/Shell theme with day/night switching
+│   │   └── unified-theme.nix    # System-level theme (Qt/SDDM/env vars/day-night switching)
 │   ├── system/           # System base configuration
 │   │   ├── default.nix   # Base system configuration, users, packages, Nix config
 │   │   └── fonts.nix     # Font configuration (Noto CJK, Source Han, WenQuanYi), WPS Office CN font aliases
@@ -58,6 +58,9 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 │   │   ├── apps.nix      # GUI applications
 │   │   ├── dev-lsp.nix   # LSP servers (including C/C++)
 │   │   ├── git.nix       # Git configuration
+│   │   ├── hyprland.nix  # Hyprland detailed config (wayland.windowManager.hyprland)
+│   │   ├── niri.nix      # Niri detailed config (wayland.windowManager.niri)
+│   │   ├── unified-theme.nix # User-level theme (GTK/XDG icons/WM colors)
 │   │   └── wallpaper-watcher.nix  # Wallpaper watcher user service
 │   └── hosts/            # Host-specific user configurations (user-level)
 │       ├── desktop/       # Desktop user configuration
@@ -120,18 +123,18 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 | `system/default.nix` | Base system configuration (packages, timezone, locale, Nix settings with Chinese mirrors) |
 | `services/default.nix` | Service module entry (imports network, security, virtualisation) |
 | `services/network.nix` | Network configuration (NetworkManager, DNS) |
-| `services/security.nix` | Security settings (firewall, sudo, faillock) |
+| `services/security.nix` | Security settings (firewall, sudo) |
 | `services/virtualisation.nix` | Docker and Libvirt configuration (optional) |
 | `boot/default.nix` | UEFI boot with systemd-boot, keep 3 boot entries, quiet boot parameters |
 | `boot/plymouth.nix` | Plymouth boot animation configuration (with systemd initrd) |
 | `input-method/default.nix` | Fcitx5 + RIME input method (Wayland only) with Catppuccin theme |
 | `desktops/desktop.nix` | Desktop environment configuration module (dynamic window manager and shell selection) |
-| `desktops/hyprland.nix` | Hyprland (Lua syntax via hyprnix) |
-| `desktops/niri.nix` | Niri window manager |
+| `desktops/hyprland.nix` | Hyprland system-level install (programs.hyprland) |
+| `desktops/niri.nix` | Niri system-level install (programs.niri) |
 | `desktops/sddm.nix` | SDDM (Wayland mode only, Xwayland support) |
 | `desktops/shell-dms.nix` | DMS-Shell dependencies |
 | `desktops/shell-noctalia.nix` | Noctalia-Shell dependencies |
-| `desktops/unified-theme.nix` | GTK/Qt/Hyprland/Niri/Shell theme (Adwaita Dark/Light), icons (Papirus), pywal integration, day/night switching, dynamic desktop environment identification |
+| `desktops/unified-theme.nix` | System-level theme (Qt/SDDM/env vars/day-night switching) |
 | `system/fonts.nix` | System font configuration (Noto CJK, Source Han, WenQuanYi), WPS Office CN font alias mapping |
 | `hardware/bluetooth.nix` | Bluetooth device configuration |
 | `hardware/firmware.nix` | Additional firmware support (e.g., Intel WiFi, audio) |
@@ -150,6 +153,9 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 | `apps.nix` | GUI applications (browser, office, media) |
 | `dev-lsp.nix` | Development tools and LSP servers (C/C++: clangd/clang-tools/cmake/ninja/gdb/lldb; Go: go/gopls; Python: python3/pyright; Rust: rustc/rust-analyzer/rustfmt/cargo) |
 | `git.nix` | Git global configuration |
+| `hyprland.nix` | Hyprland detailed config (wayland.windowManager.hyprland: settings/keybinds/binds) |
+| `niri.nix` | Niri detailed config (wayland.windowManager.niri: settings) |
+| `unified-theme.nix` | User-level theme (GTK/XDG icons/Hyprland-Niri color merging) |
 | `wallpaper-watcher.nix` | Wallpaper change watcher user service (auto-update colors) |
 
 ### Documentation (`docs/`)

@@ -31,14 +31,14 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 │   │   ├── mouse.nix       # 鼠标侧键配置说明
 │   │   ├── nvidia.nix
 │   │   └── sound.nix       # 音频配置
-│   ├── desktops/         # 桌面环境配置
+│   ├── desktops/         # 桌面环境配置（NixOS 系统级）
 │   │   ├── desktop.nix    # 桌面配置模块（动态选择窗口管理器和 shell）
-│   │   ├── hyprland.nix   # Hyprland 窗口管理器（通过 hyprnix 使用 Lua 配置）
-│   │   ├── niri.nix       # Niri 窗口管理器
+│   │   ├── hyprland.nix   # Hyprland（programs.hyprland，系统级安装）
+│   │   ├── niri.nix       # Niri（programs.niri，系统级安装）
 │   │   ├── sddm.nix       # SDDM（仅 Wayland）
 │   │   ├── shell-dms.nix  # DMS-Shell（轻量级）
 │   │   ├── shell-noctalia.nix   # Noctalia-Shell（现代化）
-│   │   └── unified-theme.nix    # GTK/Qt/Hyprland/Niri/Shell 主题，支持日夜切换
+│   │   └── unified-theme.nix    # 系统级主题（Qt/SDDM/环境变量/日夜切换）
 │   ├── system/           # 系统基础配置
 │   │   ├── default.nix   # 基础系统配置、用户、包、Nix 配置
 │   │   └── fonts.nix     # 字体配置（Noto CJK、思源、文泉驿）、WPS Office CN 字体别名
@@ -58,6 +58,9 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 │   │   ├── apps.nix      # GUI 应用
 │   │   ├── dev-lsp.nix   # LSP 服务器（包括 C/C++）
 │   │   ├── git.nix       # Git 配置
+│   │   ├── hyprland.nix  # Hyprland 详细配置（wayland.windowManager.hyprland）
+│   │   ├── niri.nix      # Niri 详细配置（wayland.windowManager.niri）
+│   │   ├── unified-theme.nix # 用户级主题（GTK/XDG 图标/WM 配色）
 │   │   └── wallpaper-watcher.nix  # 壁纸监听器用户服务
 │   └── hosts/            # 主机特定用户配置（用户级）
 │       ├── desktop/       # 桌面用户配置
@@ -120,18 +123,18 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 | `system/default.nix` | 基础系统配置（包、时区、区域设置、带中国镜像的 Nix 设置） |
 | `services/default.nix` | 服务模块入口（导入网络、安全、虚拟化） |
 | `services/network.nix` | 网络配置（NetworkManager、DNS） |
-| `services/security.nix` | 安全设置（防火墙、sudo、faillock） |
+| `services/security.nix` | 安全设置（防火墙、sudo） |
 | `services/virtualisation.nix` | Docker 和 Libvirt 配置（可选） |
 | `boot/default.nix` | UEFI 启动，使用 systemd-boot，保留 3 个启动项，静默启动参数 |
 | `boot/plymouth.nix` | Plymouth 启动动画配置（配合 systemd initrd） |
 | `input-method/default.nix` | Fcitx5 + RIME 输入法（仅 Wayland），含 Catppuccin 主题 |
 | `desktops/desktop.nix` | 桌面环境配置模块（动态选择窗口管理器和桌面 shell） |
-| `desktops/hyprland.nix` | Hyprland（通过 hyprnix 使用 Lua 语法） |
-| `desktops/niri.nix` | Niri 窗口管理器 |
+| `desktops/hyprland.nix` | Hyprland 系统级安装（programs.hyprland） |
+| `desktops/niri.nix` | Niri 系统级安装（programs.niri） |
 | `desktops/sddm.nix` | SDDM（仅 Wayland 模式，支持 Xwayland） |
 | `desktops/shell-dms.nix` | DMS-Shell 依赖 |
 | `desktops/shell-noctalia.nix` | Noctalia-Shell 依赖 |
-| `desktops/unified-theme.nix` | GTK/Qt/Hyprland/Niri/Shell 主题（Adwaita Dark/Light）、图标（Papirus）、pywal 集成、日夜切换、桌面环境标识动态切换 |
+| `desktops/unified-theme.nix` | 系统级主题（Qt/SDDM/环境变量/日夜切换） |
 | `system/fonts.nix` | 系统字体配置（Noto CJK、思源、文泉驿）、WPS Office CN 字体别名映射 |
 | `hardware/bluetooth.nix` | 蓝牙设备配置 |
 | `hardware/firmware.nix` | 额外固件支持（如 Intel WiFi、音频等） |
@@ -150,6 +153,9 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 | `apps.nix` | GUI 应用（浏览器、办公、媒体） |
 | `dev-lsp.nix` | 开发工具和 LSP 服务器（C/C++: clangd/clang-tools/cmake/ninja/gdb/lldb；Go: go/gopls；Python: python3/pyright；Rust: rustc/rust-analyzer/rustfmt/cargo） |
 | `git.nix` | Git 全局配置 |
+| `hyprland.nix` | Hyprland 详细配置（wayland.windowManager.hyprland：settings/keybinds/binds） |
+| `niri.nix` | Niri 详细配置（wayland.windowManager.niri：settings） |
+| `unified-theme.nix` | 用户级主题（GTK/XDG 图标/Hyprland-Niri 配色合并） |
 | `wallpaper-watcher.nix` | 壁纸变化监听器用户服务（自动更新配色） |
 
 ### 文档 (`docs/`)
