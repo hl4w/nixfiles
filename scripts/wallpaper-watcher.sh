@@ -30,8 +30,9 @@ NC='\033[0m'
 WALLPAPER_DIR="${HOME}/.wallpapers"
 WAL_CACHE="${HOME}/.cache/wal"
 CURRENT_WALLPAPER_FILE="${WAL_CACHE}/wal"
-WATCH_INTERVAL=2  # 检查间隔（秒）
+WATCH_INTERVAL="${WATCH_INTERVAL:-5}"  # 检查间隔（秒），默认 5 秒以降低 CPU 占用
 LAST_TRIGGER_TIME=0
+LAST_CACHE_MODIFIED=0
 
 info() {
     echo -e "${GREEN}[WATCHER]${NC} $1"
@@ -48,9 +49,10 @@ error() {
 
 # 获取当前壁纸路径
 get_current_wallpaper() {
-    # 优先从 pywal 配置获取
+    # pywal 的 ~/.cache/wal/wal 文件内容就是当前壁纸路径（纯文本，非 key=value）
     if [ -f "$CURRENT_WALLPAPER_FILE" ]; then
-        local wp=$(awk -F'=' '/wallpaper/ {print $2}' "$CURRENT_WALLPAPER_FILE" | head -n 1 | tr -d '"')
+        local wp
+        wp=$(head -n 1 "$CURRENT_WALLPAPER_FILE" | tr -d '"')
         [ -n "$wp" ] && echo "$wp" && return
     fi
     
@@ -58,13 +60,14 @@ get_current_wallpaper() {
     local config_files=(
         "${HOME}/.config/hypr/hyprpaper.conf"
         "${HOME}/.config/noctalia-shell/config.conf"
-        "${HOME}/.config/dms-shell/config.conf"
+        "${HOME}/.config/DankMaterialShell/config.conf"
         "${HOME}/.config/sway/config"
     )
     
     for cfg in "${config_files[@]}"; do
         if [ -f "$cfg" ]; then
-            local wp=$(grep -i "wallpaper" "$cfg" | head -n 1 | awk '{print $2}')
+            local wp
+            wp=$(grep -i "wallpaper" "$cfg" | head -n 1 | awk '{print $2}')
             [ -n "$wp" ] && echo "$wp" && return
         fi
     done
@@ -90,16 +93,21 @@ apply_colors() {
         # 使用 pywal 提取颜色并应用
         if command -v wal &> /dev/null; then
             info "使用 pywal 从壁纸提取颜色..."
-            wal -i "$wallpaper" 2>/dev/null
+            if ! wal -i "$wallpaper" 2>/dev/null; then
+                warn "pywal 取色失败: $wallpaper"
+                return 0
+            fi
             
             # 更新额外配置
             update_starship
             update_shell_colors
         else
-            error "pywal 未安装"
+            warn "pywal 未安装，跳过取色"
+            return 0
         fi
     else
-        error "壁纸文件不存在: $wallpaper"
+        warn "壁纸文件不存在: $wallpaper"
+        return 0
     fi
 }
 
@@ -208,9 +216,10 @@ main() {
         
         # 额外检查 pywal 缓存目录变化
         if [ -d "$WAL_CACHE" ]; then
-            local cache_modified=$(stat -c "%Y" "$WAL_CACHE" 2>/dev/null || echo 0)
-            if [ "$cache_modified" -ne "$last_cache_modified" ]; then
-                last_cache_modified="$cache_modified"
+            local cache_modified
+            cache_modified=$(stat -c "%Y" "$WAL_CACHE" 2>/dev/null || echo 0)
+            if [ "$cache_modified" -ne "$LAST_CACHE_MODIFIED" ]; then
+                LAST_CACHE_MODIFIED="$cache_modified"
             fi
         fi
         

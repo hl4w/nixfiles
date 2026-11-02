@@ -112,21 +112,22 @@ list_wallpapers() {
     echo "可用壁纸:"
     echo "------------------------"
     
-    local format_pattern=""
-    for fmt in "${SUPPORTED_FORMATS[@]}"; do
-        [ -n "$format_pattern" ] && format_pattern="$format_pattern -o "
-        format_pattern="$format_pattern -name \"*.$fmt\""
+    local find_args=(-name "*.${SUPPORTED_FORMATS[0]}")
+    for fmt in "${SUPPORTED_FORMATS[@]:1}"; do
+        find_args+=(-o -name "*.$fmt")
     done
     
-    find "$WALLPAPER_DIR" -maxdepth 1 -type f \( $format_pattern \) | \
+    find "$WALLPAPER_DIR" -maxdepth 1 -type f \( "${find_args[@]}" \) | \
         sort | \
         while read -r file; do
-            local basename=$(basename "$file")
-            local size=$(du -h "$file" | cut -f1)
-            printf "  %-30s %s\n" "$basename" "$size"
+            local name size
+            name=$(basename "$file")
+            size=$(du -h "$file" | cut -f1)
+            printf "  %-30s %s\n" "$name" "$size"
         done
     
-    local count=$(find "$WALLPAPER_DIR" -maxdepth 1 -type f \( $format_pattern \) | wc -l)
+    local count
+    count=$(find "$WALLPAPER_DIR" -maxdepth 1 -type f \( "${find_args[@]}" \) | wc -l)
     echo "------------------------"
     echo "共 $count 张壁纸"
 }
@@ -274,6 +275,7 @@ update_neovim() {
     source "$COLOR_FILE"
     
     # 创建 Neovim 配色配置
+    mkdir -p "${HOME}/.config/nvim/colors"
     cat > "${HOME}/.config/nvim/colors/wal.vim" << EOF
 " 自动生成的 pywal Neovim 配色
 set background=dark
@@ -351,22 +353,14 @@ EOF
 set_wallpaper() {
     local wallpaper="$1"
     
-    # 设置壁纸（通过 Hyprland）
+    # Hyprland 下通过 hyprpaper 设置；空监视器名表示应用到所有显示器
     if command -v hyprctl &> /dev/null; then
-        hyprctl hyprpaper wallpaper "eDP-1,$wallpaper"
-        success "壁纸已设置 (Hyprland)"
-    fi
-    
-    # 设置壁纸（通过 Noctalia-Shell）
-    if command -v noctalia-shell &> /dev/null; then
-        noctalia-shell --set-wallpaper "$wallpaper"
-        success "壁纸已设置 (Noctalia-Shell)"
-    fi
-    
-    # 设置壁纸（通过 DMS-Shell）
-    if command -v dms-shell &> /dev/null; then
-        dms-shell --wallpaper "$wallpaper"
-        success "壁纸已设置 (DMS-Shell)"
+        hyprctl hyprpaper unload all >/dev/null 2>&1 || true
+        hyprctl hyprpaper preload "$wallpaper" >/dev/null 2>&1 || true
+        hyprctl hyprpaper wallpaper ",$wallpaper" >/dev/null 2>&1 || true
+        success "壁纸已设置 (Hyprland/hyprpaper)"
+    else
+        warning "未检测到 Hyprland，跳过壁纸设置（仅更新配色）"
     fi
 }
 
@@ -380,7 +374,7 @@ apply_colors() {
     info "应用配色..."
     
     # 重新生成所有配置文件
-    wal -R 2>/dev/null
+    wal -R 2>/dev/null || true
     
     # 更新各个应用配置
     update_starship
@@ -393,13 +387,6 @@ apply_colors() {
 
 # ============== 主函数 ==============
 main() {
-    # 检查 pywal 是否安装
-    if ! command -v wal &> /dev/null; then
-        error "pywal 未安装，请先安装 pywal"
-        error "安装命令: nix-env -iA nixos.pywal"
-        exit 1
-    fi
-    
     local action="apply"
     local wallpaper=""
     
@@ -411,6 +398,9 @@ main() {
                 exit 0
                 ;;
             -w|--wallpaper)
+                if [ -z "${2:-}" ]; then
+                    error "选项 $1 缺少壁纸路径"
+                fi
                 wallpaper="$2"
                 action="set"
                 shift
@@ -430,18 +420,24 @@ main() {
                 action="apply"
                 ;;
             -s|--set)
+                if [ -z "${2:-}" ]; then
+                    error "选项 $1 缺少壁纸名称"
+                fi
                 wallpaper="$2"
                 action="set"
                 shift
                 ;;
             *)
                 error "未知选项: $1"
-                show_help
-                exit 1
                 ;;
         esac
         shift
     done
+    
+    # 仅在需要取色的动作中检查 pywal（-h/-l/-c 已提前退出）
+    if ! command -v wal &> /dev/null; then
+        error "pywal 未安装，请在 Home Manager 配置中启用 pywal"
+    fi
     
     # 创建必要的目录
     mkdir -p "$WALLPAPER_DIR"

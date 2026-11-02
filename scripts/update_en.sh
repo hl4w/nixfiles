@@ -48,8 +48,10 @@ usage() {
     exit 0
 }
 
-# Defaults
-TARGET_HOSTNAME="$HOSTNAME"
+# Defaults: prefer $HOSTNAME, fall back to the hostname command
+TARGET_HOSTNAME="${HOSTNAME:-$(hostname 2>/dev/null || true)}"
+# Current user: used to render the Home Manager command hint
+CURRENT_USER="${USER:-$(id -un)}"
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -58,6 +60,9 @@ while [[ $# -gt 0 ]]; do
             usage
             ;;
         -H|--hostname)
+            if [ -z "${2:-}" ]; then
+                error "Option $1 requires a hostname argument"
+            fi
             TARGET_HOSTNAME="$2"
             shift 2
             ;;
@@ -66,6 +71,10 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+if [ -z "$TARGET_HOSTNAME" ]; then
+    error "Unable to determine hostname, specify one with -H <hostname>"
+fi
 
 info "=========================================="
 info "        HL4W NixOS Update Utility"
@@ -76,13 +85,10 @@ info "Updating flake inputs..."
 nix flake update
 
 info "Building system configuration..."
-if [ -n "$TARGET_HOSTNAME" ]; then
-    info "Target host: $TARGET_HOSTNAME"
-    nix build .#"$TARGET_HOSTNAME"
-else
-    warn "No hostname specified, using default configuration"
-    nix build .#desktop
-fi
+info "Target host: $TARGET_HOSTNAME"
+# nixosConfigurations build outputs require the full attribute path;
+# `nix build .#host` only works when flakes expose packages.<system>.<host>
+nix build ".#nixosConfigurations.\"${TARGET_HOSTNAME}\".config.system.build.toplevel"
 
 echo
 info "=========================================="
@@ -91,4 +97,4 @@ info "=========================================="
 echo
 info "Next steps to deploy the update:"
 echo "  sudo nixos-rebuild switch --flake .#$TARGET_HOSTNAME"
-echo "  home-manager switch --flake .#$USER@$TARGET_HOSTNAME"
+echo "  home-manager switch --flake .#$CURRENT_USER@$TARGET_HOSTNAME"

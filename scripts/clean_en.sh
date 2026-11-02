@@ -72,10 +72,12 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         -s|--store)
+            CLEAN_STORE=true
             CLEAN_GENERATIONS=false
             shift
             ;;
         -g|--generations)
+            CLEAN_GENERATIONS=true
             CLEAN_STORE=false
             shift
             ;;
@@ -101,7 +103,7 @@ if [ "$NON_INTERACTIVE" = false ]; then
         echo "  - Clean unused packages from Nix store"
     fi
     if [ "$CLEAN_GENERATIONS" = true ]; then
-        echo "  - Delete old system generations (keep latest 3)"
+        echo "  - Delete old system generations (keep current generation)"
     fi
     echo
     if ! confirm "Confirm to continue?"; then
@@ -112,7 +114,8 @@ fi
 
 if [ "$CLEAN_STORE" = true ]; then
     info "Cleaning Nix store..."
-    nix store gc --print-roots
+    # The store is owned by root; a plain user GC would fail with permission errors
+    sudo nix store gc
     info "Nix store cleanup complete"
 fi
 

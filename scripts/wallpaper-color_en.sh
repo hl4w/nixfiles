@@ -112,21 +112,23 @@ list_wallpapers() {
     echo "Available wallpapers:"
     echo "------------------------"
     
-    local format_pattern=""
-    for fmt in "${SUPPORTED_FORMATS[@]}"; do
-        [ -n "$format_pattern" ] && format_pattern="$format_pattern -o "
-        format_pattern="$format_pattern -name \"*.$fmt\""
+    # Build find arguments as an array so quoted patterns reach find correctly
+    local find_args=(-name "*.${SUPPORTED_FORMATS[0]}")
+    for fmt in "${SUPPORTED_FORMATS[@]:1}"; do
+        find_args+=(-o -name "*.$fmt")
     done
-    
-    find "$WALLPAPER_DIR" -maxdepth 1 -type f \( $format_pattern \) | \
+
+    find "$WALLPAPER_DIR" -maxdepth 1 -type f \( "${find_args[@]}" \) | \
         sort | \
         while read -r file; do
-            local basename=$(basename "$file")
-            local size=$(du -h "$file" | cut -f1)
-            printf "  %-30s %s\n" "$basename" "$size"
+            local name size
+            name=$(basename "$file")
+            size=$(du -h "$file" | cut -f1)
+            printf "  %-30s %s\n" "$name" "$size"
         done
-    
-    local count=$(find "$WALLPAPER_DIR" -maxdepth 1 -type f \( $format_pattern \) | wc -l)
+
+    local count
+    count=$(find "$WALLPAPER_DIR" -maxdepth 1 -type f \( "${find_args[@]}" \) | wc -l)
     echo "------------------------"
     echo "Total: $count wallpapers"
 }
@@ -274,6 +276,7 @@ update_neovim() {
     source "$COLOR_FILE"
     
     # Create Neovim color config
+    mkdir -p "${HOME}/.config/nvim/colors"
     cat > "${HOME}/.config/nvim/colors/wal.vim" << EOF
 " Auto-generated pywal Neovim colors
 set background=dark
@@ -351,22 +354,14 @@ EOF
 set_wallpaper() {
     local wallpaper="$1"
     
-    # Set wallpaper (via Hyprland)
+    # Under Hyprland use hyprpaper; an empty monitor name applies to all outputs
     if command -v hyprctl &> /dev/null; then
-        hyprctl hyprpaper wallpaper "eDP-1,$wallpaper"
-        success "Wallpaper set (Hyprland)"
-    fi
-    
-    # Set wallpaper (via Noctalia-Shell)
-    if command -v noctalia-shell &> /dev/null; then
-        noctalia-shell --set-wallpaper "$wallpaper"
-        success "Wallpaper set (Noctalia-Shell)"
-    fi
-    
-    # Set wallpaper (via DMS-Shell)
-    if command -v dms-shell &> /dev/null; then
-        dms-shell --wallpaper "$wallpaper"
-        success "Wallpaper set (DMS-Shell)"
+        hyprctl hyprpaper unload all >/dev/null 2>&1 || true
+        hyprctl hyprpaper preload "$wallpaper" >/dev/null 2>&1 || true
+        hyprctl hyprpaper wallpaper ",$wallpaper" >/dev/null 2>&1 || true
+        success "Wallpaper set (Hyprland/hyprpaper)"
+    else
+        warning "Hyprland not detected, skipping wallpaper change (colors only)"
     fi
 }
 
@@ -380,7 +375,7 @@ apply_colors() {
     info "Applying colors..."
     
     # Regenerate all config files
-    wal -R 2>/dev/null
+    wal -R 2>/dev/null || true
     
     # Update various app configs
     update_starship
@@ -393,13 +388,6 @@ apply_colors() {
 
 # ============== Main Function ==============
 main() {
-    # Check if pywal is installed
-    if ! command -v wal &> /dev/null; then
-        error "pywal is not installed, please install pywal first"
-        error "Install command: nix-env -iA nixos.pywal"
-        exit 1
-    fi
-    
     local action="apply"
     local wallpaper=""
     
@@ -411,6 +399,9 @@ main() {
                 exit 0
                 ;;
             -w|--wallpaper)
+                if [ -z "${2:-}" ]; then
+                    error "Option $1 requires a wallpaper path"
+                fi
                 wallpaper="$2"
                 action="set"
                 shift
@@ -430,18 +421,24 @@ main() {
                 action="apply"
                 ;;
             -s|--set)
+                if [ -z "${2:-}" ]; then
+                    error "Option $1 requires a wallpaper name"
+                fi
                 wallpaper="$2"
                 action="set"
                 shift
                 ;;
             *)
                 error "Unknown option: $1"
-                show_help
-                exit 1
                 ;;
         esac
         shift
     done
+    
+    # Only require pywal for actions that need color extraction (-h/-l/-c already exit)
+    if ! command -v wal &> /dev/null; then
+        error "pywal is not installed, enable pywal in your Home Manager configuration"
+    fi
     
     # Create necessary directories
     mkdir -p "$WALLPAPER_DIR"

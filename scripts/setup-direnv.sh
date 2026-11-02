@@ -79,17 +79,22 @@ echo
 
 info "初始化 direnv..."
 if ! command -v direnv &> /dev/null; then
-    warn "direnv 未安装，将尝试安装..."
-    nix-env -iA nixos.direnv -q
+    warn "direnv 未安装，尝试通过 nix profile 安装..."
+    # nix-env -iA nixos.* 依赖已配置的 nixos channel，在 flakes 环境下不可用
+    nix profile install nixpkgs#direnv
 fi
 
-info "允许当前目录的 direnv 配置..."
-direnv allow
+if [ ! -f .envrc ]; then
+    warn "当前目录没有 .envrc，跳过 direnv allow"
+else
+    info "允许当前目录的 direnv 配置..."
+    direnv allow
+fi
 
 info "配置 Shell hook..."
 
 # 检测当前 Shell
-SHELL_NAME=$(basename "$SHELL")
+SHELL_NAME=$(basename "${SHELL:-bash}")
 
 case "$SHELL_NAME" in
     zsh)
@@ -116,6 +121,8 @@ if grep -q "direnv hook" "$HOOK_FILE" 2>/dev/null; then
     info "direnv hook 已配置在 $HOOK_FILE"
 else
     info "添加 direnv hook 到 $HOOK_FILE..."
+    mkdir -p "$(dirname "$HOOK_FILE")"
+    touch "$HOOK_FILE"
     echo "$HOOK_LINE" >> "$HOOK_FILE"
     info "已添加 direnv hook"
 fi

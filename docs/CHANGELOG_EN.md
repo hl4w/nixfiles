@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [v0.0.6] - 2026-11-02
 ### Fixed
+- **Script robustness (all 14 scripts under `scripts/`)**:
+  - `setup-disk.sh` / `setup-disk_en.sh` rewritten: fixed overlapping p3/p2 on the unencrypted path, `mkswap` running before the root filesystem was mounted, wrong partition naming for `/dev/sda` (now derived by `part_name()`), duplicated `mkfs`; added passphrase confirmation to the encrypted flow; replaced `eval` with array arguments
+  - `clean.sh` / `clean_en.sh`: fixed `-s`/`-g` clearing each other (which cleaned nothing); `nix store gc` now runs via `sudo` (the store is root-owned)
+  - `update.sh` / `update_en.sh`: hostname now falls back to a detection chain; `-H` without an argument errors out; builds use the full attribute path `nixosConfigurations.<host>.config.system.build.toplevel`
+  - `setup-direnv.sh` / `setup-direnv_en.sh`: install via `nix profile install nixpkgs#direnv` (`nix-env -iA nixos.*` is unavailable in flake setups); skip `direnv allow` when `.envrc` is absent; create directory and file before appending the hook
+  - `wallpaper-color.sh` / `wallpaper-color_en.sh`: `find` arguments are now built as an array (the previous string concatenation made globs never match); fixed `local name=$(...)` declarations; `wal -R` failures no longer abort; hyprpaper applies the wallpaper to all monitors and the unverified `noctalia-shell`/`dms-shell` CLI flags were removed; `-h` no longer requires pywal
+  - `wallpaper-watcher.sh` / `wallpaper-watcher_en.sh`: initialized `LAST_CACHE_MODIFIED` (previously uninitialized and broke numeric comparison); read the wallpaper path directly from `~/.cache/wal/wal`; a failed color extraction no longer kills the watcher; polling interval configurable via `WATCH_INTERVAL`
+  - `install.sh` / `install_en.sh`: `youruser` placeholder replacement now escapes sed metacharacters and verifies the result; `POWER_MANAGEMENT` explicitly initialized; non-interactive mode (`-y`) fails fast on missing arguments instead of blocking on prompts; added validation for host type, window manager, desktop shell and polkit agent; `nixos-generate-config` automatically adds `--root /mnt` inside the installer; removed the Intel `i915.enable_psr=0` kernel parameter; build hints use the full attribute path
 - **Fixed NixOS vs Home Manager module boundary confusion (critical)**:
   - `wayland.windowManager.hyprland` / `wayland.windowManager.niri` are Home Manager modules, not available in NixOS system config → Refactor: NixOS layer uses `programs.hyprland`/`programs.niri` for installation; detailed config moved to `home/common/hyprland.nix`/`niri.nix`
   - `gtk.*` / `xdg.iconTheme` are Home Manager options → moved from `modules/desktops/unified-theme.nix` to `home/common/unified-theme.nix`; system layer keeps only `qt`/`services.sddm`/`environment.*`

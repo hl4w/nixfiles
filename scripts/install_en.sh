@@ -82,6 +82,8 @@ WINDOW_MANAGER=""
 DESKTOP_SHELL=""
 POLKIT_AGENT=""
 NON_INTERACTIVE="false"
+# Laptop power management flag, defaults to false so it is never uninitialized
+POWER_MANAGEMENT="false"
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -94,38 +96,47 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         -U|--username)
+            [ -n "${2:-}" ] || error "Option $1 requires a username argument"
             USERNAME="$2"
             shift 2
             ;;
         -H|--hostname)
+            [ -n "${2:-}" ] || error "Option $1 requires a hostname argument"
             HOSTNAME="$2"
             shift 2
             ;;
         -G|--git-user)
+            [ -n "${2:-}" ] || error "Option $1 requires a Git username argument"
             GIT_USERNAME="$2"
             shift 2
             ;;
         -E|--git-email)
+            [ -n "${2:-}" ] || error "Option $1 requires a Git email argument"
             GIT_EMAIL="$2"
             shift 2
             ;;
         -T|--host-type)
+            [ -n "${2:-}" ] || error "Option $1 requires a host type argument"
             HOST_TYPE_NAME="$2"
             shift 2
             ;;
         -W|--wm)
+            [ -n "${2:-}" ] || error "Option $1 requires a window manager argument"
             WINDOW_MANAGER="$2"
             shift 2
             ;;
         -S|--shell)
+            [ -n "${2:-}" ] || error "Option $1 requires a desktop shell argument"
             DESKTOP_SHELL="$2"
             shift 2
             ;;
         -P|--polkit-agent)
+            [ -n "${2:-}" ] || error "Option $1 requires a polkit agent argument"
             POLKIT_AGENT="$2"
             shift 2
             ;;
         -N|--name)
+            [ -n "${2:-}" ] || error "Option $1 requires a flake configuration name argument"
             FLAKE_NAME="$2"
             shift 2
             ;;
@@ -140,9 +151,24 @@ info "       HL4W NixOS Configuration Installer"
 info "=========================================="
 echo
 
-# Interactive input (if not provided via arguments)
-info "Please enter the following configuration:"
-echo
+# Non-interactive mode: fail fast on missing required arguments instead of blocking on prompts
+if [ "$NON_INTERACTIVE" = "true" ]; then
+    [ -n "$USERNAME" ] || error "Non-interactive mode requires -U/--username"
+    [ -n "$HOSTNAME" ] || error "Non-interactive mode requires -H/--hostname"
+    [ -n "$HOST_TYPE_NAME" ] || error "Non-interactive mode requires -T/--host-type"
+    [ -n "$FLAKE_NAME" ] || FLAKE_NAME="$HOSTNAME"
+    [ -n "$GIT_USERNAME" ] || GIT_USERNAME="$USERNAME"
+    [ -n "$GIT_EMAIL" ] || GIT_EMAIL="$USERNAME@example.com"
+    if [ "$HOST_TYPE_NAME" != "server" ]; then
+        [ -n "$WINDOW_MANAGER" ] || error "Non-interactive mode requires -W/--wm"
+        [ -n "$DESKTOP_SHELL" ] || error "Non-interactive mode requires -S/--shell"
+        [ -n "$POLKIT_AGENT" ] || POLKIT_AGENT="kde"
+    fi
+else
+    # Interactive input (if not provided via arguments)
+    info "Please enter the following configuration:"
+    echo
+fi
 
 if [ -z "$USERNAME" ]; then
     read -p "Username: " -e USERNAME
@@ -261,6 +287,27 @@ if [ "$HOST_TYPE_NAME" != "server" ]; then
     fi
 fi
 
+# Validate every value regardless of interactive or argument input
+case "$HOST_TYPE_NAME" in
+    desktop|laptop|server) ;;
+    *) error "Invalid host type: $HOST_TYPE_NAME (expected: desktop/laptop/server)" ;;
+esac
+
+if [ "$HOST_TYPE_NAME" != "server" ]; then
+    case "$WINDOW_MANAGER" in
+        hyprland|niri) ;;
+        *) error "Invalid window manager: $WINDOW_MANAGER (expected: hyprland/niri)" ;;
+    esac
+    case "$DESKTOP_SHELL" in
+        dms|noctalia) ;;
+        *) error "Invalid desktop shell: $DESKTOP_SHELL (expected: dms/noctalia)" ;;
+    esac
+    case "$POLKIT_AGENT" in
+        kde|hyprland) ;;
+        *) error "Invalid polkit agent: $POLKIT_AGENT (expected: kde/hyprland)" ;;
+    esac
+fi
+
 echo
 info "Configuration Summary:"
 echo "------------------------------------------"
@@ -314,11 +361,7 @@ elif lspci 2>/dev/null | grep -qiE "(vga|3d).*amd|ati|radeon"; then
 # Detect Intel integrated GPU
 elif lspci 2>/dev/null | grep -qiE "(vga|3d).*intel"; then
     GPU_TYPE="intel"
-    info "Intel integrated GPU detected"
-    GPU_KERNEL_PARAMS='
-  boot.kernelParams = [
-    "i915.enable_psr=0"
-  ];'
+    info "Intel integrated GPU detected (using kernel default driver parameters)"
 else
     GPU_TYPE="unknown"
     info "Unknown GPU type, using generic configuration"
@@ -504,13 +547,26 @@ else
     warn "To change the Git email, manually edit the userEmail field in home/common/git.nix"
 fi
 
-info "Updating hosts/common/default.nix user configuration..."
-sed -i.bak "s/youruser/$USERNAME/g" hosts/common/default.nix
-rm -f hosts/common/default.nix.bak
+info "Updating user-related placeholders..."
 
-info "Updating modules/services/virtualisation.nix..."
-sed -i.bak "s/youruser/$USERNAME/g" modules/services/virtualisation.nix
-rm -f modules/services/virtualisation.nix.bak
+# The username may contain sed metacharacters, so it must be escaped before substitution
+for target in hosts/common/default.nix modules/services/virtualisation.nix; do
+    if [ ! -f "$target" ]; then
+        warn "File does not exist, skipping: $target"
+        continue
+    fi
+    if grep -q 'youruser' "$target"; then
+        sed -i.bak "s/youruser/${USERNAME_ESC}/g" "$target"
+        rm -f "${target}.bak"
+        # Verify after substitution to avoid silent failures
+        if grep -q 'youruser' "$target"; then
+            error "Failed to replace username placeholder: $target"
+        fi
+        info "Username placeholder updated: $target"
+    else
+        info "No 'youruser' placeholder found, skipping: $target"
+    fi
+done
 
 # =============================================
 # Configure flake.nix host output
@@ -560,17 +616,24 @@ echo
 if confirm "Generate hardware configuration now? (requires sudo)"; then
     info "Generating hardware configuration..."
     if command -v nixos-generate-config &> /dev/null; then
-        if sudo nixos-generate-config --show-hardware-config > "hosts/$HOSTNAME/hardware-configuration.nix"; then
+        # In the installer the target root is mounted at /mnt,
+        # so --root /mnt is required to detect the correct mount points and UUIDs
+        GEN_ARGS=(--show-hardware-config)
+        if [ -d /mnt/etc ] && mountpoint -q /mnt 2>/dev/null; then
+            GEN_ARGS=(--root /mnt --show-hardware-config)
+        fi
+
+        if sudo nixos-generate-config "${GEN_ARGS[@]}" > "hosts/$HOSTNAME/hardware-configuration.nix"; then
             info "Hardware configuration generated: hosts/$HOSTNAME/hardware-configuration.nix"
             info "Recommended: Check and edit hardware configuration file to ensure disk UUIDs and mount points are correct"
         else
-            error "Failed to generate hardware configuration, please run manually:"
-            error "  sudo nixos-generate-config --show-hardware-config > hosts/$HOSTNAME/hardware-configuration.nix"
+            error "Failed to generate hardware configuration, please run manually: sudo nixos-generate-config --show-hardware-config > hosts/$HOSTNAME/hardware-configuration.nix"
         fi
     else
-        error "nixos-generate-config command not available (may not be in NixOS installer)"
+        warn "nixos-generate-config command not available (may not be in NixOS installer)"
         info "Please run the following in NixOS installer:"
         info "  sudo nixos-generate-config --show-hardware-config > hosts/$HOSTNAME/hardware-configuration.nix"
+        exit 1
     fi
 else
     info "Skipping automatic hardware configuration generation"
@@ -623,7 +686,7 @@ echo "# Check configuration syntax:"
 echo "  nix flake check"
 echo ""
 echo "# Test build (no deployment):"
-echo "  nix build .#$FLAKE_NAME"
+echo "  nix build .#nixosConfigurations.\"$FLAKE_NAME\".config.system.build.toplevel"
 echo ""
 echo "# Rollback to previous generation:"
 echo "  sudo nixos-rebuild switch --rollback"

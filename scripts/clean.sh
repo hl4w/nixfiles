@@ -72,10 +72,12 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         -s|--store)
+            CLEAN_STORE=true
             CLEAN_GENERATIONS=false
             shift
             ;;
         -g|--generations)
+            CLEAN_GENERATIONS=true
             CLEAN_STORE=false
             shift
             ;;
@@ -101,7 +103,7 @@ if [ "$NON_INTERACTIVE" = false ]; then
         echo "  - 清理 Nix store 中不再被引用的包"
     fi
     if [ "$CLEAN_GENERATIONS" = true ]; then
-        echo "  - 删除旧系统版本（保留最近3个）"
+        echo "  - 删除旧系统版本（保留当前代）"
     fi
     echo
     if ! confirm "确认继续？"; then
@@ -112,7 +114,8 @@ fi
 
 if [ "$CLEAN_STORE" = true ]; then
     info "清理 Nix store..."
-    nix store gc --print-roots
+    # store 归 root 所有，普通用户直接 GC 会因权限不足失败
+    sudo nix store gc
     info "Nix store 清理完成"
 fi
 

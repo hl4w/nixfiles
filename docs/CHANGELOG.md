@@ -6,6 +6,14 @@
 
 ## [v0.0.6] - 2026-11-02
 ### Fixed
+- **脚本健壮性修复（`scripts/` 全部 14 个脚本）**:
+  - `setup-disk.sh` / `setup-disk_en.sh` 重写：修正非加密路径 p3 与 p2 重叠、`mkswap` 在根分区挂载前执行、`/dev/sda` 分区名推导错误（改用 `part_name()` 函数）、重复 `mkfs`；加密流程增加密码二次确认；改用数组传参替代 `eval`
+  - `clean.sh` / `clean_en.sh`：修复 `-s`/`-g` 参数互相清零导致「两个都不清理」的问题；`nix store gc` 改由 `sudo` 执行（store 属 root）
+  - `update.sh` / `update_en.sh`：主机名自动回退；`-H` 缺少参数时报错；构建改用完整属性路径 `nixosConfigurations.<host>.config.system.build.toplevel`
+  - `setup-direnv.sh` / `setup-direnv_en.sh`：改用 `nix profile install nixpkgs#direnv`（`nix-env -iA nixos.*` 在 flakes 环境不可用）；`.envrc` 不存在时跳过 `direnv allow`；写入 hook 前创建目录与文件
+  - `wallpaper-color.sh` / `wallpaper-color_en.sh`：`find` 参数改为数组（原字符串拼接导致通配符永不匹配）；修正 `local name=$(...)` 变量声明；`wal -R` 失败不再中断；hyprpaper 应用壁纸改为全显示器写法，删除未经验证的 `noctalia-shell`/`dms-shell` 命令行参数；`-h` 不再要求 pywal
+  - `wallpaper-watcher.sh` / `wallpaper-watcher_en.sh`：初始化 `LAST_CACHE_MODIFIED`（原未初始化导致数值比较报错）；pywal 壁纸路径直接读取 `~/.cache/wal/wal`；取色失败不再退出监听进程；检查间隔可通过 `WATCH_INTERVAL` 配置
+  - `install.sh` / `install_en.sh`：`youruser` 占位符替换加入 sed 转义与替换后校验；`POWER_MANAGEMENT` 显式初始化；非交互模式（`-y`）缺失必需参数时直接报错而非阻塞提问；新增主机类型/窗口管理器/桌面 Shell/polkit 代理取值校验；`nixos-generate-config` 在安装介质下自动追加 `--root /mnt`；移除 Intel `i915.enable_psr=0` 内核参数；构建提示改用完整属性路径
 - **修复 NixOS 与 Home Manager 模块边界混淆（致命级）**:
   - `wayland.windowManager.hyprland` / `wayland.windowManager.niri` 是 Home Manager 模块，在 NixOS 系统层不存在 → 重构：NixOS 层用 `programs.hyprland`/`programs.niri` 负责安装，详细配置移至 `home/common/hyprland.nix`/`niri.nix`
   - `gtk.*` / `xdg.iconTheme` 是 Home Manager 选项 → 从 `modules/desktops/unified-theme.nix` 移至 `home/common/unified-theme.nix`，系统层仅保留 `qt`/`services.sddm`/`environment.*`

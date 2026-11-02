@@ -80,16 +80,21 @@ echo
 info "Initializing direnv..."
 if ! command -v direnv &> /dev/null; then
     warn "direnv is not installed, attempting to install..."
-    nix-env -iA nixos.direnv -q
+    # nix-env -iA nixos.* relies on a configured NixOS channel and is unavailable in flake setups
+    nix profile install nixpkgs#direnv
 fi
 
-info "Allowing direnv configuration for current directory..."
-direnv allow
+if [ ! -f .envrc ]; then
+    warn "No .envrc in the current directory, skipping direnv allow"
+else
+    info "Allowing direnv configuration for current directory..."
+    direnv allow
+fi
 
 info "Configuring Shell hook..."
 
 # Detect current shell
-SHELL_NAME=$(basename "$SHELL")
+SHELL_NAME=$(basename "${SHELL:-bash}")
 
 case "$SHELL_NAME" in
     zsh)
@@ -116,6 +121,8 @@ if grep -q "direnv hook" "$HOOK_FILE" 2>/dev/null; then
     info "direnv hook already configured in $HOOK_FILE"
 else
     info "Adding direnv hook to $HOOK_FILE..."
+    mkdir -p "$(dirname "$HOOK_FILE")"
+    touch "$HOOK_FILE"
     echo "$HOOK_LINE" >> "$HOOK_FILE"
     info "direnv hook added"
 fi

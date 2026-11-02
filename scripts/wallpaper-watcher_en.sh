@@ -30,8 +30,9 @@ NC='\033[0m'
 WALLPAPER_DIR="${HOME}/.wallpapers"
 WAL_CACHE="${HOME}/.cache/wal"
 CURRENT_WALLPAPER_FILE="${WAL_CACHE}/wal"
-WATCH_INTERVAL=2  # Check interval (seconds)
+WATCH_INTERVAL="${WATCH_INTERVAL:-5}"  # Check interval (seconds), default 5 to keep CPU usage low
 LAST_TRIGGER_TIME=0
+LAST_CACHE_MODIFIED=0
 
 info() {
     echo -e "${GREEN}[WATCHER]${NC} $1"
@@ -48,9 +49,10 @@ error() {
 
 # Get current wallpaper path
 get_current_wallpaper() {
-    # Prefer from pywal config
+    # pywal's ~/.cache/wal/wal holds the current wallpaper path as plain text
     if [ -f "$CURRENT_WALLPAPER_FILE" ]; then
-        local wp=$(awk -F'=' '/wallpaper/ {print $2}' "$CURRENT_WALLPAPER_FILE" | head -n 1 | tr -d '"')
+        local wp
+        wp=$(head -n 1 "$CURRENT_WALLPAPER_FILE" | tr -d '"')
         [ -n "$wp" ] && echo "$wp" && return
     fi
     
@@ -58,13 +60,14 @@ get_current_wallpaper() {
     local config_files=(
         "${HOME}/.config/hypr/hyprpaper.conf"
         "${HOME}/.config/noctalia-shell/config.conf"
-        "${HOME}/.config/dms-shell/config.conf"
+        "${HOME}/.config/DankMaterialShell/config.conf"
         "${HOME}/.config/sway/config"
     )
     
     for cfg in "${config_files[@]}"; do
         if [ -f "$cfg" ]; then
-            local wp=$(grep -i "wallpaper" "$cfg" | head -n 1 | awk '{print $2}')
+            local wp
+            wp=$(grep -i "wallpaper" "$cfg" | head -n 1 | awk '{print $2}')
             [ -n "$wp" ] && echo "$wp" && return
         fi
     done
@@ -90,16 +93,22 @@ apply_colors() {
         # Use pywal to extract colors and apply
         if command -v wal &> /dev/null; then
             info "Extracting colors from wallpaper using pywal..."
-            wal -i "$wallpaper" 2>/dev/null
+            # Never abort the watcher on a failed extraction; just skip this round
+            if ! wal -i "$wallpaper" 2>/dev/null; then
+                warn "pywal color extraction failed: $wallpaper"
+                return 0
+            fi
             
             # Update extra configs
             update_starship
             update_shell_colors
         else
-            error "pywal is not installed"
+            warn "pywal is not installed, skipping color extraction"
+            return 0
         fi
     else
-        error "Wallpaper file does not exist: $wallpaper"
+        warn "Wallpaper file does not exist: $wallpaper"
+        return 0
     fi
 }
 
@@ -184,7 +193,6 @@ main() {
     # Get initial wallpaper
     last_wallpaper=$(get_current_wallpaper)
     last_modified=0
-    last_cache_modified=0
     
     if [ -n "$last_wallpaper" ] && [ -f "$last_wallpaper" ]; then
         last_modified=$(stat -c "%Y" "$last_wallpaper" 2>/dev/null || echo 0)
@@ -209,9 +217,10 @@ main() {
         
         # Extra check for pywal cache directory changes
         if [ -d "$WAL_CACHE" ]; then
-            local cache_modified=$(stat -c "%Y" "$WAL_CACHE" 2>/dev/null || echo 0)
-            if [ "$cache_modified" -ne "$last_cache_modified" ]; then
-                last_cache_modified="$cache_modified"
+            local cache_modified
+            cache_modified=$(stat -c "%Y" "$WAL_CACHE" 2>/dev/null || echo 0)
+            if [ "$cache_modified" -ne "$LAST_CACHE_MODIFIED" ]; then
+                LAST_CACHE_MODIFIED="$cache_modified"
             fi
         fi
         

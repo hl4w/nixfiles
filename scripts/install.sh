@@ -82,6 +82,8 @@ WINDOW_MANAGER=""
 DESKTOP_SHELL=""
 POLKIT_AGENT=""
 NON_INTERACTIVE="false"
+# 笔记本电源管理开关，默认关闭，由主机类型分支置为 true（避免未初始化变量）
+POWER_MANAGEMENT="false"
 
 # 解析命令行参数
 while [[ $# -gt 0 ]]; do
@@ -94,38 +96,47 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         -U|--username)
+            [ -n "${2:-}" ] || error "选项 $1 缺少用户名参数"
             USERNAME="$2"
             shift 2
             ;;
         -H|--hostname)
+            [ -n "${2:-}" ] || error "选项 $1 缺少主机名参数"
             HOSTNAME="$2"
             shift 2
             ;;
         -G|--git-user)
+            [ -n "${2:-}" ] || error "选项 $1 缺少 Git 用户名参数"
             GIT_USERNAME="$2"
             shift 2
             ;;
         -E|--git-email)
+            [ -n "${2:-}" ] || error "选项 $1 缺少 Git 邮箱参数"
             GIT_EMAIL="$2"
             shift 2
             ;;
         -T|--host-type)
+            [ -n "${2:-}" ] || error "选项 $1 缺少主机类型参数"
             HOST_TYPE_NAME="$2"
             shift 2
             ;;
         -W|--wm)
+            [ -n "${2:-}" ] || error "选项 $1 缺少窗口管理器参数"
             WINDOW_MANAGER="$2"
             shift 2
             ;;
         -S|--shell)
+            [ -n "${2:-}" ] || error "选项 $1 缺少桌面 Shell 参数"
             DESKTOP_SHELL="$2"
             shift 2
             ;;
         -P|--polkit-agent)
+            [ -n "${2:-}" ] || error "选项 $1 缺少 polkit 代理参数"
             POLKIT_AGENT="$2"
             shift 2
             ;;
         -N|--name)
+            [ -n "${2:-}" ] || error "选项 $1 缺少 flake 配置名称参数"
             FLAKE_NAME="$2"
             shift 2
             ;;
@@ -140,9 +151,24 @@ info "       HL4W NixOS Configuration Installer"
 info "=========================================="
 echo
 
-# 交互式输入（如果没有通过参数提供）
-info "请输入以下配置信息:"
-echo
+# 非交互模式：缺失的必需参数直接报错，绝不进入阻塞式输入
+if [ "$NON_INTERACTIVE" = "true" ]; then
+    [ -n "$USERNAME" ] || error "非交互模式必须通过 -U/--username 指定用户名"
+    [ -n "$HOSTNAME" ] || error "非交互模式必须通过 -H/--hostname 指定主机名"
+    [ -n "$HOST_TYPE_NAME" ] || error "非交互模式必须通过 -T/--host-type 指定主机类型"
+    [ -n "$FLAKE_NAME" ] || FLAKE_NAME="$HOSTNAME"
+    [ -n "$GIT_USERNAME" ] || GIT_USERNAME="$USERNAME"
+    [ -n "$GIT_EMAIL" ] || GIT_EMAIL="$USERNAME@example.com"
+    if [ "$HOST_TYPE_NAME" != "server" ]; then
+        [ -n "$WINDOW_MANAGER" ] || error "非交互模式必须通过 -W/--wm 指定窗口管理器"
+        [ -n "$DESKTOP_SHELL" ] || error "非交互模式必须通过 -S/--shell 指定桌面 Shell"
+        [ -n "$POLKIT_AGENT" ] || POLKIT_AGENT="kde"
+    fi
+else
+    # 交互式输入（如果没有通过参数提供）
+    info "请输入以下配置信息:"
+    echo
+fi
 
 if [ -z "$USERNAME" ]; then
     read -p "用户名：" -e USERNAME
@@ -261,6 +287,27 @@ if [ "$HOST_TYPE_NAME" != "server" ]; then
     fi
 fi
 
+# 统一校验取值合法性（交互输入与命令行参数都需校验）
+case "$HOST_TYPE_NAME" in
+    desktop|laptop|server) ;;
+    *) error "无效的主机类型: $HOST_TYPE_NAME（可选: desktop/laptop/server）" ;;
+esac
+
+if [ "$HOST_TYPE_NAME" != "server" ]; then
+    case "$WINDOW_MANAGER" in
+        hyprland|niri) ;;
+        *) error "无效的窗口管理器: $WINDOW_MANAGER（可选: hyprland/niri）" ;;
+    esac
+    case "$DESKTOP_SHELL" in
+        dms|noctalia) ;;
+        *) error "无效的桌面 Shell: $DESKTOP_SHELL（可选: dms/noctalia）" ;;
+    esac
+    case "$POLKIT_AGENT" in
+        kde|hyprland) ;;
+        *) error "无效的 polkit 代理: $POLKIT_AGENT（可选: kde/hyprland）" ;;
+    esac
+fi
+
 echo
 info "配置摘要:"
 echo "------------------------------------------"
@@ -314,11 +361,7 @@ elif lspci 2>/dev/null | grep -qiE "(vga|3d).*amd|ati|radeon"; then
 # 检测 Intel 集成显卡
 elif lspci 2>/dev/null | grep -qiE "(vga|3d).*intel"; then
     GPU_TYPE="intel"
-    info "检测到 Intel 集成显卡"
-    GPU_KERNEL_PARAMS='
-  boot.kernelParams = [
-    "i915.enable_psr=0"
-  ];'
+    info "检测到 Intel 集成显卡（使用内核默认驱动参数）"
 else
     GPU_TYPE="unknown"
     info "未识别显卡类型，使用通用配置"
@@ -504,13 +547,26 @@ else
     warn "如需修改 Git 邮箱，请手动编辑 home/common/git.nix 中的 userEmail 字段"
 fi
 
-info "更新 hosts/common/default.nix 用户配置..."
-sed -i.bak "s/youruser/$USERNAME/g" hosts/common/default.nix
-rm -f hosts/common/default.nix.bak
+info "更新用户相关占位符..."
 
-info "更新 modules/services/virtualisation.nix..."
-sed -i.bak "s/youruser/$USERNAME/g" modules/services/virtualisation.nix
-rm -f modules/services/virtualisation.nix.bak
+# 用户名可能包含 sed 元字符，必须先转义才能安全用于替换串
+for target in hosts/common/default.nix modules/services/virtualisation.nix; do
+    if [ ! -f "$target" ]; then
+        warn "文件不存在，跳过: $target"
+        continue
+    fi
+    if grep -q 'youruser' "$target"; then
+        sed -i.bak "s/youruser/${USERNAME_ESC}/g" "$target"
+        rm -f "${target}.bak"
+        # 替换后校验，避免静默失败
+        if grep -q 'youruser' "$target"; then
+            error "用户名占位符替换失败: $target"
+        fi
+        info "用户名占位符已更新: $target"
+    else
+        info "未找到 'youruser' 占位符，跳过: $target"
+    fi
+done
 
 # =============================================
 # 配置 flake.nix 主机输出
@@ -560,17 +616,24 @@ echo
 if confirm "是否立即生成硬件配置？(需要 sudo 权限)"; then
     info "生成硬件配置..."
     if command -v nixos-generate-config &> /dev/null; then
-        if sudo nixos-generate-config --show-hardware-config > "hosts/$HOSTNAME/hardware-configuration.nix"; then
+        # 安装介质场景下目标系统根目录挂载在 /mnt，
+        # 必须传入 --root /mnt 才能探测到正确的挂载点与 UUID
+        GEN_ARGS=(--show-hardware-config)
+        if [ -d /mnt/etc ] && mountpoint -q /mnt 2>/dev/null; then
+            GEN_ARGS=(--root /mnt --show-hardware-config)
+        fi
+
+        if sudo nixos-generate-config "${GEN_ARGS[@]}" > "hosts/$HOSTNAME/hardware-configuration.nix"; then
             info "硬件配置已生成: hosts/$HOSTNAME/hardware-configuration.nix"
             info "建议检查并编辑硬件配置文件，确保磁盘 UUID 和挂载点正确"
         else
-            error "生成硬件配置失败，请手动运行:"
-            error "  sudo nixos-generate-config --show-hardware-config > hosts/$HOSTNAME/hardware-configuration.nix"
+            error "生成硬件配置失败，请手动运行: sudo nixos-generate-config --show-hardware-config > hosts/$HOSTNAME/hardware-configuration.nix"
         fi
     else
-        error "nixos-generate-config 命令不可用（可能不在 NixOS 安装介质中）"
+        warn "nixos-generate-config 命令不可用（可能不在 NixOS 安装介质中）"
         info "请在 NixOS 安装介质中运行以下命令:"
         info "  sudo nixos-generate-config --show-hardware-config > hosts/$HOSTNAME/hardware-configuration.nix"
+        exit 1
     fi
 else
     info "跳过自动生成硬件配置"
@@ -623,7 +686,7 @@ echo "# 检查配置语法:"
 echo "  nix flake check"
 echo ""
 echo "# 测试构建（不部署）:"
-echo "  nix build .#$FLAKE_NAME"
+echo "  nix build .#nixosConfigurations.\"$FLAKE_NAME\".config.system.build.toplevel"
 echo ""
 echo "# 回滚到上一代:"
 echo "  sudo nixos-rebuild switch --rollback"

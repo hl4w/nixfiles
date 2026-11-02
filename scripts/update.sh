@@ -48,8 +48,10 @@ usage() {
     exit 0
 }
 
-# 默认值
-TARGET_HOSTNAME="$HOSTNAME"
+# 默认值：优先使用 $HOSTNAME，退化到 hostname 命令
+TARGET_HOSTNAME="${HOSTNAME:-$(hostname 2>/dev/null || true)}"
+# 当前用户：用于生成 Home Manager 命令提示
+CURRENT_USER="${USER:-$(id -un)}"
 
 # 解析命令行参数
 while [[ $# -gt 0 ]]; do
@@ -58,6 +60,9 @@ while [[ $# -gt 0 ]]; do
             usage
             ;;
         -H|--hostname)
+            if [ -z "${2:-}" ]; then
+                error "选项 $1 缺少主机名参数"
+            fi
             TARGET_HOSTNAME="$2"
             shift 2
             ;;
@@ -66,6 +71,10 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+if [ -z "$TARGET_HOSTNAME" ]; then
+    error "无法确定主机名，请使用 -H <hostname> 指定"
+fi
 
 info "=========================================="
 info "        HL4W NixOS Update Utility"
@@ -76,13 +85,10 @@ info "更新 flake 依赖..."
 nix flake update
 
 info "构建系统配置..."
-if [ -n "$TARGET_HOSTNAME" ]; then
-    info "目标主机: $TARGET_HOSTNAME"
-    nix build .#"$TARGET_HOSTNAME"
-else
-    warn "未指定主机名，使用默认配置"
-    nix build .#desktop
-fi
+info "目标主机: $TARGET_HOSTNAME"
+# nixosConfigurations 的构建产物需走完整属性路径；
+# `nix build .#host` 只在 flakes 暴露 packages.<system>.<host> 时才有效
+nix build ".#nixosConfigurations.\"${TARGET_HOSTNAME}\".config.system.build.toplevel"
 
 echo
 info "=========================================="
@@ -91,4 +97,4 @@ info "=========================================="
 echo
 info "接下来可以运行以下命令部署更新:"
 echo "  sudo nixos-rebuild switch --flake .#$TARGET_HOSTNAME"
-echo "  home-manager switch --flake .#$USER@$TARGET_HOSTNAME"
+echo "  home-manager switch --flake .#$CURRENT_USER@$TARGET_HOSTNAME"
