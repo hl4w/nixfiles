@@ -33,6 +33,8 @@ sudo ./scripts/setup-disk.sh -T desktop -W hyprland -S dms /dev/nvme0n1 my-host 
 sudo nixos-install --flake .#my-host
 ```
 
+If `-T/-W/-S` are omitted, the script prompts in an interactive terminal for host type, window manager and desktop shell (Enter keeps the defaults `desktop`/`hyprland`/`dms`); with `-y` or non-TTY stdin it uses the defaults without blocking.
+
 On an existing NixOS system, use `install.sh` to generate the host configuration:
 
 **Method 1: Using install.sh (Recommended)**

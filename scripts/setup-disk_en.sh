@@ -50,6 +50,10 @@ usage() {
     echo "  -W, --wm            Specify window manager: hyprland/niri"
     echo "  -S, --shell         Specify desktop shell: dms/noctalia"
     echo ""
+    echo "Notes:"
+    echo "  If -T/-W/-S are omitted, an interactive terminal will prompt for them (Enter = default)."
+    echo "  With -y or non-TTY stdin, the defaults desktop/hyprland/dms are used."
+    echo ""
     echo "Examples:"
     echo "  $0 -y /dev/nvme0n1 my-desktop john"
     echo "  $0 -y -T desktop -W hyprland -S dms /dev/nvme0n1 my-desktop john"
@@ -63,6 +67,68 @@ part_name() {
         /dev/nvme*|/dev/mmcblk*|/dev/loop*) echo "${disk}p${index}" ;;
         *) echo "${disk}${index}" ;;
     esac
+}
+
+# Validate that an explicitly provided value is in the allowed list
+# Usage: validate_choice <name> <value> <allowed...>
+validate_choice() {
+    local name="$1" value="$2"
+    shift 2
+    local allowed
+    for allowed in "$@"; do
+        [ "$value" = "$allowed" ] && return 0
+    done
+    error "$name has an invalid value: $value (allowed: $*)"
+}
+
+# Interactive selection: only prompts on an interactive terminal and outside -y mode;
+# the chosen value is printed to stdout
+# Usage: prompt_choice <prompt> <default> <options...>
+prompt_choice() {
+    local prompt="$1" default="$2" choice opt i
+    shift 2
+    local options=("$@")
+
+    # Non-interactive mode or non-TTY stdin: fall back to the default so automation never stalls
+    if [ "$NON_INTERACTIVE" = true ] || [ ! -t 0 ]; then
+        warn "Not specified, using default: $default" >&2
+        echo "$default"
+        return 0
+    fi
+
+    while true; do
+        echo -e "${YELLOW}${prompt}${NC}" >&2
+        i=1
+        for opt in "${options[@]}"; do
+            if [ "$opt" = "$default" ]; then
+                echo "  $i) $opt (default)" >&2
+            else
+                echo "  $i) $opt" >&2
+            fi
+            i=$((i + 1))
+        done
+        printf "Select [1-%d, press Enter to use default %s]: " "${#options[@]}" "$default" >&2
+        read -r choice || choice=""
+
+        # Empty input: use the default
+        if [ -z "$choice" ]; then
+            echo "$default"
+            return 0
+        fi
+        # Numeric index
+        if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#options[@]}" ]; then
+            echo "${options[$((choice - 1))]}"
+            return 0
+        fi
+        # Literal name
+        for opt in "${options[@]}"; do
+            if [ "$choice" = "$opt" ]; then
+                echo "$opt"
+                return 0
+            fi
+        done
+        warn "Invalid choice: $choice, please try again" >&2
+    done
 }
 
 # Defaults
@@ -134,20 +200,29 @@ fi
 [ -e "$DISK" ] || error "Disk device does not exist: $DISK"
 [ -b "$DISK" ] || error "Path is not a block device: $DISK"
 
-# install.sh runs non-interactively and will not prompt again;
-# apply recommended defaults for unspecified desktop components so the flow never stalls
+# Validate explicitly provided values so invalid ones are not silently forwarded to install.sh
+if [ -n "$HOST_TYPE" ]; then
+    validate_choice "Host type" "$HOST_TYPE" desktop laptop server
+fi
+if [ -n "$WINDOW_MANAGER" ]; then
+    validate_choice "Window manager" "$WINDOW_MANAGER" hyprland niri
+fi
+if [ -n "$DESKTOP_SHELL" ]; then
+    validate_choice "Desktop shell" "$DESKTOP_SHELL" dms noctalia
+fi
+
+# When not explicitly specified: let the user choose on an interactive terminal;
+# with -y or non-TTY stdin fall back to the recommended defaults so the flow never stalls
+# (install.sh runs non-interactively and will not prompt again)
 if [ -z "$HOST_TYPE" ]; then
-    HOST_TYPE="desktop"
-    warn "Host type not specified, using default: desktop"
+    HOST_TYPE="$(prompt_choice "Select host type" desktop desktop laptop server)"
 fi
 if [ "$HOST_TYPE" != "server" ]; then
     if [ -z "$WINDOW_MANAGER" ]; then
-        WINDOW_MANAGER="hyprland"
-        warn "Window manager not specified, using default: hyprland"
+        WINDOW_MANAGER="$(prompt_choice "Select window manager" hyprland hyprland niri)"
     fi
     if [ -z "$DESKTOP_SHELL" ]; then
-        DESKTOP_SHELL="dms"
-        warn "Desktop shell not specified, using default: dms"
+        DESKTOP_SHELL="$(prompt_choice "Select desktop shell" dms dms noctalia)"
     fi
 fi
 

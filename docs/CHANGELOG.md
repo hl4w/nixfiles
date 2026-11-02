@@ -8,6 +8,7 @@
 ### Fixed
 - **脚本健壮性修复（`scripts/` 全部 14 个脚本）**:
   - `setup-disk.sh` / `setup-disk_en.sh` 重写：修正非加密路径 p3 与 p2 重叠、`mkswap` 在根分区挂载前执行、`/dev/sda` 分区名推导错误（改用 `part_name()` 函数）、重复 `mkfs`；加密流程增加密码二次确认；改用数组传参替代 `eval`
+  - `setup-disk.sh` / `setup-disk_en.sh` 新增交互式选择：未传 `-T/-W/-S` 时在交互终端提示选择主机类型/窗口管理器/桌面 Shell（回车用默认值）；`-y` 或 stdin 非终端时回退默认 `desktop`/`hyprland`/`dms`；同时校验显式传入的取值，非法值直接报错
   - `clean.sh` / `clean_en.sh`：修复 `-s`/`-g` 参数互相清零导致「两个都不清理」的问题；`nix store gc` 改由 `sudo` 执行（store 属 root）
   - `update.sh` / `update_en.sh`：主机名自动回退；`-H` 缺少参数时报错；构建改用完整属性路径 `nixosConfigurations.<host>.config.system.build.toplevel`
   - `setup-direnv.sh` / `setup-direnv_en.sh`：改用 `nix profile install nixpkgs#direnv`（`nix-env -iA nixos.*` 在 flakes 环境不可用）；`.envrc` 不存在时跳过 `direnv allow`；写入 hook 前创建目录与文件

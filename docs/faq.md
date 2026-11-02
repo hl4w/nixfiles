@@ -33,6 +33,8 @@ sudo ./scripts/setup-disk.sh -T desktop -W hyprland -S dms /dev/nvme0n1 my-host 
 sudo nixos-install --flake .#my-host
 ```
 
+省略 `-T/-W/-S` 时，脚本会在交互终端中提示选择主机类型、窗口管理器与桌面 Shell（直接回车使用默认值 `desktop`/`hyprland`/`dms`）；使用 `-y` 或 stdin 非终端时直接采用默认值，不会阻塞。
+
 已有 NixOS 系统时使用 `install.sh` 生成主机配置：
 
 **方法 1：使用 install.sh（推荐）**

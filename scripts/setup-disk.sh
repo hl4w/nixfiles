@@ -50,6 +50,10 @@ usage() {
     echo "  -W, --wm            指定窗口管理器: hyprland/niri"
     echo "  -S, --shell         指定桌面 Shell: dms/noctalia"
     echo
+    echo "说明:"
+    echo "  未指定 -T/-W/-S 时，在交互终端中会提示选择（直接回车使用默认值）；"
+    echo "  使用 -y 或 stdin 非终端时按默认值 desktop/hyprland/dms 处理。"
+    echo
     echo "示例:"
     echo "  $0 -y /dev/nvme0n1 my-desktop john"
     echo "  $0 -y -T desktop -W hyprland -S dms /dev/nvme0n1 my-desktop john"
@@ -63,6 +67,67 @@ part_name() {
         /dev/nvme*|/dev/mmcblk*|/dev/loop*) echo "${disk}p${index}" ;;
         *) echo "${disk}${index}" ;;
     esac
+}
+
+# 校验显式传入的取值是否在允许列表内
+# 用法: validate_choice <名称> <取值> <允许值...>
+validate_choice() {
+    local name="$1" value="$2"
+    shift 2
+    local allowed
+    for allowed in "$@"; do
+        [ "$value" = "$allowed" ] && return 0
+    done
+    error "$name 取值无效: $value（可选: $*）"
+}
+
+# 交互式选择：仅在交互终端且非 -y 模式时提示，结果输出到 stdout
+# 用法: prompt_choice <提示语> <默认值> <可选值...>
+prompt_choice() {
+    local prompt="$1" default="$2" choice opt i
+    shift 2
+    local options=("$@")
+
+    # 非交互模式或 stdin 不是终端时直接返回默认值，避免自动化流程卡住
+    if [ "$NON_INTERACTIVE" = true ] || [ ! -t 0 ]; then
+        warn "未指定，使用默认值: $default" >&2
+        echo "$default"
+        return 0
+    fi
+
+    while true; do
+        echo -e "${YELLOW}${prompt}${NC}" >&2
+        i=1
+        for opt in "${options[@]}"; do
+            if [ "$opt" = "$default" ]; then
+                echo "  $i) $opt（默认）" >&2
+            else
+                echo "  $i) $opt" >&2
+            fi
+            i=$((i + 1))
+        done
+        printf "请选择 [1-%d，直接回车使用默认值 %s]: " "${#options[@]}" "$default" >&2
+        read -r choice || choice=""
+
+        # 空输入：使用默认值
+        if [ -z "$choice" ]; then
+            echo "$default"
+            return 0
+        fi
+        # 数字编号
+        if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#options[@]}" ]; then
+            echo "${options[$((choice - 1))]}"
+            return 0
+        fi
+        # 直接输入名称
+        for opt in "${options[@]}"; do
+            if [ "$choice" = "$opt" ]; then
+                echo "$opt"
+                return 0
+            fi
+        done
+        warn "无效选择: $choice，请重新输入" >&2
+    done
 }
 
 # 默认值
@@ -134,20 +199,29 @@ fi
 [ -e "$DISK" ] || error "磁盘设备不存在: $DISK"
 [ -b "$DISK" ] || error "指定的路径不是块设备: $DISK"
 
-# install.sh 以非交互模式运行，不会再次提问；
-# 未显式指定的桌面组件使用推荐默认值，避免安装流程中断
+# 校验显式传入的取值，避免把非法值静默传给 install.sh
+if [ -n "$HOST_TYPE" ]; then
+    validate_choice "主机类型" "$HOST_TYPE" desktop laptop server
+fi
+if [ -n "$WINDOW_MANAGER" ]; then
+    validate_choice "窗口管理器" "$WINDOW_MANAGER" hyprland niri
+fi
+if [ -n "$DESKTOP_SHELL" ]; then
+    validate_choice "桌面 Shell" "$DESKTOP_SHELL" dms noctalia
+fi
+
+# 未显式指定时：交互终端内让用户选择；
+# 使用 -y 或 stdin 非终端时回落到推荐默认值，避免安装流程中断
+# （install.sh 以非交互模式运行，不会再次提问）
 if [ -z "$HOST_TYPE" ]; then
-    HOST_TYPE="desktop"
-    warn "未指定主机类型，使用默认值: desktop"
+    HOST_TYPE="$(prompt_choice "选择主机类型" desktop desktop laptop server)"
 fi
 if [ "$HOST_TYPE" != "server" ]; then
     if [ -z "$WINDOW_MANAGER" ]; then
-        WINDOW_MANAGER="hyprland"
-        warn "未指定窗口管理器，使用默认值: hyprland"
+        WINDOW_MANAGER="$(prompt_choice "选择窗口管理器" hyprland hyprland niri)"
     fi
     if [ -z "$DESKTOP_SHELL" ]; then
-        DESKTOP_SHELL="dms"
-        warn "未指定桌面 Shell，使用默认值: dms"
+        DESKTOP_SHELL="$(prompt_choice "选择桌面 Shell" dms dms noctalia)"
     fi
 fi
 

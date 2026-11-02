@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - **Script robustness (all 14 scripts under `scripts/`)**:
   - `setup-disk.sh` / `setup-disk_en.sh` rewritten: fixed overlapping p3/p2 on the unencrypted path, `mkswap` running before the root filesystem was mounted, wrong partition naming for `/dev/sda` (now derived by `part_name()`), duplicated `mkfs`; added passphrase confirmation to the encrypted flow; replaced `eval` with array arguments
+  - `setup-disk.sh` / `setup-disk_en.sh` added interactive selection: when `-T/-W/-S` are omitted, an interactive terminal prompts for host type / window manager / desktop shell (Enter keeps the default); `-y` or non-TTY stdin falls back to `desktop`/`hyprland`/`dms`; explicitly passed values are validated and invalid ones fail fast
   - `clean.sh` / `clean_en.sh`: fixed `-s`/`-g` clearing each other (which cleaned nothing); `nix store gc` now runs via `sudo` (the store is root-owned)
   - `update.sh` / `update_en.sh`: hostname now falls back to a detection chain; `-H` without an argument errors out; builds use the full attribute path `nixosConfigurations.<host>.config.system.build.toplevel`
   - `setup-direnv.sh` / `setup-direnv_en.sh`: install via `nix profile install nixpkgs#direnv` (`nix-env -iA nixos.*` is unavailable in flake setups); skip `direnv allow` when `.envrc` is absent; create directory and file before appending the hook
