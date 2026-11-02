@@ -536,6 +536,8 @@ sudo ./scripts/setup-disk.sh -T desktop -W hyprland -S dms /dev/nvme0n1 my-hostn
 sudo nixos-install --flake .#my-hostname
 ```
 
+`-T/-W/-S` 分别指定主机类型（`desktop`/`laptop`/`server`）、窗口管理器（`hyprland`/`niri`）与桌面 Shell（`dms`/`noctalia`）。省略时脚本会在交互终端提示选择（回车用默认值）；`-y` 或 stdin 非终端时回退默认 `desktop`/`hyprland`/`dms`，非法取值会直接报错。
+
 已有系统仅生成主机配置：
 
 ```bash
@@ -563,6 +565,12 @@ nix flake update
 # 使用脚本一键更新（包含 flake update 和系统重建）
 ./scripts/update.sh
 ```
+
+### 持续集成
+
+`.github/workflows/build.yml` 在 push / PR 到 `master` 时运行：先执行 `nix flake check --no-build` 做纯求值检查，再通过 `nix eval --apply` 动态读取 `nixosConfigurations`，逐个构建 `nixosConfigurations.<host>.config.system.build.toplevel`；未声明主机时仅输出告警并跳过构建。
+
+仓库当前未提交 `flake.lock`，CI 每次都会重新解析输入版本。建议在本地执行 `nix flake lock` 后提交锁文件，以固定依赖并提高二进制缓存命中率。
 
 ### 验证与回滚
 

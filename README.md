@@ -65,6 +65,8 @@ reboot
 
 `setup-disk.sh` 会依次完成：GPT 分区表 → EFI 分区 → LUKS2 加密容器 → LVM（root/swap/home）→ 格式化 → 挂载 → 克隆配置仓库 → 调用 `install.sh` 生成主机配置。非加密模式则跳过 LUKS/LVM，按 60% / 40% 拆分 `/` 与 `/home` 并创建 swapfile。
 
+省略 `-T/-W/-S` 时，脚本会在交互终端中依次提示选择主机类型、窗口管理器与桌面 Shell（直接回车使用默认值 `desktop`/`hyprland`/`dms`）；使用 `-y` 或 stdin 非终端时直接采用默认值，不会阻塞自动化流程。选择 `server` 时会跳过窗口管理器与桌面 Shell 的询问。
+
 ### 方式二：已有 NixOS 系统，仅初始化主机配置
 
 ```bash
@@ -124,7 +126,7 @@ home-manager switch --flake .#<username>@<hostname>
 
 | 脚本 | 用途 | 常用参数 |
 |------|------|----------|
-| `setup-disk.sh <disk> <host> <user>` | 全新安装：分区、LUKS2+LVM 加密、格式化挂载并部署配置 | `-y` 非交互执行、`-c` 关闭加密、`-r` 指定仓库、`-T/-W/-S` 指定主机类型/窗口管理器/桌面 Shell |
+| `setup-disk.sh <disk> <host> <user>` | 全新安装：分区、LUKS2+LVM 加密、格式化挂载并部署配置 | `-y` 非交互执行、`-c` 关闭加密、`-r` 指定仓库、`-T/-W/-S` 指定主机类型/窗口管理器/桌面 Shell（省略时交互选择） |
 | `install.sh` | 初始化主机配置：生成 `hosts/<host>`、`home/hosts/<host>.nix`、硬件配置，更新占位符 | `-y` 非交互、`-U` 用户名、`-H` 主机名、`-G/-E` Git 用户名/邮箱、`-T/-W/-S/-P` 组件选择、`-N` flake 配置名称 |
 | `update.sh` | 更新 flake 输入并重建系统 | `-H` 指定主机名（默认自动探测） |
 | `clean.sh` | 清理 Nix store 与旧系统版本 | `-s` 仅清理 store、`-g` 仅清理旧系统代、`-a` 全部（默认）、`-y` 自动确认 |

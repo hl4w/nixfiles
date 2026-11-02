@@ -65,6 +65,8 @@ reboot
 
 `setup-disk.sh` runs: GPT partition table → EFI partition → LUKS2 container → LVM (root/swap/home) → formatting → mounting → repository clone → `install.sh` host generation. Without encryption it skips LUKS/LVM, splits the disk 60%/40% between `/` and `/home`, and creates a swapfile.
 
+When `-T/-W/-S` are omitted, the script prompts in an interactive terminal for host type, window manager and desktop shell (Enter keeps the defaults `desktop`/`hyprland`/`dms`); with `-y` or non-TTY stdin it uses the defaults and never blocks automation. Choosing `server` skips the window manager and desktop shell prompts.
+
 ### Option 2: Existing NixOS system, host configuration only
 
 ```bash
@@ -124,7 +126,7 @@ Every script ships in two variants (`*.sh` in Chinese, `*_en.sh` in English).
 
 | Script | Purpose | Common options |
 |--------|---------|----------------|
-| `setup-disk.sh <disk> <host> <user>` | Fresh install: partitioning, LUKS2+LVM encryption, format/mount, config deployment | `-y` non-interactive, `-c` disable encryption, `-r` repository URL, `-T/-W/-S` host type / window manager / desktop shell |
+| `setup-disk.sh <disk> <host> <user>` | Fresh install: partitioning, LUKS2+LVM encryption, format/mount, config deployment | `-y` non-interactive, `-c` disable encryption, `-r` repository URL, `-T/-W/-S` host type / window manager / desktop shell (interactive when omitted) |
 | `install.sh` | Initialize host config: generate `hosts/<host>` and `home/hosts/<host>.nix`, hardware config, replace placeholders | `-y` non-interactive, `-U` username, `-H` hostname, `-G/-E` Git user/email, `-T/-W/-S/-P` component selection, `-N` flake configuration name |
 | `update.sh` | Update flake inputs and rebuild the system | `-H` hostname (auto-detected by default) |
 | `clean.sh` | Clean the Nix store and old generations | `-s` store only, `-g` generations only, `-a` all (default), `-y` auto-confirm |

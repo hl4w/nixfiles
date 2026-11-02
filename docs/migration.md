@@ -15,7 +15,7 @@ cp -r ~/.local/share ~/.local/share.backup
 
 ### 步骤 2：运行安装脚本
 
-> 全新机器请先运行 `scripts/setup-disk.sh <磁盘> <主机名> <用户名>` 完成分区、加密与挂载；已有 NixOS 系统可直接运行 `install.sh`。
+> 全新机器请先运行 `scripts/setup-disk.sh <磁盘> <主机名> <用户名>` 完成分区、加密与挂载，再通过 `-T/-W/-S` 指定或按提示交互选择主机类型、窗口管理器与桌面 Shell；已有 NixOS 系统可直接运行 `install.sh`。
 
 ```bash
 # 克隆仓库

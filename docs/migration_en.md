@@ -15,7 +15,7 @@ cp -r ~/.local/share ~/.local/share.backup
 
 ### Step 2: Run Installation Script
 
-> For a fresh machine, run `scripts/setup-disk.sh <disk> <hostname> <username>` first to partition, encrypt and mount the disk; on an existing NixOS system, run `install.sh` directly.
+> For a fresh machine, run `scripts/setup-disk.sh <disk> <hostname> <username>` first to partition, encrypt and mount the disk, then pass `-T/-W/-S` or answer the interactive prompts to pick the host type, window manager and desktop shell; on an existing NixOS system, run `install.sh` directly.
 
 ```bash
 # Clone repository

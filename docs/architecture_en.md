@@ -536,6 +536,8 @@ sudo ./scripts/setup-disk.sh -T desktop -W hyprland -S dms /dev/nvme0n1 my-hostn
 sudo nixos-install --flake .#my-hostname
 ```
 
+`-T/-W/-S` select the host type (`desktop`/`laptop`/`server`), window manager (`hyprland`/`niri`) and desktop shell (`dms`/`noctalia`). When omitted, an interactive terminal prompts for them (Enter keeps the default); with `-y` or non-TTY stdin the defaults `desktop`/`hyprland`/`dms` are used, and invalid values fail fast.
+
 Existing system, host configuration only:
 
 ```bash
@@ -563,6 +565,12 @@ nix flake update
 # One-click update using script (includes flake update and system rebuild)
 ./scripts/update.sh
 ```
+
+### Continuous Integration
+
+`.github/workflows/build.yml` runs on push / pull request to `master`: it first evaluates the flake with `nix flake check --no-build`, then reads `nixosConfigurations` dynamically via `nix eval --apply` and builds `nixosConfigurations.<host>.config.system.build.toplevel` for each host; when no host is declared it only emits a warning and skips building.
+
+`flake.lock` is not committed yet, so CI re-resolves input versions on every run. Run `nix flake lock` locally and commit the lock file to pin dependencies and improve binary cache hits.
 
 ### Verification and Rollback
 
