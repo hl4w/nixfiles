@@ -8,7 +8,7 @@ HOST ?= desktop
 all: build
 
 build:
-	nix build .#$(HOST)
+	nix build .#nixosConfigurations.$(HOST).config.system.build.toplevel
 
 switch-home:
 	home-manager switch --flake .#$(USER)@$(HOST)

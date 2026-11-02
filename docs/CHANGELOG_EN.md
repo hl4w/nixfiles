@@ -55,6 +55,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - `.github/workflows/build.yml` watched branch `main` → `master` (matching the actual branch, otherwise CI never triggers)
   - `.github/workflows/build.yml` build targets `nix build .#desktop`/`.#laptop`/`.#server` (non-existent flake outputs) → generate `flake.lock` with `nix flake lock`, evaluate with `nix flake check --no-build`, then discover `nixosConfigurations` dynamically and build the full attribute path `nixosConfigurations.<host>.config.system.build.toplevel`; if no host is declared, emit a warning and skip building
   - `Makefile` `switch-home` hardcoded placeholder `youruser@desktop` → now `USER`/`HOST` variables, supporting `make USER=<name> HOST=<host>`
+  - `Makefile` `build` target `nix build .#$(HOST)` (non-existent flake output) → `nix build .#nixosConfigurations.$(HOST).config.system.build.toplevel`
 - **Removed duplicated theme environment variables at system level**:
   - Removed `GTK_THEME`/`GTK2_RC_FILES`/`QT_STYLE_OVERRIDE`/`XDG_ICON_THEME` (higher priority than Home Manager user-level config; would override `gtk`/`xdg.iconTheme` modules)
 - **Fixed desktop shell modules**:
