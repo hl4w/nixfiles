@@ -64,13 +64,19 @@ git clone https://gitee.com/hl4w/nixfiles.git
 cd nixfiles
 
 # 2. 一键分区 + 加密 + 部署配置（会清空目标磁盘）
-sudo ./scripts/setup-disk.sh -T desktop -W hyprland -S dms /dev/nvme0n1 my-hostname myuser
+#    <disk>      目标磁盘设备（如 /dev/nvme0n1、/dev/sda），分区名自动推导
+#    <hostname>  主机名（同时作为 flake 配置名称）
+#    <username>  用户名
+sudo ./scripts/setup-disk.sh <disk> <hostname> <username>
 
-# 若目标磁盘为 /dev/sda 这类设备，分区名会自动推导（无需手动指定分区号）
-# 如需跳过磁盘加密（不推荐）：sudo ./scripts/setup-disk.sh -c /dev/sda my-hostname myuser
+# 组件未指定时进入交互选择；也可显式指定主机类型 / 窗口管理器 / 桌面 Shell
+# sudo ./scripts/setup-disk.sh -T desktop -W hyprland -S dms <disk> <hostname> <username>
+
+# 如需跳过磁盘加密（不推荐）：在设备参数前加 -c
+# sudo ./scripts/setup-disk.sh -c <disk> <hostname> <username>
 
 # 3. 检查生成的硬件配置后安装系统
-sudo nixos-install --flake .#my-hostname
+sudo nixos-install --flake .#<hostname>
 
 # 4. 重启并进入系统
 reboot

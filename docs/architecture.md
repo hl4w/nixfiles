@@ -532,8 +532,8 @@ nixConfig = {
 全新安装（NixOS ISO 环境，需 root）：
 
 ```bash
-sudo ./scripts/setup-disk.sh -T desktop -W hyprland -S dms /dev/nvme0n1 my-hostname myuser
-sudo nixos-install --flake .#my-hostname
+sudo ./scripts/setup-disk.sh <disk> <hostname> <username>
+sudo nixos-install --flake .#<hostname>
 ```
 
 `-T/-W/-S` 分别指定主机类型（`desktop`/`laptop`/`server`）、窗口管理器（`hyprland`/`niri`）与桌面 Shell（`dms`/`noctalia`）。省略时脚本会在交互终端提示选择（回车用默认值）；`-y` 或 stdin 非终端时回退默认 `desktop`/`hyprland`/`dms`，非法取值会直接报错。

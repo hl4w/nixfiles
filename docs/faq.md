@@ -29,8 +29,8 @@ Flakes 提供可重现的构建、更好的依赖管理，以及更清晰的 Nix
 ```bash
 git clone https://gitee.com/hl4w/nixfiles.git
 cd nixfiles
-sudo ./scripts/setup-disk.sh -T desktop -W hyprland -S dms /dev/nvme0n1 my-host myuser
-sudo nixos-install --flake .#my-host
+sudo ./scripts/setup-disk.sh <disk> <hostname> <username>
+sudo nixos-install --flake .#<hostname>
 ```
 
 省略 `-T/-W/-S` 时，脚本会在交互终端中提示选择主机类型、窗口管理器与桌面 Shell（直接回车使用默认值 `desktop`/`hyprland`/`dms`）；使用 `-y` 或 stdin 非终端时直接采用默认值，不会阻塞。

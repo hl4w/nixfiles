@@ -64,13 +64,19 @@ git clone https://gitee.com/hl4w/nixfiles.git
 cd nixfiles
 
 # 2. Partition + encrypt + deploy config in one command (wipes the target disk)
-sudo ./scripts/setup-disk.sh -T desktop -W hyprland -S dms /dev/nvme0n1 my-hostname myuser
+#    <disk>      target disk device (e.g. /dev/nvme0n1, /dev/sda); partition names are derived
+#    <hostname>  host name (also used as the flake configuration name)
+#    <username>  user name
+sudo ./scripts/setup-disk.sh <disk> <hostname> <username>
 
-# Partition names are derived automatically for devices such as /dev/sda
-# To skip disk encryption (not recommended): sudo ./scripts/setup-disk.sh -c /dev/sda my-hostname myuser
+# Components are chosen interactively when omitted; they can also be passed explicitly
+# sudo ./scripts/setup-disk.sh -T desktop -W hyprland -S dms <disk> <hostname> <username>
+
+# To skip disk encryption (not recommended): add -c before the positional arguments
+# sudo ./scripts/setup-disk.sh -c <disk> <hostname> <username>
 
 # 3. Review the generated hardware configuration, then install
-sudo nixos-install --flake .#my-hostname
+sudo nixos-install --flake .#<hostname>
 
 # 4. Reboot into the new system
 reboot

@@ -29,8 +29,8 @@ For a fresh machine (booted from the NixOS ISO), run the disk setup script first
 ```bash
 git clone https://gitee.com/hl4w/nixfiles.git
 cd nixfiles
-sudo ./scripts/setup-disk.sh -T desktop -W hyprland -S dms /dev/nvme0n1 my-host myuser
-sudo nixos-install --flake .#my-host
+sudo ./scripts/setup-disk.sh <disk> <hostname> <username>
+sudo nixos-install --flake .#<hostname>
 ```
 
 If `-T/-W/-S` are omitted, the script prompts in an interactive terminal for host type, window manager and desktop shell (Enter keeps the defaults `desktop`/`hyprland`/`dms`); with `-y` or non-TTY stdin it uses the defaults without blocking.

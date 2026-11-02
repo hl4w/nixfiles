@@ -532,8 +532,8 @@ The `secrets/` directory is reserved for agenix-managed secrets (`.age` encrypte
 Fresh install (NixOS ISO environment, root required):
 
 ```bash
-sudo ./scripts/setup-disk.sh -T desktop -W hyprland -S dms /dev/nvme0n1 my-hostname myuser
-sudo nixos-install --flake .#my-hostname
+sudo ./scripts/setup-disk.sh <disk> <hostname> <username>
+sudo nixos-install --flake .#<hostname>
 ```
 
 `-T/-W/-S` select the host type (`desktop`/`laptop`/`server`), window manager (`hyprland`/`niri`) and desktop shell (`dms`/`noctalia`). When omitted, an interactive terminal prompts for them (Enter keeps the default); with `-y` or non-TTY stdin the defaults `desktop`/`hyprland`/`dms` are used, and invalid values fail fast.
