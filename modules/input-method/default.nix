@@ -23,14 +23,8 @@
     };
   };
 
-  # 仅安装 GUI 配置工具和 RIME 数据（addons 已包含核心包）
+  # GUI 配置工具（RIME 数据已由 oh-my-rime flake input 提供，无需额外安装 rime-data-*）
   environment.systemPackages = with pkgs; [
     qt6Packages.fcitx5-configtool  # GUI 配置工具
-    rime-data-luna-pinyin          # 朙月拼音（默认启用）
-    rime-data-flypy                # 小鹤双拼
-    rime-data-bopomofo             # 注音
-    rime-data-terra-pinyin         # 地球拼音
-    rime-data-pinyin-simp          # 拼音简化字
-    rime-data-stroke               # 笔画输入
   ];
 }

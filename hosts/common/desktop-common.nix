@@ -9,7 +9,5 @@
 
 {
   # 桌面环境通用配置（不依赖具体桌面选项）
-  
-  # 用户附加组（桌面环境需要的权限）
-  users.users.youruser.extraGroups = [ "video" "audio" ];
+  # 视频/音频/网络管理/容器组已在 hosts/common/default.nix 中统一声明
 }

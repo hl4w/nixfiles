@@ -8,7 +8,7 @@
     executable = true;
   };
 
-  # 启动壁纸监听服务
+  # 启动壁纸监听服务（systemd user service）
   systemd.user.services.wallpaper-watcher = {
     Unit = {
       Description = "Wallpaper change watcher";
@@ -26,7 +26,6 @@
     };
   };
 
-  # 确保服务自动启动
-  systemd.user.enable = true;
-  systemd.user.services.wallpaper-watcher.enable = true;
+  # 注意: Home Manager 的 systemd.user.services.<name>.enable = true 已由
+  #  Install.WantedBy 自动处理，无需额外声明 systemd.user.enable
 }

@@ -4,6 +4,41 @@
 
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。
 
+## [Unreleased]
+### Fixed
+- **移除不存在的 NixOS 选项（致命级）**:
+  - 删除 `security.pam.enableSSS = false` — NixOS 中不存在此选项，会导致求值错误
+  - 删除 `security.faillock.enable = true` — NixOS 中不存在此选项，会导致求值错误（faillock 需通过 `security.pam` 自定义规则实现）
+- **移除不存在的 NixOS 模块选项**:
+  - 删除 `programs.noctalia-shell.enable` / `programs.dms-shell.enable` — noctalia-shell 和 dms-shell 是 Wayland shell 包，不是 NixOS 模块选项
+- **修复 Hyprland 0.55 (NixOS 26.05) 兼容性**:
+  - 从 hyprnix flake 迁移到 NixOS 原生 `wayland.windowManager.hyprland` 模块
+  - 添加 `configType = "hyprlang"`（Hyprland 0.55+ 默认 Lua 配置，当前仍使用 hyprlang 格式需显式声明）
+  - `misc.xwayland = true` 改为 `xwayland.enable = true`（0.55+ 独立声明）
+  - 移除 hyprlang 插件（`hyprland-plugins.*` 在 0.55+ 包名已变）
+  - 移除独立 `xwayland` 包（已由模块自动安装）
+  - 修正 unified-theme.nix 中 `config.hyprland.settings.decoration` → `config.wayland.windowManager.hyprland.settings.decoration`
+- **修复 Fcitx5 与 oh-my-rime 冲突**:
+  - 移除系统级 `rime-data-*` 包（oh-my-rime flake input 已提供完整的 schema/dict 文件，避免重复安装）
+- **修复 wallpaper-watcher.nix 无效选项**:
+  - 移除 `systemd.user.enable = true` 和 `systemd.user.services.wallpaper-watcher.enable = true`（Home Manager 中 `Install.WantedBy` 已自动处理启用）
+- **清理 virtualisation.nix 硬编码**:
+  - 移除 `users.users.youruser.extraGroups` 中的 docker/libvirt 组（改为在 hosts/common/default.nix 中统一声明 docker 组，libvirt 改为可选）
+  - `libvirtd.enable` 改为 `lib.mkDefault false`（笔记本等主机不需要）
+- **清理 security.nix 无效防火墙规则**:
+  - 移除 `allowedUDPPorts = [ 80 443 ]`（HTTP/HTTPS 均为 TCP 协议，UDP 规则无意义）
+- **优化 nvidia.nix**:
+  - 移除独立 `nvidia-settings` 包（已包含在 nvidia 驱动包中）
+
+### Changed
+- **简化 flake.nix**:
+  - 移除 `hyprnix` flake input（NixOS 26.05 原生 Hyprland 模块已完整支持，无需 hyprnix）
+- **统一用户组声明**:
+  - 将 `video`/`audio`/`docker` 组统一在 `hosts/common/default.nix` 中声明（原分散在 desktop-common.nix 和 virtualisation.nix 中）
+  - 清理 `hosts/common/desktop-common.nix`（已无独立配置）
+- **统一终端浮动规则**:
+  - Hyprland windowrulev2 添加 `foot` 终端浮动规则（与 foot 默认终端一致）
+
 ## [v0.0.5] - 2026-06-16
 ### Added
 - **GPL v3.0 许可证更新**: 验证并确认项目使用完整的 GNU General Public License v3.0

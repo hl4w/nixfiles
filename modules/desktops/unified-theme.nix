@@ -206,7 +206,7 @@ in
       # 窗口装饰设置（合并而非覆盖）
       {
         decoration = lib.mkMerge [
-          config.hyprland.settings.decoration or {}
+          (config.wayland.windowManager.hyprland.settings.decoration or {})
           {
             rounding = 12;                  # 圆角半径
             blur = true;                    # 启用模糊
@@ -240,27 +240,11 @@ in
       }
     ]);
 
-    # ==================== Noctalia-Shell 主题配置 ====================
-    programs.noctalia-shell = lib.mkIf (pkgs ? noctalia-shell) {
-      enable = true;
-      theme = "dark";
-      iconTheme = "Papirus-Dark";
-      font = {
-        name = "Noto Sans";
-        size = 11;
-      };
-    };
-
-    # ==================== DMS-Shell 主题配置 ====================
-    programs.dms-shell = lib.mkIf (pkgs ? dms-shell) {
-      enable = true;
-      theme = "dark";
-      iconTheme = "Papirus-Dark";
-      font = {
-        name = "Noto Sans";
-        size = 11;
-      };
-    };
+    # ==================== Noctalia-Shell / DMS-Shell 主题配置 ====================
+    # 注意：noctalia-shell 和 dms-shell 是独立的 Wayland shell 包，
+    # 不是 NixOS 模块选项（没有 programs.noctalia-shell / programs.dms-shell）。
+    # 主题配置已通过环境变量和 xdg.iconTheme 在 unified-theme 中统一处理。
+    # 如需 shell 特定配置，请在对应 shell 模块（shell-noctalia.nix / shell-dms.nix）中设置。
 
     # ==================== 额外的 GTK/Qt 配置文件和壁纸目录 ====================
     environment.etc = {

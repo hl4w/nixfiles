@@ -1,26 +1,26 @@
 # Hyprland 窗口管理器配置模块
-# 基于 Hyprnix 管理的动态平铺 Wayland 窗口管理器
+# 基于 NixOS 26.05 原生 wayland.windowManager.hyprland 模块
 # 主题配色由 unified-theme.nix 统一管理
+#
+# Hyprland 0.55 (NixOS 26.05) 重大变更:
+# - 默认配置语言从 hyprlang 切换到 Lua
+# - hyprnix flake 不再必需，NixOS 原生模块已完整支持
+# - plugins 包名有调整（hyprland-plugins.* 可能已迁移）
+# - Xwayland 支持从模块独立声明
+#
+# 参考: https://wiki.nixos.org/wiki/Hyprland
 { config, pkgs, inputs, ... }:
 
 {
-  # 导入依赖模块
-  imports = [
-    inputs.hyprnix.nixosModules.default  # Hyprnix 模块
-    ./unified-theme.nix                   # 统一主题配置（GTK、Qt、Hyprland、Niri、SDDM）
-  ];
-
   # Hyprland 主配置
-  hyprland = {
-    enable = true;  # 启用 Hyprland
-    package = pkgs.hyprland;  # 使用 NixOS 库中的 Hyprland
+  wayland.windowManager.hyprland = {
+    enable = true;
+    package = pkgs.hyprland;  # 使用 NixOS 库中的 Hyprland 0.55
 
-    # 启用的 Hyprland 插件
-    plugins = with pkgs; [
-      hyprland-plugins.hyprbars   # 窗口标题栏插件
-      hyprland-plugins.hyprfocus  # 焦点高亮插件
-      hyprland-plugins.hyprdecor  # 窗口装饰插件
-    ];
+    # Hyprland 0.55+ 默认 Lua 配置格式
+    # 当前配置使用 hyprlang（Hyprland 原生命令式格式），需显式声明
+    # 未来可迁移到 Lua 格式以获得更好的模块化和条件逻辑
+    configType = "hyprlang";
 
     # Hyprland 设置（主题配色由 unified-theme.nix 统一管理）
     settings = {
@@ -67,11 +67,16 @@
       misc = {
         disable_hyprland_logo = true;   # 禁用启动 Logo
         disable_splash_rendering = true; # 禁用启动画面
-        xwayland = true;                # 启用 Xwayland 兼容
+      };
+
+      # Xwayland 兼容配置（Hyprland 0.55+ 独立声明）
+      xwayland = {
+        enable = true;                  # 启用 Xwayland 兼容
       };
 
       # 窗口规则
       windowrulev2 = [
+        "rule = float,class:^(foot)$"       # foot 终端浮动
         "rule = float,class:^(kitty)$"      # Kitty 终端浮动
         "rule = float,class:^(alacritty)$"  # Alacritty 终端浮动
         "rule = float,class:^(rofi)$"       # Rofi 浮动
@@ -128,6 +133,5 @@
     xdg-desktop-portal-hyprland  # Hyprland 桌面门户
     hyprpaper               # Hyprland 壁纸工具
     hyprpicker              # 颜色拾取工具
-    xwayland                # Xwayland 兼容层
   ];
 }

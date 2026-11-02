@@ -4,6 +4,40 @@ All significant project changes will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+### Fixed
+- **Removed non-existent NixOS options (critical)**:
+  - Deleted `security.pam.enableSSS = false` — this option does not exist in NixOS, causes evaluation errors
+  - Deleted `security.faillock.enable = true` — this option does not exist in NixOS (faillock requires custom `security.pam` rules)
+- **Removed non-existent NixOS module options**:
+  - Deleted `programs.noctalia-shell.enable` / `programs.dms-shell.enable` — noctalia-shell and dms-shell are Wayland shell packages, not NixOS module options
+- **Hyprland 0.55 (NixOS 26.05) compatibility**:
+  - Migrated from hyprnix flake to native NixOS `wayland.windowManager.hyprland` module
+  - Added `configType = "hyprlang"` (Hyprland 0.55+ defaults to Lua config; explicit declaration needed for hyprlang format)
+  - `misc.xwayland = true` → `xwayland.enable = true` (0.55+ standalone declaration)
+  - Removed hyprland-plugins (package names changed in 0.55+)
+  - Removed standalone `xwayland` package (auto-installed by module)
+  - Fixed unified-theme.nix: `config.hyprland.settings.decoration` → `config.wayland.windowManager.hyprland.settings.decoration`
+- **Fcitx5 vs oh-my-rime conflict fix**:
+  - Removed system-level `rime-data-*` packages (oh-my-rime flake input provides all schema/dict files)
+- **wallpaper-watcher.nix invalid options**:
+  - Removed `systemd.user.enable = true` and `systemd.user.services.wallpaper-watcher.enable = true` (Home Manager `Install.WantedBy` handles enablement)
+- **virtualisation.nix hardcoded values**:
+  - Removed `users.users.youruser.extraGroups` docker/libvirt groups (unified in hosts/common/default.nix; libvirt made optional via `lib.mkDefault false`)
+- **security.nix invalid firewall rules**:
+  - Removed `allowedUDPPorts = [ 80 443 ]` (HTTP/HTTPS use TCP only)
+- **nvidia.nix optimization**:
+  - Removed standalone `nvidia-settings` package (included in nvidia driver package)
+
+### Changed
+- **Flake simplification**:
+  - Removed `hyprnix` flake input (NixOS 26.05 native Hyprland module fully supports it)
+- **Unified user group declarations**:
+  - Moved `video`/`audio`/`docker` groups to `hosts/common/default.nix` (previously scattered across desktop-common.nix and virtualisation.nix)
+  - Cleaned up `hosts/common/desktop-common.nix` (no independent config left)
+- **Unified terminal floating rules**:
+  - Added `foot` terminal floating rule to Hyprland windowrulev2 (matches foot default terminal)
+
 ## [v0.0.5] - 2026-06-16
 ### Added
 - **GPL v3.0 License Update**: Verified and confirmed the project uses the complete GNU General Public License v3.0

@@ -38,9 +38,6 @@
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    
-    # Hyprland 工具链（用于管理 Hyprland 配置）
-    hyprnix.url = "github:hyprwm/hyprnix/main";
 
     # oh-my-rime RIME 输入法配置框架（薄荷拼音）
     # 仓库: https://github.com/Mintimate/oh-my-rime

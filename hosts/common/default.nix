@@ -19,7 +19,13 @@
   # 默认用户配置（安装时会替换 youruser）
   users.users.youruser = {
     isNormalUser = true;           # 普通用户
-    extraGroups = [ "wheel" "networkmanager" ];  # 附加组：wheel（sudo）、networkmanager
+    extraGroups = [
+      "wheel"           # sudo 权限
+      "networkmanager"  # NetworkManager 管理权限
+      "docker"          # Docker 容器管理（libvirt 按需在主机级添加）
+      "video"           # 视频设备访问
+      "audio"           # 音频设备访问
+    ];
     shell = pkgs.zsh;              # 默认 Shell：Zsh
   };
 }
