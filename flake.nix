@@ -1,6 +1,6 @@
 # HL4W NixOS 配置 Flake 文件
 # 项目入口文件，定义输入和输出配置
-# Version: v0.0.5
+# Version: v0.0.6
 {
   description = "HL4W NixOS configuration with Home Manager - Hyprland/Niri";
 

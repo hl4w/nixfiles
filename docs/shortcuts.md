@@ -1,6 +1,6 @@
 # HL4W NixOS Configuration - 快捷键参考
 
-**Version: v0.0.5**
+**Version: v0.0.6**
 
 本文档详细说明 Hyprland 和 Niri 窗口管理器的快捷键配置。
 

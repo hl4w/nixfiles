@@ -1,6 +1,6 @@
 # HL4W NixOS Configuration - Keyboard Shortcuts
 
-**Version: v0.0.5**
+**Version: v0.0.6**
 
 This document details the keyboard shortcuts for Hyprland and Niri window managers.
 

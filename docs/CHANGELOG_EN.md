@@ -4,7 +4,7 @@ All significant project changes will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [v0.0.6] - 2026-11-02
 ### Fixed
 - **Fixed NixOS vs Home Manager module boundary confusion (critical)**:
   - `wayland.windowManager.hyprland` / `wayland.windowManager.niri` are Home Manager modules, not available in NixOS system config → Refactor: NixOS layer uses `programs.hyprland`/`programs.niri` for installation; detailed config moved to `home/common/hyprland.nix`/`niri.nix`
@@ -40,8 +40,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Cleanup invalid config**:
   - Removed `allowedUDPPorts = [ 80 443 ]` (HTTP/HTTPS are TCP only)
   - Removed standalone `nvidia-settings` (included in driver)
+- **Fixed font package reference causing build failure**:
+  - `fonts.nix` `XDG_DATA_DIRS` still referenced the split-away `pkgs.noto-fonts-cjk` → now `noto-fonts-cjk-sans` + `noto-fonts-cjk-serif`
+- **Fixed CI and build scripts**:
+  - `.github/workflows/build.yml` listened on `main` → `master` (matching the actual branch; otherwise CI never triggers)
+  - `Makefile` `switch-home` hardcoded placeholder `youruser@desktop` → now uses `USER`/`HOST` variables; supports `make USER=<name> HOST=<host>`
+- **Removed duplicated theme environment variables at system level**:
+  - Removed `GTK_THEME`/`GTK2_RC_FILES`/`QT_STYLE_OVERRIDE`/`XDG_ICON_THEME` (higher priority than Home Manager user-level config; would override `gtk`/`xdg.iconTheme` modules)
+- **Fixed desktop shell modules**:
+  - `shell-dms.nix` now uses the official NixOS 26.05 `programs.dms-shell` module (brings dependencies and `dms.service` systemd startup) instead of installing the raw `dms-shell` package
+  - `shell-noctalia.nix` removed `blueberry` (no longer in 26.05); `services.power-management.enable` (non-existent) → `powerManagement.enable`; added `services.upower.enable`; trimmed runtime deps already wrapped by the `noctalia-shell` package
 
 ### Changed
+- **Clarified shell naming status**: In nixos-26.05 neither `dms-shell` nor `noctalia-shell` was renamed; upstream `dux-shell` (DMS 2.0) and `noctalia` v5 are new packages not backported to the 26.05 stable branch, so existing names are kept
 - **Architecture refactor**: WM detailed config moved from NixOS system layer to Home Manager user layer, conforming to NixOS native module boundaries
 - **Flake simplification**: Removed `hyprnix` flake input
 - **Unified user group declarations**: `video`/`audio`/`docker` groups in `hosts/common/default.nix`

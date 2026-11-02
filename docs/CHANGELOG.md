@@ -4,7 +4,7 @@
 
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。
 
-## [Unreleased]
+## [v0.0.6] - 2026-11-02
 ### Fixed
 - **修复 NixOS 与 Home Manager 模块边界混淆（致命级）**:
   - `wayland.windowManager.hyprland` / `wayland.windowManager.niri` 是 Home Manager 模块，在 NixOS 系统层不存在 → 重构：NixOS 层用 `programs.hyprland`/`programs.niri` 负责安装，详细配置移至 `home/common/hyprland.nix`/`niri.nix`
@@ -40,8 +40,19 @@
 - **清理无效配置**:
   - 移除 `allowedUDPPorts = [ 80 443 ]`（HTTP/HTTPS 仅 TCP）
   - 移除独立 `nvidia-settings`（已包含在驱动中）
+- **修复字体包引用导致构建失败**:
+  - `fonts.nix` 的 `XDG_DATA_DIRS` 仍引用已被拆分的 `pkgs.noto-fonts-cjk` → 改为 `noto-fonts-cjk-sans` + `noto-fonts-cjk-serif`
+- **修复 CI 与构建脚本**:
+  - `.github/workflows/build.yml` 监听分支 `main` → `master`（与实际分支一致，否则 CI 永不触发）
+  - `Makefile` 的 `switch-home` 硬编码占位符 `youruser@desktop` → 改为 `USER`/`HOST` 变量，支持 `make USER=<name> HOST=<host>`
+- **移除系统层重复的主题环境变量**:
+  - 删除 `GTK_THEME`/`GTK2_RC_FILES`/`QT_STYLE_OVERRIDE`/`XDG_ICON_THEME`（优先级高于 Home Manager 用户级配置，会覆盖 `gtk`/`xdg.iconTheme` 模块）
+- **修复桌面 Shell 模块**:
+  - `shell-dms.nix` 改用 NixOS 26.05 官方 `programs.dms-shell` 模块（自带依赖与 `dms.service` systemd 启动），不再裸装 `dms-shell` 包
+  - `shell-noctalia.nix` 移除 26.05 已删除的 `blueberry` 包；`services.power-management.enable`（不存在）→ `powerManagement.enable`；补充 `services.upower.enable`；精简 `noctalia-shell` 包内已包装的运行时依赖
 
 ### Changed
+- **明确 Shell 命名现状**: nixos-26.05 中 `dms-shell`/`noctalia-shell` 均未改名；上游 `dux-shell`（DMS 2.0）与 `noctalia` v5 属新包，26.05 稳定分支未回移，故保持现有命名
 - **架构重构**: 窗口管理器详细配置从 NixOS 系统层移至 Home Manager 用户层，符合 NixOS 原生模块边界
 - **简化 flake.nix**: 移除 `hyprnix` flake input
 - **统一用户组声明**: `video`/`audio`/`docker` 组统一在 `hosts/common/default.nix` 中声明
