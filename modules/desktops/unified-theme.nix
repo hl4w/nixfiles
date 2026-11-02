@@ -143,7 +143,9 @@ in
       enable = true;
       theme = {
         name = "Adwaita-dark";
-        package = pkgs.gnome.adwaita-icon-theme;
+        # Adwaita-dark GTK2/GTK3 主题由 gnome-themes-extra 提供
+        # （之前误用了 adwaita-icon-theme，那是图标包不是主题包）
+        package = pkgs.gnome.gnome-themes-extra;
       };
       iconTheme = {
         name = "Papirus-Dark";
@@ -159,6 +161,11 @@ in
       };
       gtk4.extraConfig = {
         gtk-application-prefer-dark-theme = 1;
+      };
+      # HM 26.05+: gtk4.theme 不再默认镜像 gtk.theme，必须显式设置
+      gtk4.theme = {
+        name = "Adwaita-dark";
+        package = pkgs.gnome.gnome-themes-extra;
       };
     };
 

@@ -19,6 +19,7 @@ in
 
   # 启用显示管理器
   # 注意: NixOS 选项路径为 services.displayManager（驼峰命名）
+  #       display-manager 含连字符，不是合法的 Nix 标识符，会导致解析错误
   services.displayManager = {
     enable = true;
     # 默认会话根据窗口管理器选择动态设置

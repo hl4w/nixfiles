@@ -47,8 +47,9 @@
   programs.yazi = {
     enable = true;
     enableZshIntegration = true;
-    # Yazi 内部配置（对应 yazi 自身的 yazi.toml）
-    # shell.enableZoxideIntegration 是 yazi 的配置项，需放在 settings 下
+    # Yazi 自身配置（写入 yazi.toml）
+    # 注意: Home Manager yazi 模块没有顶级 shell 选项，
+    #       shell 配置必须放在 settings 下（对应 yazi.toml 的 [shell] 段）
     settings = {
       shell = {
         enableZoxideIntegration = true;  # 按 Ctrl+G 然后 z 使用 zoxide 跳转
