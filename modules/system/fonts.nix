@@ -10,9 +10,9 @@
   fonts.packages = with pkgs; [
     # 基础字体
     noto-fonts                  # Noto 基础字体
-    noto-fonts-cjk              # Noto CJK 字体（中日韩统一包）
-    noto-fonts-emoji            # Noto Emoji 字体
-    noto-fonts-color-emoji      # Noto 彩色 Emoji 字体
+    noto-fonts-cjk-sans         # Noto CJK 无衬线字体（中日韩，已替换 noto-fonts-cjk）
+    noto-fonts-cjk-serif        # Noto CJK 衬线字体（中日韩）
+    noto-fonts-color-emoji      # Noto 彩色 Emoji 字体（已替换 noto-fonts-emoji）
     cantarell-fonts             # Cantarell 字体（GNOME 默认）
     liberation-fonts            # Liberation 字体（替代微软字体）
     

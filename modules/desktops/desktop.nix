@@ -37,6 +37,7 @@ in
     # 根据窗口管理器选择导入相应模块
     imports = [
       ./sddm.nix
+      ./unified-theme.nix           # 系统级主题（Qt/SDDM/环境变量）
       (lib.mkIf (cfg.windowManager == "hyprland") ./hyprland.nix)
       (lib.mkIf (cfg.windowManager == "niri") ./niri.nix)
       (lib.mkIf (cfg.shell == "dms") ./shell-dms.nix)
