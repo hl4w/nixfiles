@@ -53,7 +53,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - `fonts.nix` `XDG_DATA_DIRS` still referenced the split-away `pkgs.noto-fonts-cjk` → now `noto-fonts-cjk-sans` + `noto-fonts-cjk-serif`
 - **Fixed CI and build scripts**:
   - `.github/workflows/build.yml` watched branch `main` → `master` (matching the actual branch, otherwise CI never triggers)
-  - `.github/workflows/build.yml` build targets `nix build .#desktop`/`.#laptop`/`.#server` (non-existent flake outputs) → generate `flake.lock` with `nix flake lock`, evaluate with `nix flake check --no-build`, then discover `nixosConfigurations` dynamically and build the full attribute path `nixosConfigurations.<host>.config.system.build.toplevel`; if no host is declared, emit a warning and skip building
+  - `.github/workflows/build.yml` build targets `nix build .#desktop`/`.#laptop`/`.#server` (non-existent flake outputs) → evaluate with `nix flake check --no-build`, then discover `nixosConfigurations` dynamically and build the full attribute path `nixosConfigurations.<host>.config.system.build.toplevel`; if no host is declared, emit a warning and skip building
+  - `.github/workflows/build.yml` dropped the standalone `nix flake lock` step (committing `flake.lock` to the repo is recommended to pin dependencies) and enabled the `auto-allocate-uids` experimental feature
   - `Makefile` `switch-home` hardcoded placeholder `youruser@desktop` → now `USER`/`HOST` variables, supporting `make USER=<name> HOST=<host>`
   - `Makefile` `build` target `nix build .#$(HOST)` (non-existent flake output) → `nix build .#nixosConfigurations.$(HOST).config.system.build.toplevel`
 - **Removed duplicated theme environment variables at system level**:
