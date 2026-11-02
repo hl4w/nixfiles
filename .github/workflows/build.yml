@@ -6,22 +6,28 @@ on:
   pull_request:
     branches: [ master ]
 
+# 同一分支的重复触发只保留最新一次，避免浪费构建资源
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
+    name: Evaluate and build hosts
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: cachix/install-nix-action@v26
+      - name: Install Nix
+        uses: cachix/install-nix-action@v26
         with:
           extra_nix_config: |
-            experimental-features = nix-command flakes auto-allocate-uids
+            experimental-features = nix-command flakes
 
-      # 【重点】flake.lock 建议提交到git，删掉单独的Generate flake.lock步骤！
-      # - name: Generate flake.lock
-      #   run: nix flake lock
-
-      - name: Check flake (求值检查 checks，不编译)
+      # 仓库尚未提交 flake.lock，Nix 会在本次运行中解析并生成锁文件；
+      # 建议在本地执行 `nix flake lock` 后提交，以固定依赖版本并提高缓存命中率。
+      - name: Evaluate flake
         run: nix flake check --no-build
 
       - name: Discover host configurations
@@ -35,13 +41,17 @@ jobs:
           echo "hosts=${hosts}" >> "$GITHUB_OUTPUT"
           if [ -z "${hosts}" ]; then
             echo "::warning::flake.nix 未声明 nixosConfigurations，请先运行 scripts/install.sh 生成主机配置后再提交"
+          else
+            echo "Detected hosts: ${hosts}"
           fi
 
       - name: Build host configurations
         if: steps.hosts.outputs.hosts != ''
+        env:
+          HOSTS: ${{ steps.hosts.outputs.hosts }}
         run: |
           set -euo pipefail
-          for host in ${{ steps.hosts.outputs.hosts }}; do
+          for host in ${HOSTS}; do
             echo "::group::Building ${host}"
             nix build ".#nixosConfigurations.${host}.config.system.build.toplevel" --no-link
             echo "::endgroup::"

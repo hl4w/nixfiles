@@ -55,6 +55,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Fixed CI and build scripts**:
   - `.github/workflows/build.yml` watched branch `main` → `master` (matching the actual branch, otherwise CI never triggers)
   - `.github/workflows/build.yml` build targets `nix build .#desktop`/`.#laptop`/`.#server` (non-existent flake outputs) → evaluate with `nix flake check --no-build`, then discover `nixosConfigurations` dynamically and build the full attribute path `nixosConfigurations.<host>.config.system.build.toplevel`; if no host is declared, emit a warning and skip building
+  - `.github/workflows/build.yml` rewritten as a single-job pipeline: added `concurrency` to cancel superseded runs on the same branch, passed the host list via `env` instead of interpolating it into the shell, and kept evaluation as the gate before building
   - `.github/workflows/build.yml` dropped the standalone `nix flake lock` step (committing `flake.lock` to the repo is recommended to pin dependencies) and enabled the `auto-allocate-uids` experimental feature
   - `Makefile` `switch-home` hardcoded placeholder `youruser@desktop` → now `USER`/`HOST` variables, supporting `make USER=<name> HOST=<host>`
   - `Makefile` `build` target `nix build .#$(HOST)` (non-existent flake output) → `nix build .#nixosConfigurations.$(HOST).config.system.build.toplevel`
