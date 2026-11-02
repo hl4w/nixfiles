@@ -31,7 +31,9 @@ in
   };
 
   # SDDM 配置 - Simple Desktop Display Manager
-  services.sddm = {
+  # 注意: SDDM 选项路径为 services.displayManager.sddm，
+  #       services.sddm 在 NixOS 中不存在，会导致求值失败
+  services.displayManager.sddm = {
     enable = true;                 # 启用 SDDM
     wayland.enable = true;         # 启用 Wayland 支持
     displayServer = "wayland";     # 使用 Wayland 显示服务器
