@@ -17,8 +17,8 @@ Flakes 提供可重现的构建、更好的依赖管理，以及更清晰的 Nix
 
 ### 有哪些桌面 Shell 可用？
 
-- **DMS-Shell**: 轻量级显示管理器 Shell
-- **Noctalia-Shell**: 现代化桌面集成 Shell
+- **DMS Shell**: 轻量级显示管理器 Shell
+- **Noctalia Shell**: 现代化桌面集成 Shell
 
 ## 安装
 
@@ -43,7 +43,7 @@ chmod +x scripts/install.sh
 1. 输入用户名、主机名、Git 信息
 2. 选择主机类型（Desktop/Laptop/Server）
 3. 选择窗口管理器（Hyprland/Niri）
-4. 选择桌面 Shell（DMS-Shell/Noctalia-Shell）
+4. 选择桌面 Shell（DMS Shell / Noctalia Shell）
 5. 生成硬件配置并部署
 
 **方法 2：手动安装**
@@ -248,9 +248,9 @@ wp-list
 - 终端（alacritty、kitty、foot）
 - Shell 提示符（Starship）
 - Neovim/Emacs 编辑器
-- Noctalia-Shell 和 DMS-Shell
+- DMS Shell 和 Noctalia Shell
 
-**自动监听器**：系统会自动监控壁纸变化。当您通过 Noctalia-Shell/DMS-Shell GUI 选择壁纸时，颜色会自动更新。
+**自动监听器**：系统会自动监控壁纸变化。当您通过 DMS Shell / Noctalia Shell GUI 选择壁纸时，颜色会自动更新。
 
 ### 壁纸颜色不生效？
 
@@ -456,26 +456,26 @@ nixos-rebuild dry-activate --flake .#<hostname>
 ### 更新后如何回滚？
 
 ```bash
-# 查看系统代次
+# 查看系统代
 sudo nixos-rebuild list-generations
 
-# 回滚到上一个代次
+# 回滚到上一个系统代
 sudo nixos-rebuild switch --rollback
 
-# 或指定回滚到特定代次
+# 或指定回滚到特定系统代
 sudo nixos-rebuild switch --generation <number>
 
 # Home Manager 回滚
 home-manager rollback
 ```
 
-### 如何清理旧代次？
+### 如何清理旧系统代？
 
 ```bash
-# 清理用户代次
+# 清理用户代
 nix-collect-garbage -d
 
-# 清理系统代次
+# 清理系统代
 sudo nix-collect-garbage -d
 
 # 或使用清理脚本

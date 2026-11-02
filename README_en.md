@@ -2,7 +2,7 @@
 
 **Version: v0.0.6**
 
-A modern configuration repository built on NixOS 26.05, featuring a deeply optimized Hyprland & Niri desktop suite with native compatibility for Noctalia & DMS Shell desktop components. Powered by Nix Flakes and Home Manager, it unifies system and user environment management across multiple devices.
+A modern configuration repository built on NixOS 26.05, featuring a deeply optimized Hyprland & Niri desktop suite with native compatibility with DMS Shell and Noctalia Shell desktop components. Powered by Nix Flakes and Home Manager, it unifies system and user environment management across multiple devices.
 
 ## Features
 
@@ -14,7 +14,7 @@ A modern configuration repository built on NixOS 26.05, featuring a deeply optim
 - **Unified Theming**: Consistent GTK/Qt/Hyprland/Niri/Shell/SDDM/Fcitx5 color schemes (Catppuccin) [(Architecture)](docs/architecture_en.md)
 - **Wallpaper Auto-color**: Uses pywal to extract colors from wallpapers, with a watcher service that follows wallpaper changes [(Architecture)](docs/architecture_en.md)
 - **Day/Night Theme Switching**: Automatic light/dark theme switching based on time [(Architecture)](docs/architecture_en.md)
-- **Flexible Desktop Configuration**: Dynamic window manager (Hyprland/Niri), desktop shell (DMS/Noctalia) and polkit agent (KDE/Hyprland) selection [(Architecture)](docs/architecture_en.md)
+- **Flexible Desktop Configuration**: Dynamic window manager (Hyprland/Niri), desktop shell (DMS Shell / Noctalia Shell) and polkit agent (KDE/Hyprland) selection [(Architecture)](docs/architecture_en.md)
 - **WPS Office CN**: Chinese version office suite with better Chinese support [(Architecture)](docs/architecture_en.md)
 - **Chinese Fonts**: Full support for Noto CJK, Source Han, WenQuanYi fonts [(Architecture)](docs/architecture_en.md)
 - **Chinese Input Method**: Fcitx5 + RIME with oh-my-rime (Mint Pinyin) framework, supporting pinyin, double pinyin, terra pinyin, plus a Catppuccin theme [(Architecture)](docs/architecture_en.md)
@@ -125,7 +125,7 @@ Every script ships in two variants (`*.sh` in Chinese, `*_en.sh` in English).
 | Script | Purpose | Common options |
 |--------|---------|----------------|
 | `setup-disk.sh <disk> <host> <user>` | Fresh install: partitioning, LUKS2+LVM encryption, format/mount, config deployment | `-y` non-interactive, `-c` disable encryption, `-r` repository URL, `-T/-W/-S` host type / window manager / desktop shell |
-| `install.sh` | Initialize host config: generate `hosts/<host>` and `home/hosts/<host>.nix`, hardware config, replace placeholders | `-y` non-interactive, `-U` username, `-H` hostname, `-G/-E` Git user/email, `-T/-W/-S/-P` component selection, `-N` flake name |
+| `install.sh` | Initialize host config: generate `hosts/<host>` and `home/hosts/<host>.nix`, hardware config, replace placeholders | `-y` non-interactive, `-U` username, `-H` hostname, `-G/-E` Git user/email, `-T/-W/-S/-P` component selection, `-N` flake configuration name |
 | `update.sh` | Update flake inputs and rebuild the system | `-H` hostname (auto-detected by default) |
 | `clean.sh` | Clean the Nix store and old generations | `-s` store only, `-g` generations only, `-a` all (default), `-y` auto-confirm |
 | `setup-direnv.sh` | Configure direnv automatic environment loading | `-y` non-interactive |
@@ -141,6 +141,7 @@ See the `docs/` directory for detailed documentation:
 | Document | Description |
 |----------|-------------|
 | `docs/CHANGELOG.md` / `docs/CHANGELOG_EN.md` | Changelog (Chinese / English) |
+| `docs/glossary.md` / `docs/glossary_en.md` | Terminology glossary and style rules (Chinese / English) |
 | `docs/architecture.md` / `docs/architecture_en.md` | Architecture overview, module structure, configuration flow |
 | `docs/shortcuts.md` / `docs/shortcuts_en.md` | Keyboard shortcut reference (Hyprland / Niri) |
 | `docs/faq.md` / `docs/faq_en.md` | Frequently asked questions and troubleshooting |
@@ -162,7 +163,7 @@ See the `docs/` directory for detailed documentation:
 │   ├── input-method/         # Input method (Fcitx5 + RIME + oh-my-rime + Catppuccin theme)
 │   ├── services/             # Services (network, security, virtualisation)
 │   └── system/               # System base (fonts, etc.)
-├── home/                     # Home Manager user configurations (user-level, HM-only options)
+├── home/                     # Home Manager user configurations (user-level, Home Manager-only options)
 │   ├── common/               # Shared user modules (apps, cli, dev-lsp, editor, git, shell,
 │   │                         #   input, hyprland, niri, unified-theme, wallpaper-watcher)
 │   └── hosts/                # Host-specific user configurations (desktop / laptop / server)
@@ -182,7 +183,7 @@ See the `docs/` directory for detailed documentation:
 |-----------|-------|-------------|
 | `hosts/` | System-level | NixOS system configuration, managed by root, native NixOS options only |
 | `modules/` | System-level | Reusable NixOS modules imported by multiple hosts |
-| `home/` | User-level | Home Manager user configuration, managed by regular users, HM-only options |
+| `home/` | User-level | Home Manager user configuration, managed by regular users, Home Manager-only options |
 
 > System and user layers are strictly separated: Home Manager options such as `gtk.*`, `xdg.*` and `wayland.windowManager.*` must not appear in `modules/`; conversely, system options such as `environment.systemPackages` and `services.*` should not be written into `home/`.
 

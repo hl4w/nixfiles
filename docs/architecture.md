@@ -36,8 +36,8 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 │   │   ├── hyprland.nix   # Hyprland（programs.hyprland，系统级安装）
 │   │   ├── niri.nix       # Niri（programs.niri，系统级安装）
 │   │   ├── sddm.nix       # SDDM（仅 Wayland）
-│   │   ├── shell-dms.nix  # DMS-Shell（轻量级）
-│   │   ├── shell-noctalia.nix   # Noctalia-Shell（现代化）
+│   │   ├── shell-dms.nix  # DMS Shell（轻量级）
+│   │   ├── shell-noctalia.nix   # Noctalia Shell（现代化）
 │   │   └── unified-theme.nix    # 系统级主题（Qt/SDDM/环境变量/日夜切换）
 │   ├── system/           # 系统基础配置
 │   │   ├── default.nix   # 基础系统配置、用户、包、Nix 配置
@@ -132,8 +132,8 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 | `desktops/hyprland.nix` | Hyprland 系统级安装（programs.hyprland） |
 | `desktops/niri.nix` | Niri 系统级安装（programs.niri） |
 | `desktops/sddm.nix` | SDDM（仅 Wayland 模式，支持 Xwayland） |
-| `desktops/shell-dms.nix` | DMS-Shell 依赖 |
-| `desktops/shell-noctalia.nix` | Noctalia-Shell 依赖 |
+| `desktops/shell-dms.nix` | DMS Shell 依赖 |
+| `desktops/shell-noctalia.nix` | Noctalia Shell 依赖 |
 | `desktops/unified-theme.nix` | 系统级主题（Qt/SDDM/环境变量/日夜切换） |
 | `system/fonts.nix` | 系统字体配置（Noto CJK、思源、文泉驿）、WPS Office CN 字体别名映射 |
 | `hardware/bluetooth.nix` | 蓝牙设备配置 |
@@ -233,7 +233,7 @@ mkHost = name: nixpkgs.lib.nixosSystem {
 1. 输入用户名、主机名、Git 信息
 2. 选择主机类型（Desktop/Laptop/Server）
 3. 选择窗口管理器（Hyprland/Niri）
-4. 选择桌面 Shell（DMS-Shell/Noctalia-Shell）
+4. 选择桌面 Shell（DMS Shell / Noctalia Shell）
 5. 选择 polkit 代理（KDE/Hyprland）
 6. 自动生成配置文件
 
@@ -290,7 +290,7 @@ nixConfig = {
 - **集成**:
   - 颜色存储在 `~/.cache/wal/`
   - 在 `home/common/shell.nix` 中自动加载
-  - 与 DMS-Shell 和 Noctalia-Shell 无缝协作
+  - 与 DMS Shell 和 Noctalia Shell 无缝协作
 
 ### 日夜主题切换
 
@@ -378,7 +378,7 @@ nixConfig = {
   - 终端（Alacritty、Kitty、Foot）
   - Starship 提示符
   - Neovim 编辑器
-  - Noctalia-Shell 和 DMS-Shell
+  - DMS Shell 和 Noctalia Shell
 
 - **实现**:
   - 脚本: `scripts/wallpaper-color.sh`
@@ -558,9 +558,9 @@ nix build .#<hostname>
 # 预览差异
 nixos-rebuild dry-activate --flake .#<hostname>
 
-# 回滚到上一个代次
+# 回滚到上一个系统代
 sudo nixos-rebuild switch --rollback
 
-# 清理旧代次
+# 清理旧系统代
 ./scripts/clean.sh
 ```

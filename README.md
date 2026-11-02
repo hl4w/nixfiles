@@ -2,7 +2,7 @@
 
 **Version: v0.0.6**
 
-一套基于 NixOS 26.05 的现代化配置仓库，内置深度优化的 Hyprland & Niri 桌面套件，原生兼容 Noctalia & DMS Shell 桌面组件。使用 Nix Flakes + Home Manager 统一管理多台设备的系统与用户环境。
+一套基于 NixOS 26.05 的现代化配置仓库，内置深度优化的 Hyprland & Niri 桌面套件，原生兼容 DMS Shell 与 Noctalia Shell 桌面组件。使用 Nix Flakes + Home Manager 统一管理多台设备的系统与用户环境。
 
 ## 特性
 
@@ -14,7 +14,7 @@
 - **主题统一**: GTK/Qt/Hyprland/Niri/Shell/SDDM/Fcitx5 统一配色（Catppuccin）[(架构文档)](docs/architecture.md)
 - **壁纸自动取色**: 使用 pywal 从壁纸提取颜色，并由监听服务在壁纸变化时自动跟随 [(架构文档)](docs/architecture.md)
 - **日夜主题切换**: 自动根据时间切换深浅风格 [(架构文档)](docs/architecture.md)
-- **灵活桌面配置**: 支持动态选择窗口管理器（Hyprland/Niri）、桌面 Shell（DMS/Noctalia）和 polkit 代理（KDE/Hyprland）组合 [(架构文档)](docs/architecture.md)
+- **灵活桌面配置**: 支持动态选择窗口管理器（Hyprland/Niri）、桌面 Shell（DMS Shell / Noctalia Shell）和 polkit 代理（KDE/Hyprland）组合 [(架构文档)](docs/architecture.md)
 - **WPS Office CN**: 中国版办公套件，中文支持更好 [(架构文档)](docs/architecture.md)
 - **中文字体**: Noto CJK、思源、文泉驿等中文字体完整支持 [(架构文档)](docs/architecture.md)
 - **中文输入法**: Fcitx5 + RIME 集成 oh-my-rime（薄荷拼音）配置框架，支持拼音、双拼、地球拼音等方案，并附带 Catppuccin 主题 [(架构文档)](docs/architecture.md)
@@ -125,9 +125,9 @@ home-manager switch --flake .#<username>@<hostname>
 | 脚本 | 用途 | 常用参数 |
 |------|------|----------|
 | `setup-disk.sh <disk> <host> <user>` | 全新安装：分区、LUKS2+LVM 加密、格式化挂载并部署配置 | `-y` 非交互执行、`-c` 关闭加密、`-r` 指定仓库、`-T/-W/-S` 指定主机类型/窗口管理器/桌面 Shell |
-| `install.sh` | 初始化主机配置：生成 `hosts/<host>`、`home/hosts/<host>.nix`、硬件配置，更新占位符 | `-y` 非交互、`-U` 用户名、`-H` 主机名、`-G/-E` Git 用户名/邮箱、`-T/-W/-S/-P` 组件选择、`-N` flake 名称 |
+| `install.sh` | 初始化主机配置：生成 `hosts/<host>`、`home/hosts/<host>.nix`、硬件配置，更新占位符 | `-y` 非交互、`-U` 用户名、`-H` 主机名、`-G/-E` Git 用户名/邮箱、`-T/-W/-S/-P` 组件选择、`-N` flake 配置名称 |
 | `update.sh` | 更新 flake 输入并重建系统 | `-H` 指定主机名（默认自动探测） |
-| `clean.sh` | 清理 Nix store 与旧系统版本 | `-s` 仅清理 store、`-g` 仅清理旧代、`-a` 全部（默认）、`-y` 自动确认 |
+| `clean.sh` | 清理 Nix store 与旧系统版本 | `-s` 仅清理 store、`-g` 仅清理旧系统代、`-a` 全部（默认）、`-y` 自动确认 |
 | `setup-direnv.sh` | 配置 direnv 自动加载开发环境 | `-y` 非交互 |
 | `wallpaper-color.sh` | 壁纸取色与配色应用 | `-w` 指定壁纸、`-s` 按名称设置、`-d` 随机、`-l` 列表、`-c` 当前配色、`-a` 仅应用配色 |
 | `wallpaper-watcher.sh` | 监听壁纸变化并自动更新配色（由 systemd 用户服务调用） | 环境变量 `WATCH_INTERVAL` 控制轮询间隔（秒，默认 5） |
@@ -141,6 +141,7 @@ home-manager switch --flake .#<username>@<hostname>
 | 文档 | 说明 |
 |------|------|
 | `docs/CHANGELOG.md` / `docs/CHANGELOG_EN.md` | 变更日志（中/英） |
+| `docs/glossary.md` / `docs/glossary_en.md` | 术语对照表与书写规范（中/英） |
 | `docs/architecture.md` / `docs/architecture_en.md` | 架构说明、模块结构、配置流程 |
 | `docs/shortcuts.md` / `docs/shortcuts_en.md` | 快捷键速查（Hyprland / Niri） |
 | `docs/faq.md` / `docs/faq_en.md` | 常见问题与故障排除 |
@@ -162,7 +163,7 @@ home-manager switch --flake .#<username>@<hostname>
 │   ├── input-method/         # 输入法（Fcitx5 + RIME + oh-my-rime + Catppuccin 主题）
 │   ├── services/             # 服务（network、security、virtualisation）
 │   └── system/               # 系统基础（fonts 等）
-├── home/                     # Home Manager 用户配置（用户级，HM 专属选项）
+├── home/                     # Home Manager 用户配置（用户级，Home Manager 专属选项）
 │   ├── common/               # 通用用户模块（apps、cli、dev-lsp、editor、git、shell、
 │   │                         #   input、hyprland、niri、unified-theme、wallpaper-watcher）
 │   └── hosts/                # 主机特定用户配置（desktop / laptop / server）
@@ -182,7 +183,7 @@ home-manager switch --flake .#<username>@<hostname>
 |------|------|------|
 | `hosts/` | 系统级 | NixOS 系统配置，由 root 管理，仅使用 NixOS 原生选项 |
 | `modules/` | 系统级 | 可复用的 NixOS 模块，可被多个主机导入 |
-| `home/` | 用户级 | Home Manager 用户配置，由普通用户管理，仅使用 HM 专属选项 |
+| `home/` | 用户级 | Home Manager 用户配置，由普通用户管理，仅使用 Home Manager 专属选项 |
 
 > 系统层与用户层严格分离：`gtk.*`、`xdg.*`、`wayland.windowManager.*` 等 Home Manager 选项不得出现在 `modules/` 中；反之 `environment.systemPackages`、`services.*` 等系统选项也不应写入 `home/`。
 

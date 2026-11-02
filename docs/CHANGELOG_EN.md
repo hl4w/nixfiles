@@ -67,6 +67,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Unified terminal floating rules**: Added `foot` terminal floating rule to Hyprland windowrulev2
 - **Updated architecture docs**: `architecture.md` and `architecture_en.md` synced with module boundary refactor
 
+### Documentation
+- **Added terminology glossary**: `docs/glossary.md` and `docs/glossary_en.md` define canonical terms, code identifiers and style rules
+- **Unified documentation terminology**: README, architecture, FAQ, migration and shortcuts documents now use `DMS Shell` / `Noctalia Shell`, `Home Manager`, `generation`, `flake configuration name` consistently; `CHANGELOG` keeps historical wording untouched
+
 ## [v0.0.5] - 2026-06-16
 ### Added
 - **GPL v3.0 License Update**: Verified and confirmed the project uses the complete GNU General Public License v3.0

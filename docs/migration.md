@@ -5,7 +5,7 @@
 ### 步骤 1：备份现有配置
 
 ```bash
-# 列出现有代次
+# 列出现有系统代
 sudo nixos-rebuild list-generations
 sudo nix-env --list-generations
 
@@ -33,7 +33,7 @@ chmod +x scripts/install.sh
 1. 输入用户名、主机名、Git 信息
 2. 选择主机类型（Desktop/Laptop/Server）
 3. 选择窗口管理器（Hyprland/Niri）
-4. 选择桌面 Shell（DMS-Shell/Noctalia-Shell）
+4. 选择桌面 Shell（DMS Shell / Noctalia Shell）
 5. **可选：自动生成硬件配置**
 
 ### 步骤 3：生成硬件配置
@@ -283,7 +283,7 @@ wp-color -s your-wallpaper.png
 wp-color -s
 ```
 
-3. **自动颜色监听器**：系统自动监控壁纸变化。当您通过 Noctalia-Shell/DMS-Shell GUI 选择壁纸时，颜色会自动更新。
+3. **自动颜色监听器**：系统自动监控壁纸变化。当您通过 DMS Shell / Noctalia Shell GUI 选择壁纸时，颜色会自动更新。
 
 4. 系统会自动：
    - 使用 pywal 从壁纸提取颜色

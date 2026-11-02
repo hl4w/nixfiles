@@ -67,6 +67,10 @@
 - **统一终端浮动规则**: Hyprland windowrulev2 添加 `foot` 终端浮动规则
 - **更新架构文档**: `architecture.md` 和 `architecture_en.md` 同步反映模块边界重构
 
+### Documentation
+- **新增术语对照表**: `docs/glossary.md` 与 `docs/glossary_en.md` 定义规范术语、代码标识符与书写规则
+- **统一文档术语**: README、架构、FAQ、迁移与快捷键文档统一使用 `DMS Shell` / `Noctalia Shell`、`Home Manager`、`系统代`、`flake 配置名称` 等表述；`CHANGELOG` 保留历史表述不做回改
+
 ## [v0.0.5] - 2026-06-16
 ### Added
 - **GPL v3.0 许可证更新**: 验证并确认项目使用完整的 GNU General Public License v3.0

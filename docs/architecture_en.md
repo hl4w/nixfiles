@@ -36,8 +36,8 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 │   │   ├── hyprland.nix   # Hyprland (programs.hyprland, system-level install)
 │   │   ├── niri.nix       # Niri (programs.niri, system-level install)
 │   │   ├── sddm.nix       # SDDM (Wayland only)
-│   │   ├── shell-dms.nix  # DMS-Shell (lightweight)
-│   │   ├── shell-noctalia.nix   # Noctalia-Shell (modern)
+│   │   ├── shell-dms.nix  # DMS Shell (lightweight)
+│   │   ├── shell-noctalia.nix   # Noctalia Shell (modern)
 │   │   └── unified-theme.nix    # System-level theme (Qt/SDDM/env vars/day-night switching)
 │   ├── system/           # System base configuration
 │   │   ├── default.nix   # Base system configuration, users, packages, Nix config
@@ -132,8 +132,8 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 | `desktops/hyprland.nix` | Hyprland system-level install (programs.hyprland) |
 | `desktops/niri.nix` | Niri system-level install (programs.niri) |
 | `desktops/sddm.nix` | SDDM (Wayland mode only, Xwayland support) |
-| `desktops/shell-dms.nix` | DMS-Shell dependencies |
-| `desktops/shell-noctalia.nix` | Noctalia-Shell dependencies |
+| `desktops/shell-dms.nix` | DMS Shell dependencies |
+| `desktops/shell-noctalia.nix` | Noctalia Shell dependencies |
 | `desktops/unified-theme.nix` | System-level theme (Qt/SDDM/env vars/day-night switching) |
 | `system/fonts.nix` | System font configuration (Noto CJK, Source Han, WenQuanYi), WPS Office CN font alias mapping |
 | `hardware/bluetooth.nix` | Bluetooth device configuration |
@@ -233,7 +233,7 @@ The script will guide you through:
 1. Enter username, hostname, Git info
 2. Select host type (Desktop/Laptop/Server)
 3. Select window manager (Hyprland/Niri)
-4. Select desktop shell (DMS-Shell/Noctalia-Shell)
+4. Select desktop shell (DMS Shell / Noctalia Shell)
 5. Select polkit agent (KDE/Hyprland)
 6. Auto-generate configuration files
 
@@ -290,7 +290,7 @@ This configuration includes a wallpaper auto-color system using `pywal`:
 - **Integration**:
   - Colors stored in `~/.cache/wal/`
   - Loaded automatically in `home/common/shell.nix`
-  - Works seamlessly with DMS-Shell and Noctalia-Shell
+  - Works seamlessly with DMS Shell and Noctalia Shell
 
 ### Day/Night Theme Switching
 
@@ -378,7 +378,7 @@ The configuration uses `pywal` to extract colors from wallpaper and apply them t
   - Terminal (Alacritty, Kitty, Foot)
   - Starship prompt
   - Neovim editor
-  - Noctalia-Shell and DMS-Shell
+  - DMS Shell and Noctalia Shell
 
 - **Implementation**:
   - Script: `scripts/wallpaper-color.sh`

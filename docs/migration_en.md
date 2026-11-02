@@ -33,7 +33,7 @@ The script will guide you through:
 1. Enter username, hostname, Git info
 2. Select host type (Desktop/Laptop/Server)
 3. Select window manager (Hyprland/Niri)
-4. Select desktop shell (DMS-Shell/Noctalia-Shell)
+4. Select desktop shell (DMS Shell / Noctalia Shell)
 5. **Optional: Auto-generate hardware configuration**
 
 ### Step 3: Generate Hardware Configuration
@@ -283,7 +283,7 @@ wp-color -s your-wallpaper.png
 wp-color -s
 ```
 
-3. **Automatic color watcher**: The system monitors wallpaper changes automatically. When you select a wallpaper via Noctalia-Shell/DMS-Shell GUI, colors will be updated automatically.
+3. **Automatic color watcher**: The system monitors wallpaper changes automatically. When you select a wallpaper via DMS Shell / Noctalia Shell GUI, colors will be updated automatically.
 
 4. The system will automatically:
    - Extract colors from the wallpaper using pywal

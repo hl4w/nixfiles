@@ -17,8 +17,8 @@ Flakes provide reproducible builds, better dependency management, and a cleaner 
 
 ### What desktop shells are available?
 
-- **DMS-Shell**: Lightweight display manager shell
-- **Noctalia-Shell**: Modern desktop integration shell
+- **DMS Shell**: Lightweight display manager shell
+- **Noctalia Shell**: Modern desktop integration shell
 
 ## Installation
 
@@ -43,7 +43,7 @@ The script will guide you through:
 1. Enter username, hostname, Git info
 2. Select host type (Desktop/Laptop/Server)
 3. Select window manager (Hyprland/Niri)
-4. Select desktop shell (DMS-Shell/Noctalia-Shell)
+4. Select desktop shell (DMS Shell / Noctalia Shell)
 5. Generate hardware config and deploy
 
 **Method 2: Manual Installation**
@@ -248,9 +248,9 @@ Colors are automatically extracted from the wallpaper and applied to:
 - Terminal (alacritty, kitty, foot)
 - Shell prompt (Starship)
 - Neovim/Emacs editors
-- Noctalia-Shell and DMS-Shell
+- DMS Shell and Noctalia Shell
 
-**Auto Watcher**: The system automatically monitors wallpaper changes. When you select a wallpaper via Noctalia-Shell/DMS-Shell GUI, colors will be updated automatically.
+**Auto Watcher**: The system automatically monitors wallpaper changes. When you select a wallpaper via DMS Shell / Noctalia Shell GUI, colors will be updated automatically.
 
 ### Wallpaper colors not applying?
 
