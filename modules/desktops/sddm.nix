@@ -18,7 +18,8 @@ in
   services.xserver.enable = false;
 
   # 启用显示管理器
-  services.display-manager = {
+  # 注意: NixOS 选项路径为 services.displayManager（驼峰命名）
+  services.displayManager = {
     enable = true;
     # 默认会话根据窗口管理器选择动态设置
     defaultSession = lib.mkDefault (
