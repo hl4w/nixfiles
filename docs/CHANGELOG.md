@@ -76,6 +76,7 @@
 - **新增术语对照表**: `docs/glossary.md` 与 `docs/glossary_en.md` 定义规范术语、代码标识符与书写规则
 - **统一文档术语**: README、架构、FAQ、迁移与快捷键文档统一使用 `DMS Shell` / `Noctalia Shell`、`Home Manager`、`系统代`、`flake 配置名称` 等表述；`CHANGELOG` 保留历史表述不做回改
 - **同步文档内容**: 架构文档更新 flake 输入（oh-my-rime 替代 hyprnix）与字体包名（`noto-fonts-cjk-sans`/`serif`），补充 glossary 文档索引与 `pkgs.lix` 写法；FAQ 与迁移文档补充 `setup-disk.sh` 安装路径、`nix flake update` 前置步骤、`nixosConfigurations` 完整构建属性路径及 `clean.sh` 参数；壁纸命令统一为 `wp-color -s/-d/-a/-l/-c`（删除不存在的 `wp-apply`/`wp-list`，修正 `wp-color -s` 无参数用法）；SDDM 选项路径修正为 `services.displayManager.sddm`；`powerManagement.cpuFreqGovernor` 去掉错误的 `services` 前缀；快捷键文档修正 Hyprland/Niri 配置位置为 `home/common/`，补充浮动规则（含 Foot）与键盘布局说明
+- **README 重排**: 特性按「桌面与外观 / 安装与系统 / 中文与办公 / 终端与开发」分组，新增「部署前验证」与「日常管理」小节，统一术语与完整属性路径说明并去除重复段落，中英文版结构保持一致
 - **补充交互选择与 CI 说明**: README 与架构文档说明 `setup-disk.sh` 省略 `-T/-W/-S` 时的交互式选择与 `-y`/非终端回退规则；架构文档新增「持续集成」小节，说明 `build.yml` 的 `nix flake check --no-build`、动态主机发现与完整构建属性路径，并提示提交 `flake.lock`
 
 ## [v0.0.5] - 2026-06-16
