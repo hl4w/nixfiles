@@ -53,6 +53,7 @@
   - `fonts.nix` 的 `XDG_DATA_DIRS` 仍引用已被拆分的 `pkgs.noto-fonts-cjk` → 改为 `noto-fonts-cjk-sans` + `noto-fonts-cjk-serif`
 - **修复 CI 与构建脚本**:
   - `.github/workflows/build.yml` 监听分支 `main` → `master`（与实际分支一致，否则 CI 永不触发）
+  - `.github/workflows/build.yml` 构建目标 `nix build .#desktop`/`.#laptop`/`.#server`（不存在的 flake 输出）→ 先 `nix flake lock` 生成锁文件，再用 `nix flake check --no-build` 做求值检查，最后动态发现 `nixosConfigurations` 并构建完整属性路径 `nixosConfigurations.<host>.config.system.build.toplevel`；未声明主机时仅告警并跳过构建
   - `Makefile` 的 `switch-home` 硬编码占位符 `youruser@desktop` → 改为 `USER`/`HOST` 变量，支持 `make USER=<name> HOST=<host>`
 - **移除系统层重复的主题环境变量**:
   - 删除 `GTK_THEME`/`GTK2_RC_FILES`/`QT_STYLE_OVERRIDE`/`XDG_ICON_THEME`（优先级高于 Home Manager 用户级配置，会覆盖 `gtk`/`xdg.iconTheme` 模块）
