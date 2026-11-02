@@ -59,6 +59,8 @@ in
     currentDesktopManager = config.desktop.windowManager;
   in {
     # ==================== 环境变量 ====================
+    # 注意: GTK_THEME / QT_STYLE_OVERRIDE / XDG_ICON_THEME 由 Home Manager 用户级配置管理，
+    #       此处不再重复设置，避免环境变量覆盖 HM 的 gtk/xdg.iconTheme 模块配置
     environment.sessionVariables = {
       WAL_CACHE_DIR = "$HOME/.cache/wal";
       WALLPAPER_DIR = "$HOME/.wallpapers";
@@ -67,12 +69,9 @@ in
       THEME_DAY_START = "${toString startDay}";
       THEME_NIGHT_START = "${toString startNight}";
 
-      GTK_THEME = "Adwaita-dark";
-      GTK2_RC_FILES = "${pkgs.gnome.gnome-themes-extra}/share/themes/Adwaita-dark/gtk-2.0/gtkrc";
-      QT_STYLE_OVERRIDE = "adwaita-dark";
+      # XDG 基础环境变量（非主题相关，保留）
       QT_QPA_PLATFORMTHEME = "gtk3";
       QT_QPA_FONTDIR = "${pkgs.noto-fonts}/share/fonts";
-      XDG_ICON_THEME = "Papirus-Dark";
       XDG_DATA_DIRS = "${pkgs.papirus-icon-theme}/share:${pkgs.gnome.adwaita-icon-theme}/share:${pkgs.kdePackages.breeze-icons}/share:/usr/share";
 
       XDG_CURRENT_DESKTOP = (if currentDesktopManager == "hyprland" then "Hyprland" else "Niri");
@@ -101,7 +100,9 @@ in
       };
     };
 
-    # ==================== 系统级 GTK/Qt 配置文件 ====================
+    # ==================== 系统级 GTK/Qt 配置文件（/etc/skel） ====================
+    # 这些是用户首次登录时的骨架默认值（~/.config 还没生成时生效）
+    # Home Manager 配置安装后会覆盖这些系统级默认值
     environment.etc = {
       "skel/.wallpapers" = {
         source = ./../../wallpapers;
