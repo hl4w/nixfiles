@@ -97,15 +97,16 @@
 
 在本配置中，`Super` 键通常指 **Windows 键** 或 **Command 键**（macOS 键盘）。
 
-### 布局切换
+### 键盘布局
 
-- 键盘布局切换：`Alt + Shift`
-- 支持英文（US）和中文（CN）两种布局
+- Hyprland 的 XKB 布局设为 `us`（`kb_layout = "us"`），中文输入由 Fcitx5 负责，无需单独的 CN 布局
+- `Alt + Shift` 作为布局/输入法切换组合键保留（`kb_options = "grp:alt_shift_toggle"`）
 
 ### 浮动窗口规则
 
-以下应用默认以浮动模式打开：
+以下应用默认以浮动模式打开（`windowrulev2`，按 `class` 匹配）：
 
+- Foot 终端（默认终端）
 - Kitty 终端
 - Alacritty 终端
 - Rofi（应用启动器、电源菜单）
@@ -117,5 +118,5 @@
 
 如需修改快捷键，编辑对应窗口管理器的配置文件：
 
-- Hyprland: `modules/desktops/hyprland.nix`
-- Niri: `modules/desktops/niri.nix`
+- Hyprland: `home/common/hyprland.nix`（按键与窗口规则），系统级启用位于 `modules/desktops/hyprland.nix`
+- Niri: `home/common/niri.nix`（`keybindings`），系统级启用位于 `modules/desktops/niri.nix`

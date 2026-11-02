@@ -7,7 +7,6 @@
 ```bash
 # 列出现有系统代
 sudo nixos-rebuild list-generations
-sudo nix-env --list-generations
 
 # 备份重要的配置文件
 cp -r ~/.config ~/.config.backup
@@ -16,6 +15,8 @@ cp -r ~/.local/share ~/.local/share.backup
 
 ### 步骤 2：运行安装脚本
 
+> 全新机器请先运行 `scripts/setup-disk.sh <磁盘> <主机名> <用户名>` 完成分区、加密与挂载；已有 NixOS 系统可直接运行 `install.sh`。
+
 ```bash
 # 克隆仓库
 # 国内用户推荐使用 Gitee 镜像：
@@ -23,6 +24,9 @@ git clone https://gitee.com/hl4w/nixfiles.git
 # 国外用户使用 GitHub：
 # git clone https://github.com/hl4w/nixfiles.git
 cd nixfiles
+
+# 生成 flake.lock（首次构建前必须执行，包含 oh-my-rime 输入）
+nix flake update
 
 # 运行安装脚本
 chmod +x scripts/install.sh
@@ -76,19 +80,19 @@ lsblk -f
 ### 步骤 6：测试构建
 
 ```bash
-nix build .#hostname
+nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 ```
 
 ### 步骤 7：部署
 
 ```bash
-sudo nixos-rebuild switch --flake .#hostname
+sudo nixos-rebuild switch --flake .#<hostname>
 ```
 
 ### 步骤 8：更新 Home Manager
 
 ```bash
-home-manager switch --flake .#username@hostname
+home-manager switch --flake .#<username>@<hostname>
 ```
 
 ## 升级到新版本 NixOS
@@ -122,13 +126,13 @@ nix flake update nixpkgs
 
 ```bash
 # 测试构建
-nix build .#hostname
+nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 
 # 部署到系统
-sudo nixos-rebuild switch --flake .#hostname
+sudo nixos-rebuild switch --flake .#<hostname>
 
 # 更新 Home Manager
-home-manager switch --flake .#username@hostname
+home-manager switch --flake .#<username>@<hostname>
 ```
 
 ## 包变更
@@ -167,7 +171,7 @@ kdePackages.polkit-kde-agent-1
 |------|------|------|
 | 系统 | git, wget, curl, nil, tmux, zsh, tree, highlight, nixpkgs-fmt | `modules/system/default.nix` |
 | 用户 | fastfetch, btop, eza, bat, fzf, fd, ripgrep, yazi, zoxide, dust, duf, tokei, hyperfine, procs | `home/common/cli.nix` |
-| 桌面 | rofi, nemo, nemo-extensions, evince, loupe, alacritty/kitty/foot（默认 foot）, pywal, vlc | `home/common/apps.nix` |
+| 桌面 | rofi, nemo, nemo-extensions, evince, loupe, alacritty/kitty/foot（默认 foot）, vlc | `home/common/apps.nix` |
 | 开发 | clangd, clang-tools, cmake, ninja, gdb, lldb, go, gopls, python3, pyright, rustc, rust-analyzer, rustfmt, cargo | `home/common/dev-lsp.nix` |
 | 办公 | wps-office-cn, nextcloud-client | `home/common/apps.nix` |
 
@@ -227,7 +231,7 @@ nix --version
 ### SDDM 配置
 
 ```nix
-services.sddm = {
+services.displayManager.sddm = {
   enable = true;
   wayland.enable = true;  # Wayland 模式
   displayServer = "wayland";
@@ -279,8 +283,11 @@ nixConfig = {
 # 设置指定壁纸
 wp-color -s your-wallpaper.png
 
-# 或使用默认壁纸
-wp-color -s
+# 随机选择壁纸
+wp-color -d
+
+# 仅应用已有配色（不重新取色）
+wp-color -a
 ```
 
 3. **自动颜色监听器**：系统自动监控壁纸变化。当您通过 DMS Shell / Noctalia Shell GUI 选择壁纸时，颜色会自动更新。
@@ -295,12 +302,7 @@ wp-color -s
 
 如果您之前使用手动主题切换，请迁移到新的统一主题系统：
 
-1. 确保 `unified-theme.nix` 已在主机配置中导入：
-```nix
-imports = [
-  ../modules/desktops/unified-theme.nix
-];
-```
+1. 系统层主题由 `modules/desktops/desktop.nix` 自动导入 `unified-theme.nix`，无需手动添加；用户层主题需导入 `home/common/unified-theme.nix`（`home/hosts/*.nix` 已包含）
 
 2. 在主机配置中配置主题模式：
 ```nix
@@ -380,9 +382,9 @@ nix show-config | grep substituters
 
 - [ ] 硬件配置已生成并更新 UUID
 - [ ] 用户配置文件已迁移到 Home Manager 模块
-- [ ] 构建成功：`nix build .#hostname`
-- [ ] 系统已部署：`sudo nixos-rebuild switch --flake .#hostname`
-- [ ] Home Manager 已更新：`home-manager switch --flake .#username@hostname`
+- [ ] 构建成功：`nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel`
+- [ ] 系统已部署：`sudo nixos-rebuild switch --flake .#<hostname>`
+- [ ] Home Manager 已更新：`home-manager switch --flake .#<username>@<hostname>`
 - [ ] 窗口管理器正确启动
 - [ ] 输入法正常工作（Fcitx5 + RIME）
 - [ ] 音频正常工作（PipeWire）

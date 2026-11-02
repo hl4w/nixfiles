@@ -12,17 +12,28 @@ Flakes provide reproducible builds, better dependency management, and a cleaner 
 
 ### What window managers are supported?
 
-- **Hyprland**: Dynamic tiling window manager with Lua configuration (via hyprnix)
+- **Hyprland**: Dynamic tiling window manager with hyprlang configuration (`configType = "hyprlang"`)
 - **Niri**: Modern scrollable-tiling window manager, recommended for laptops
 
 ### What desktop shells are available?
 
-- **DMS Shell**: Lightweight display manager shell
+- **DMS Shell**: Lightweight desktop shell
 - **Noctalia Shell**: Modern desktop integration shell
 
 ## Installation
 
 ### How do I install NixOS with this configuration?
+
+For a fresh machine (booted from the NixOS ISO), run the disk setup script first. It handles partitioning, LUKS2 + LVM encryption, formatting, mounting and config deployment in one go:
+
+```bash
+git clone https://gitee.com/hl4w/nixfiles.git
+cd nixfiles
+sudo ./scripts/setup-disk.sh -T desktop -W hyprland -S dms /dev/nvme0n1 my-host myuser
+sudo nixos-install --flake .#my-host
+```
+
+On an existing NixOS system, use `install.sh` to generate the host configuration:
 
 **Method 1: Using install.sh (Recommended)**
 
@@ -44,7 +55,10 @@ The script will guide you through:
 2. Select host type (Desktop/Laptop/Server)
 3. Select window manager (Hyprland/Niri)
 4. Select desktop shell (DMS Shell / Noctalia Shell)
-5. Generate hardware config and deploy
+5. Select polkit agent (KDE/Hyprland)
+6. Generate hardware config and deploy
+
+For non-interactive mode pass flags directly, e.g. `./scripts/install.sh -y -U john -H my-desktop -T desktop -W hyprland -S dms -P kde` (`-y` auto-confirms prompts and `-N` sets the flake configuration name; run `./scripts/install.sh -h` for all options).
 
 **Method 2: Manual Installation**
 
@@ -200,11 +214,11 @@ procs -l
 
 ### How do I configure Hyprland?
 
-Edit `modules/desktops/hyprland.nix` for system-level configuration. Hyprland uses Lua syntax managed by hyprnix.
+System-level enablement lives in `modules/desktops/hyprland.nix`; keybindings, window rules and other details live in `home/common/hyprland.nix` using hyprlang syntax (`configType = "hyprlang"`).
 
 ### How do I configure Niri?
 
-Edit `modules/desktops/niri.nix` for system-level configuration.
+System-level enablement lives in `modules/desktops/niri.nix`; keybindings and other details live in `home/common/niri.nix`.
 
 ### How do I configure input method (Chinese)?
 
@@ -228,20 +242,18 @@ Modify the `Theme` value in `classicui.conf` within `home/common/input.nix`, for
 This configuration includes a wallpaper auto-color system using `pywal`:
 
 ```bash
-# Set specified wallpaper and apply colors
+# Set specified wallpaper and apply colors (-s requires a name or path)
 wp-color -s my-wallpaper.png
 
-# Use default wallpaper (default.jpg)
-wp-color -s
-
-# Randomly select wallpaper from ~/.wallpapers/
+# Pick a random wallpaper from ~/.wallpapers (same as wp-color -d)
 wp-random
 
-# Apply current colors without changing wallpaper
-wp-apply
+# Apply the current color scheme only (no wallpaper change, no re-extraction)
+wp-color -a
 
-# List available wallpapers
-wp-list
+# List available wallpapers / show current colors
+wp-color -l
+wp-color -c
 ```
 
 Colors are automatically extracted from the wallpaper and applied to:
@@ -255,7 +267,7 @@ Colors are automatically extracted from the wallpaper and applied to:
 ### Wallpaper colors not applying?
 
 Ensure:
-- `pywal` is installed (included in `unified-theme.nix`)
+- `pywal` is installed (declared in `modules/desktops/unified-theme.nix`)
 - Wallpaper directory exists: `~/.wallpapers` (automatically created)
 - Colors are loaded in shell: `source ~/.cache/wal/colors.sh`
 - Wallpaper watcher service is running: `systemctl --user status wallpaper-watcher`
@@ -290,9 +302,9 @@ desktop.unified-theme = {
 ### Theme switching not working?
 
 Ensure:
-- `unified-theme.nix` is imported in your host configuration
+- Both `modules/desktops/unified-theme.nix` (system) and `home/common/unified-theme.nix` (user) are imported
 - Commands are available: `which theme-auto theme-dark theme-light`
-- Theme scripts are in `environment.systemPackages`
+- Theme scripts are generated via `writeScriptBin` in `modules/desktops/unified-theme.nix` and added to `environment.systemPackages`
 
 ### How do I configure Chinese mirrors?
 
@@ -342,8 +354,8 @@ Check:
 ### SDDM won't start
 
 Check:
-- Display manager is enabled: `services.sddm.enable = true`
-- Wayland mode is enabled: `services.sddm.wayland.enable = true`
+- Display manager is enabled: `services.displayManager.sddm.enable = true`
+- Wayland mode is enabled: `services.displayManager.sddm.wayland.enable = true`
 - Graphics drivers are properly configured
 - `qt6Packages.qtwayland` is installed
 
@@ -377,7 +389,7 @@ nix show-config | grep substituters
 
 ### How do I optimize performance?
 
-- Enable `services.powerManagement.cpuFreqGovernor = "performance"` for desktop
+- Enable `powerManagement.cpuFreqGovernor = "performance"` for desktop
 - Use `boot.kernelParams` for hardware-specific optimizations
 - Add `nix.settings.max-jobs` based on CPU cores
 
@@ -391,7 +403,7 @@ nix show-config | grep substituters
 
 ### How do I manage secrets?
 
-Use `agenix` to encrypt secrets. See `secrets/README.md` for details.
+The `secrets/` directory is reserved for encrypted secrets, but the default configuration does not yet integrate the agenix module. To use it, follow `secrets/README.md` to add agenix to the flake inputs and host configuration.
 
 ### How do I enable the firewall?
 
@@ -447,7 +459,7 @@ home-manager switch --flake .#<username>@<hostname>
 nix flake check
 
 # Test build (no deployment)
-nix build .#<hostname>
+nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 
 # Preview changes
 nixos-rebuild dry-activate --flake .#<hostname>
@@ -478,6 +490,6 @@ nix-collect-garbage -d
 # Clean system generations
 sudo nix-collect-garbage -d
 
-# Or use the clean script
-./scripts/clean.sh
+# Or use the cleanup script (-a all, -s store only, -g old generations only)
+./scripts/clean.sh -a
 ```

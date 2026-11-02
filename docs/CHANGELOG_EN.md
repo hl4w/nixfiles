@@ -16,14 +16,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - `install.sh` / `install_en.sh`: `youruser` placeholder replacement now escapes sed metacharacters and verifies the result; `POWER_MANAGEMENT` explicitly initialized; non-interactive mode (`-y`) fails fast on missing arguments instead of blocking on prompts; added validation for host type, window manager, desktop shell and polkit agent; `nixos-generate-config` automatically adds `--root /mnt` inside the installer; removed the Intel `i915.enable_psr=0` kernel parameter; build hints use the full attribute path
 - **Fixed NixOS vs Home Manager module boundary confusion (critical)**:
   - `wayland.windowManager.hyprland` / `wayland.windowManager.niri` are Home Manager modules, not available in NixOS system config → Refactor: NixOS layer uses `programs.hyprland`/`programs.niri` for installation; detailed config moved to `home/common/hyprland.nix`/`niri.nix`
-  - `gtk.*` / `xdg.iconTheme` are Home Manager options → moved from `modules/desktops/unified-theme.nix` to `home/common/unified-theme.nix`; system layer keeps only `qt`/`services.sddm`/`environment.*`
+  - `gtk.*` / `xdg.iconTheme` are Home Manager options → moved from `modules/desktops/unified-theme.nix` to `home/common/unified-theme.nix`; system layer keeps only `qt`/`services.displayManager.sddm`/`environment.*`
   - NixOS `qt` module only supports `enable`/`platformTheme`/`style`; removed non-existent `qt.iconTheme`/`qt.font`
 - **Removed non-existent NixOS options (critical)**:
   - Deleted `security.pam.enableSSS = false`
   - Deleted `security.faillock.enable = true`
   - Deleted `programs.noctalia-shell.enable` / `programs.dms-shell.enable` (packages, not module options)
-- **Fixed Nix syntax error (critical)**:
+- **Fixed Nix syntax errors (critical)**:
   - `services.display-manager` → `services.displayManager` (hyphen is not a valid Nix identifier; parsed as subtraction)
+  - `services.sddm` → `services.displayManager.sddm` (`services.sddm` does not exist in NixOS and would fail evaluation)
 - **Hyprland 0.55 (NixOS 26.05) compatibility**:
   - Removed `hyprnix` flake input, using native NixOS module
   - Added `configType = "hyprlang"` (0.55+ defaults to Lua)
@@ -70,6 +71,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Documentation
 - **Added terminology glossary**: `docs/glossary.md` and `docs/glossary_en.md` define canonical terms, code identifiers and style rules
 - **Unified documentation terminology**: README, architecture, FAQ, migration and shortcuts documents now use `DMS Shell` / `Noctalia Shell`, `Home Manager`, `generation`, `flake configuration name` consistently; `CHANGELOG` keeps historical wording untouched
+- **Synced documentation content**: architecture inputs updated (oh-my-rime replaces hyprnix), font packages corrected (`noto-fonts-cjk-sans`/`serif`), glossary entries added to the docs index and `pkgs.lix` usage fixed; FAQ and migration guide now cover the `setup-disk.sh` install path, the `nix flake update` prerequisite, the full `nixosConfigurations` build attribute path and `clean.sh` flags; wallpaper commands unified as `wp-color -s/-d/-a/-l/-c` (removed non-existent `wp-apply`/`wp-list`, fixed the argument-less `wp-color -s` usage); SDDM option path corrected to `services.displayManager.sddm`; `powerManagement.cpuFreqGovernor` no longer prefixed with `services`; shortcuts docs point to `home/common/` for Hyprland/Niri configuration and now cover floating rules (including Foot) and keyboard layout
 
 ## [v0.0.5] - 2026-06-16
 ### Added

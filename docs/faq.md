@@ -12,17 +12,28 @@ Flakes 提供可重现的构建、更好的依赖管理，以及更清晰的 Nix
 
 ### 支持哪些窗口管理器？
 
-- **Hyprland**: 动态平铺窗口管理器，使用 Lua 配置（通过 hyprnix）
+- **Hyprland**: 动态平铺窗口管理器，使用 hyprlang 配置（`configType = "hyprlang"`）
 - **Niri**: 现代可滚动平铺窗口管理器，推荐用于笔记本电脑
 
 ### 有哪些桌面 Shell 可用？
 
-- **DMS Shell**: 轻量级显示管理器 Shell
+- **DMS Shell**: 轻量级桌面 Shell
 - **Noctalia Shell**: 现代化桌面集成 Shell
 
 ## 安装
 
 ### 如何使用此配置安装 NixOS？
+
+全新机器（从 NixOS ISO 启动）推荐先运行磁盘安装脚本，一次性完成分区、LUKS2 + LVM 加密、格式化、挂载与配置部署：
+
+```bash
+git clone https://gitee.com/hl4w/nixfiles.git
+cd nixfiles
+sudo ./scripts/setup-disk.sh -T desktop -W hyprland -S dms /dev/nvme0n1 my-host myuser
+sudo nixos-install --flake .#my-host
+```
+
+已有 NixOS 系统时使用 `install.sh` 生成主机配置：
 
 **方法 1：使用 install.sh（推荐）**
 
@@ -44,7 +55,10 @@ chmod +x scripts/install.sh
 2. 选择主机类型（Desktop/Laptop/Server）
 3. 选择窗口管理器（Hyprland/Niri）
 4. 选择桌面 Shell（DMS Shell / Noctalia Shell）
-5. 生成硬件配置并部署
+5. 选择 polkit 代理（KDE/Hyprland）
+6. 生成硬件配置并部署
+
+非交互模式可传入参数，例如 `./scripts/install.sh -y -U john -H my-desktop -T desktop -W hyprland -S dms -P kde`（`-y` 为自动确认开关，`-N` 可单独指定 flake 配置名称；完整选项见 `./scripts/install.sh -h`）。
 
 **方法 2：手动安装**
 
@@ -200,11 +214,11 @@ procs -l
 
 ### 如何配置 Hyprland？
 
-编辑 `modules/desktops/hyprland.nix` 进行系统级配置。Hyprland 使用由 hyprnix 管理的 Lua 语法。
+系统级启用位于 `modules/desktops/hyprland.nix`；按键绑定、窗口规则等详细配置位于 `home/common/hyprland.nix`，使用 hyprlang 语法（`configType = "hyprlang"`）。
 
 ### 如何配置 Niri？
 
-编辑 `modules/desktops/niri.nix` 进行系统级配置。
+系统级启用位于 `modules/desktops/niri.nix`；按键绑定等详细配置位于 `home/common/niri.nix`。
 
 ### 如何配置输入法（中文）？
 
@@ -228,20 +242,18 @@ procs -l
 本配置包含使用 `pywal` 的壁纸自动取色系统：
 
 ```bash
-# 设置指定壁纸并应用颜色
+# 设置指定壁纸并应用颜色（-s 必须带壁纸名称或路径）
 wp-color -s my-wallpaper.png
 
-# 使用默认壁纸（default.jpg）
-wp-color -s
-
-# 从 ~/.wallpapers/ 随机选择壁纸
+# 从 ~/.wallpapers/ 随机选择壁纸并取色（等价于 wp-color -d）
 wp-random
 
-# 应用当前颜色（不更换壁纸）
-wp-apply
+# 应用当前配色（不更换壁纸，不重新取色）
+wp-color -a
 
-# 列出可用壁纸
-wp-list
+# 列出可用壁纸 / 查看当前配色
+wp-color -l
+wp-color -c
 ```
 
 颜色会自动从壁纸提取并应用到：
@@ -255,7 +267,7 @@ wp-list
 ### 壁纸颜色不生效？
 
 确保：
-- `pywal` 已安装（包含在 `unified-theme.nix` 中）
+- `pywal` 已安装（包含在 `modules/desktops/unified-theme.nix` 中）
 - 壁纸目录存在：`~/.wallpapers`（自动创建）
 - 颜色已在 Shell 中加载：`source ~/.cache/wal/colors.sh`
 - 壁纸监听器服务正在运行：`systemctl --user status wallpaper-watcher`
@@ -290,9 +302,9 @@ desktop.unified-theme = {
 ### 主题切换不工作？
 
 确保：
-- `unified-theme.nix` 已在主机配置中导入
+- 系统层 `modules/desktops/unified-theme.nix` 与用户层 `home/common/unified-theme.nix` 均已导入
 - 命令可用：`which theme-auto theme-dark theme-light`
-- 主题脚本在 `environment.systemPackages` 中
+- 主题脚本由 `modules/desktops/unified-theme.nix` 通过 `writeScriptBin` 生成并加入 `environment.systemPackages`
 
 ### 如何配置中国镜像？
 
@@ -342,8 +354,8 @@ substituters = [
 ### SDDM 无法启动
 
 检查：
-- 显示管理器已启用：`services.sddm.enable = true`
-- Wayland 模式已启用：`services.sddm.wayland.enable = true`
+- 显示管理器已启用：`services.displayManager.sddm.enable = true`
+- Wayland 模式已启用：`services.displayManager.sddm.wayland.enable = true`
 - 图形驱动已正确配置
 - `qt6Packages.qtwayland` 已安装
 
@@ -377,7 +389,7 @@ nix show-config | grep substituters
 
 ### 如何优化性能？
 
-- 为桌面启用 `services.powerManagement.cpuFreqGovernor = "performance"`
+- 为桌面启用 `powerManagement.cpuFreqGovernor = "performance"`
 - 使用 `boot.kernelParams` 进行硬件特定优化
 - 根据 CPU 核心数添加 `nix.settings.max-jobs`
 
@@ -391,7 +403,7 @@ nix show-config | grep substituters
 
 ### 如何管理密钥？
 
-使用 `agenix` 加密密钥。有关详细信息，请参阅 `secrets/README.md`。
+仓库预留 `secrets/` 目录用于存放加密密钥，但当前默认配置尚未集成 agenix 模块。如需使用，请先按 `secrets/README.md` 将 agenix 加入 flake 输入与主机配置。
 
 ### 如何启用防火墙？
 
@@ -447,7 +459,7 @@ home-manager switch --flake .#<username>@<hostname>
 nix flake check
 
 # 测试构建（不部署）
-nix build .#<hostname>
+nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 
 # 预览差异
 nixos-rebuild dry-activate --flake .#<hostname>
@@ -478,6 +490,6 @@ nix-collect-garbage -d
 # 清理系统代
 sudo nix-collect-garbage -d
 
-# 或使用清理脚本
-./scripts/clean.sh
+# 或使用清理脚本（-a 全部、-s 仅 Nix store、-g 仅旧系统代）
+./scripts/clean.sh -a
 ```

@@ -7,7 +7,6 @@
 ```bash
 # List existing generations
 sudo nixos-rebuild list-generations
-sudo nix-env --list-generations
 
 # Backup important dotfiles
 cp -r ~/.config ~/.config.backup
@@ -16,6 +15,8 @@ cp -r ~/.local/share ~/.local/share.backup
 
 ### Step 2: Run Installation Script
 
+> For a fresh machine, run `scripts/setup-disk.sh <disk> <hostname> <username>` first to partition, encrypt and mount the disk; on an existing NixOS system, run `install.sh` directly.
+
 ```bash
 # Clone repository
 # Chinese users recommended to use Gitee mirror:
@@ -23,6 +24,9 @@ git clone https://gitee.com/hl4w/nixfiles.git
 # International users use GitHub:
 # git clone https://github.com/hl4w/nixfiles.git
 cd nixfiles
+
+# Generate flake.lock before the first build (includes the oh-my-rime input)
+nix flake update
 
 # Run installation script
 chmod +x scripts/install.sh
@@ -76,19 +80,19 @@ Key files to migrate:
 ### Step 6: Test Build
 
 ```bash
-nix build .#hostname
+nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 ```
 
 ### Step 7: Deploy
 
 ```bash
-sudo nixos-rebuild switch --flake .#hostname
+sudo nixos-rebuild switch --flake .#<hostname>
 ```
 
 ### Step 8: Update Home Manager
 
 ```bash
-home-manager switch --flake .#username@hostname
+home-manager switch --flake .#<username>@<hostname>
 ```
 
 ## Upgrading to New NixOS Version
@@ -122,13 +126,13 @@ nix flake update nixpkgs
 
 ```bash
 # Test build
-nix build .#hostname
+nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 
 # Deploy to system
-sudo nixos-rebuild switch --flake .#hostname
+sudo nixos-rebuild switch --flake .#<hostname>
 
 # Update Home Manager
-home-manager switch --flake .#username@hostname
+home-manager switch --flake .#<username>@<hostname>
 ```
 
 ## Package Changes
@@ -167,7 +171,7 @@ Packages are now classified by level:
 |-------|----------|----------|
 | System | git, wget, curl, nil, tmux, zsh, tree, highlight, nixpkgs-fmt | `modules/system/default.nix` |
 | User | fastfetch, btop, eza, bat, fzf, fd, ripgrep, yazi, zoxide, dust, duf, tokei, hyperfine, procs | `home/common/cli.nix` |
-| Desktop | rofi, nemo, nemo-extensions, evince, loupe, alacritty/kitty/foot (foot default), pywal, vlc | `home/common/apps.nix` |
+| Desktop | rofi, nemo, nemo-extensions, evince, loupe, alacritty/kitty/foot (foot default), vlc | `home/common/apps.nix` |
 | Development | clangd, clang-tools, cmake, ninja, gdb, lldb, go, gopls, python3, pyright, rustc, rust-analyzer, rustfmt, cargo | `home/common/dev-lsp.nix` |
 | Office | wps-office-cn, nextcloud-client | `home/common/apps.nix` |
 
@@ -227,7 +231,7 @@ This configuration now only supports Wayland/Xwayland:
 ### SDDM Configuration
 
 ```nix
-services.sddm = {
+services.displayManager.sddm = {
   enable = true;
   wayland.enable = true;  # Wayland mode
   displayServer = "wayland";
@@ -279,8 +283,11 @@ If you were using a custom wallpaper setup, migrate to the new auto-color system
 # Set specified wallpaper
 wp-color -s your-wallpaper.png
 
-# Or use default wallpaper
-wp-color -s
+# Pick a random wallpaper from ~/.wallpapers
+wp-color -d
+
+# Apply the existing color scheme only (no re-extraction)
+wp-color -a
 ```
 
 3. **Automatic color watcher**: The system monitors wallpaper changes automatically. When you select a wallpaper via DMS Shell / Noctalia Shell GUI, colors will be updated automatically.
@@ -295,12 +302,7 @@ wp-color -s
 
 If you were using manual theme switching, migrate to the new unified theme system:
 
-1. Ensure `unified-theme.nix` is imported in your host configuration:
-```nix
-imports = [
-  ../modules/desktops/unified-theme.nix
-];
-```
+1. The system-level theme is imported automatically by `modules/desktops/desktop.nix` via `unified-theme.nix`, so no manual import is needed; the user-level theme requires importing `home/common/unified-theme.nix` (already included by `home/hosts/*.nix`)
 
 2. Configure theme mode in your host configuration:
 ```nix
@@ -380,9 +382,9 @@ If mirrors are not showing, add them to `flake.nix` and `modules/system/default.
 
 - [ ] Hardware configuration generated and UUIDs updated
 - [ ] User dotfiles migrated to Home Manager modules
-- [ ] Build succeeds: `nix build .#hostname`
-- [ ] System deployed: `sudo nixos-rebuild switch --flake .#hostname`
-- [ ] Home Manager updated: `home-manager switch --flake .#username@hostname`
+- [ ] Build succeeds: `nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel`
+- [ ] System deployed: `sudo nixos-rebuild switch --flake .#<hostname>`
+- [ ] Home Manager updated: `home-manager switch --flake .#<username>@<hostname>`
 - [ ] Window manager starts correctly
 - [ ] Input method works (Fcitx5 + RIME)
 - [ ] Audio works (PipeWire)

@@ -80,10 +80,10 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 │   ├── install_en.sh     # 安装脚本（英文版本）
 │   ├── update.sh         # 更新 flake 并重建
 │   ├── update_en.sh      # 更新脚本（英文版本）
-│   ├── clean.sh          # 清理 Nix store
+│   ├── clean.sh          # 清理 Nix store 与旧系统代
 │   ├── clean_en.sh       # 清理脚本（英文版本）
-│   ├── setup-disk.sh     # 磁盘分区脚本
-│   ├── setup-disk_en.sh  # 磁盘分区脚本（英文版本）
+│   ├── setup-disk.sh     # 磁盘分区、LUKS2 加密与配置部署
+│   ├── setup-disk_en.sh  # 磁盘分区、LUKS2 加密与配置部署（英文版本）
 │   ├── setup-direnv.sh   # direnv 设置脚本
 │   ├── setup-direnv_en.sh # direnv 设置脚本（英文版本）
 │   ├── wallpaper-color.sh # 壁纸自动取色脚本
@@ -103,6 +103,8 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 │   ├── CHANGELOG_EN.md   # 变更日志（英文）
 │   ├── faq.md            # 常见问题
 │   ├── faq_en.md         # 常见问题（英文）
+│   ├── glossary.md       # 术语对照表
+│   ├── glossary_en.md    # 术语对照表（英文）
 │   ├── migration.md      # 迁移指南
 │   ├── migration_en.md   # 迁移指南（英文）
 │   ├── shortcuts.md      # 快捷键参考
@@ -168,6 +170,8 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 | `CHANGELOG_EN.md` | 变更日志（英文） |
 | `faq.md` | 常见问题 |
 | `faq_en.md` | 常见问题（英文） |
+| `glossary.md` | 术语对照表（中英对照与书写规范） |
+| `glossary_en.md` | 术语对照表（英文） |
 | `migration.md` | 迁移指南 |
 | `migration_en.md` | 迁移指南（英文） |
 | `shortcuts.md` | Hyprland/Niri 快捷键参考 |
@@ -183,7 +187,7 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 |------|-----|------|
 | `nixpkgs` | `github:NixOS/nixpkgs/nixos-26.05` | NixOS 26.05 稳定版 |
 | `home-manager` | `github:nix-community/home-manager/release-26.05` | Home Manager 与 nixpkgs 版本同步 |
-| `hyprnix` | `github:hyprwm/hyprnix/main` | Hyprland 工具链，用于管理 Hyprland 配置 |
+| `oh-my-rime` | `github:Mintimate/oh-my-rime/main` | RIME 输入法配置框架（`flake = false`，仅作为源码输入） |
 
 ### 全局配置 (nixConfig)
 
@@ -282,10 +286,10 @@ nixConfig = {
 
 - **脚本**:
   - `scripts/wallpaper-color.sh`: 壁纸颜色提取主脚本
-  - `wp-color`: 设置指定壁纸并应用颜色
-  - `wp-random`: 从 `~/.wallpapers/` 随机选择壁纸
-  - `wp-apply`: 应用当前颜色（不更换壁纸）
-  - `wp-list`: 列出可用壁纸
+  - `wp-color -s <壁纸>`: 设置指定壁纸并取色
+  - `wp-color -d` / `wp-random`: 从 `~/.wallpapers/` 随机选择壁纸并取色
+  - `wp-color -a`: 应用当前配色（不更换壁纸、不重新取色）
+  - `wp-color -l` / `wp-color -c`: 列出可用壁纸 / 查看当前配色
 
 - **集成**:
   - 颜色存储在 `~/.cache/wal/`
@@ -360,10 +364,10 @@ nixConfig = {
 配置使用 `pywal` 从壁纸提取颜色并应用到各种应用：
 
 - **命令**:
-  - `wp-color -s <wallpaper>`: 设置壁纸并应用颜色
-  - `wp-random`: 从壁纸目录随机选择
-  - `wp-apply`: 应用当前颜色（不更换壁纸）
-  - `wp-list`: 列出可用壁纸
+  - `wp-color -s <wallpaper>`: 设置壁纸并取色
+  - `wp-color -d` / `wp-random`: 从壁纸目录随机选择并取色
+  - `wp-color -a`: 应用当前配色（不更换壁纸、不重新取色）
+  - `wp-color -l` / `wp-color -c`: 列出可用壁纸 / 查看当前配色
 
 - **壁纸目录**:
   - 项目: `wallpapers/`
@@ -399,7 +403,7 @@ nixConfig = {
 |------|------|------|
 | 系统 | git、wget、curl、nil、tmux、zsh、tree、highlight、nixpkgs-fmt | `modules/system/default.nix` |
 | 用户 | fastfetch、btop、eza、bat、fzf、fd、ripgrep、yazi、zoxide、dust、duf、tokei、hyperfine、procs | `home/common/cli.nix` |
-| 桌面 | rofi、nemo、nemo-extensions、evince、loupe、alacritty/kitty/foot（默认 foot）、pywal、vlc | `home/common/apps.nix` |
+| 桌面 | rofi、nemo、nemo-extensions、evince、loupe、alacritty/kitty/foot（默认 foot）、vlc | `home/common/apps.nix` |
 | 开发 | clangd、clang-tools、cmake、ninja、gdb、lldb、go、gopls、python3、pyright、rustc、rust-analyzer、rustfmt、cargo | `home/common/dev-lsp.nix` |
 | 办公 | wps-office-cn、nextcloud-client | `home/common/apps.nix` |
 
@@ -411,23 +415,25 @@ nixConfig = {
 - **默认字体**: Noto Sans（英文），通过 FontConfig fallback 支持中文
 - **基础字体包**:
   - `noto-fonts` - Noto 基础字体
-  - `noto-fonts-emoji` - Noto Emoji 字体
-  - `noto-fonts-color-emoji` - Noto 彩色 Emoji 字体
+  - `noto-fonts-color-emoji` - Noto 彩色 Emoji 字体（替代已弃用的 `noto-fonts-emoji`）
 - **中文字体包**:
-  - `noto-fonts-cjk` - Noto CJK 中日韩字体
+  - `noto-fonts-cjk-sans` - Noto CJK 无衬线字体（已替代 `noto-fonts-cjk`）
+  - `noto-fonts-cjk-serif` - Noto CJK 衬线字体
   - `source-han-sans` - 思源黑体
   - `source-han-serif` - 思源宋体
   - `source-han-mono` - 思源等宽
   - `wqy_microhei` - 文泉驿微米黑
   - `wqy_zenhei` - 文泉驿正黑
-  - `wqy_bitmapfont` - 文泉驿点阵字体
 - **编程字体包**:
   - `jetbrains-mono` - JetBrains Mono 等宽字体
+  - `nerd-fonts.jetbrains-mono` - JetBrains Mono Nerd Font（终端/编辑器图标支持）
   - `fira-code` - Fira Code 编程字体（连字支持）
   - `source-code-pro` - Source Code Pro 编程字体
   - `iosevka` - Iosevka 编程字体（高度可定制）
 - **图标字体**:
   - `font-awesome` - Font Awesome 图标字体
+- **其他字体**:
+  - `ipaexfont` - IPA 日文字体
 
 - **字体别名映射**（WPS Office CN 兼容）:
   - SimSun → Noto Serif CJK SC
@@ -472,8 +478,8 @@ nixConfig = {
 
 - **配置方式**:
   ```nix
-  # 使用 Lix stable 版本
-  nix.package = pkgs.lixPackageSets.stable.lix;
+  # 使用 Lix（nixpkgs 中的 pkgs.lix 属性）
+  nix.package = pkgs.lix;
   ```
 
 - **Overlay 配置**: 使用 `nixpkgs.overlays` 确保依赖 Nix 的工具（如 nixpkgs-review、nix-eval-jobs）也使用 Lix
@@ -517,13 +523,25 @@ nixConfig = {
 
 ## 密钥管理
 
-密钥使用 `agenix` 管理。加密文件存储在 `secrets/` 中，在部署时解密。
+`secrets/` 目录预留用于 agenix 密钥管理（`.age` 加密文件），但当前 flake 未启用 agenix 模块；使用前需按 `secrets/README.md` 集成输入与模块。
 
 ## 构建流程
 
 ### 初始安装
 
+全新安装（NixOS ISO 环境，需 root）：
+
 ```bash
+sudo ./scripts/setup-disk.sh -T desktop -W hyprland -S dms /dev/nvme0n1 my-hostname myuser
+sudo nixos-install --flake .#my-hostname
+```
+
+已有系统仅生成主机配置：
+
+```bash
+# 首次构建前生成 flake.lock（包含 oh-my-rime 输入）
+nix flake update
+
 # 使用安装脚本进行初始安装
 ./scripts/install.sh
 ```
@@ -553,7 +571,7 @@ nix flake update
 nix flake check
 
 # 测试构建（不部署）
-nix build .#<hostname>
+nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 
 # 预览差异
 nixos-rebuild dry-activate --flake .#<hostname>

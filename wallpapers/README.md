@@ -14,26 +14,26 @@ After cloning, copy the desired wallpapers to this directory or symlink the repo
 
 ## Usage
 
-1. Add your wallpaper images to this directory (supports: .jpg, .jpeg, .png, .gif)
+1. Add your wallpaper images to this directory (supports: .jpg, .jpeg, .png, .gif, .webp)
 2. During installation, wallpapers will be automatically copied to `~/.wallpapers/`
-3. Use the following commands to manage wallpapers:
+3. Use the following commands to manage wallpapers (`wp-color` and `wp-random` are shell aliases defined in `home/common/shell.nix`):
 
 ```bash
-# Use default wallpaper (default.png)
-wp-color -s
-
-# Set specified wallpaper and apply colors
+# Set a specified wallpaper and apply colors (-s requires a name or path)
 wp-color -s my-wallpaper.png
 
-# Randomly select from wallpaper directory
+# Pick a random wallpaper from ~/.wallpapers and apply colors (same as wp-color -d)
 wp-random
 
-# Apply current colors (without changing wallpaper)
-wp-apply
+# Apply the current color scheme only (no wallpaper change, no re-extraction)
+wp-color -a
 
-# List available wallpapers
-wp-list
+# List available wallpapers / show the current color scheme
+wp-color -l
+wp-color -c
 ```
+
+The default wallpaper `default.jpg` is applied automatically on first login; there is no dedicated command for it.
 
 ## Recommended Wallpaper Specifications
 

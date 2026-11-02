@@ -80,10 +80,10 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 │   ├── install_en.sh     # Installation script (English)
 │   ├── update.sh         # Update flake and rebuild
 │   ├── update_en.sh      # Update script (English)
-│   ├── clean.sh          # Clean nix store
+│   ├── clean.sh          # Clean nix store and old generations
 │   ├── clean_en.sh       # Cleanup script (English)
-│   ├── setup-disk.sh     # Disk partitioning script
-│   ├── setup-disk_en.sh  # Disk partitioning script (English)
+│   ├── setup-disk.sh     # Partitioning, LUKS2 encryption and config deployment
+│   ├── setup-disk_en.sh  # Partitioning, LUKS2 encryption and config deployment (English)
 │   ├── setup-direnv.sh   # direnv setup script
 │   ├── setup-direnv_en.sh # direnv setup script (English)
 │   ├── wallpaper-color.sh # Wallpaper auto-color script
@@ -103,6 +103,8 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 │   ├── CHANGELOG_EN.md   # Change log (English)
 │   ├── faq.md            # FAQ
 │   ├── faq_en.md         # FAQ (English)
+│   ├── glossary.md       # Glossary
+│   ├── glossary_en.md    # Glossary (English)
 │   ├── migration.md      # Migration guide
 │   ├── migration_en.md   # Migration guide (English)
 │   ├── shortcuts.md      # Keyboard shortcuts reference
@@ -168,6 +170,8 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 | `CHANGELOG_EN.md` | Change log (English) |
 | `faq.md` | FAQ |
 | `faq_en.md` | FAQ (English) |
+| `glossary.md` | Glossary (terminology and writing conventions) |
+| `glossary_en.md` | Glossary (English) |
 | `migration.md` | Migration guide |
 | `migration_en.md` | Migration guide (English) |
 | `shortcuts.md` | Hyprland/Niri keyboard shortcuts reference |
@@ -183,7 +187,7 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 |-------|-----|-------------|
 | `nixpkgs` | `github:NixOS/nixpkgs/nixos-26.05` | NixOS 26.05 stable |
 | `home-manager` | `github:nix-community/home-manager/release-26.05` | Home Manager, synced with nixpkgs version |
-| `hyprnix` | `github:hyprwm/hyprnix/main` | Hyprland toolchain for managing Hyprland configuration |
+| `oh-my-rime` | `github:Mintimate/oh-my-rime/main` | RIME input method configuration framework (`flake = false`, source-only input) |
 
 ### Global Configuration (nixConfig)
 
@@ -282,10 +286,10 @@ This configuration includes a wallpaper auto-color system using `pywal`:
 
 - **Scripts**:
   - `scripts/wallpaper-color.sh`: Main script for wallpaper color extraction
-  - `wp-color`: Set specified wallpaper and apply colors
-  - `wp-random`: Randomly select wallpaper from `~/.wallpapers/`
-  - `wp-apply`: Apply current colors without changing wallpaper
-  - `wp-list`: List available wallpapers
+  - `wp-color -s <wallpaper>`: Set the specified wallpaper and extract colors
+  - `wp-color -d` / `wp-random`: Pick a random wallpaper from `~/.wallpapers/` and extract colors
+  - `wp-color -a`: Apply the current color scheme (no wallpaper change, no re-extraction)
+  - `wp-color -l` / `wp-color -c`: List available wallpapers / show the current color scheme
 
 - **Integration**:
   - Colors stored in `~/.cache/wal/`
@@ -360,10 +364,10 @@ The desktop configuration module `modules/desktops/desktop.nix` supports dynamic
 The configuration uses `pywal` to extract colors from wallpaper and apply them to various applications:
 
 - **Commands**:
-  - `wp-color -s <wallpaper>`: Set wallpaper and apply colors
-  - `wp-random`: Randomly select from wallpaper directory
-  - `wp-apply`: Apply current colors without changing wallpaper
-  - `wp-list`: List available wallpapers
+  - `wp-color -s <wallpaper>`: Set the wallpaper and extract colors
+  - `wp-color -d` / `wp-random`: Pick a random wallpaper from the directory and extract colors
+  - `wp-color -a`: Apply the current color scheme (no wallpaper change, no re-extraction)
+  - `wp-color -l` / `wp-color -c`: List available wallpapers / show the current color scheme
 
 - **Wallpaper Directory**:
   - Project: `wallpapers/`
@@ -399,7 +403,7 @@ This configuration only supports Wayland/Xwayland, not pure X11:
 |-------|----------|----------|
 | System | git, wget, curl, nil, tmux, zsh, tree, highlight, nixpkgs-fmt | `modules/system/default.nix` |
 | User | fastfetch, btop, eza, bat, fzf, fd, ripgrep, yazi, zoxide, dust, duf, tokei, hyperfine, procs | `home/common/cli.nix` |
-| Desktop | rofi, nemo, nemo-extensions, evince, loupe, alacritty/kitty/foot (foot default), pywal, vlc | `home/common/apps.nix` |
+| Desktop | rofi, nemo, nemo-extensions, evince, loupe, alacritty/kitty/foot (foot default), vlc | `home/common/apps.nix` |
 | Development | clangd, clang-tools, cmake, ninja, gdb, lldb, go, gopls, python3, pyright, rustc, rust-analyzer, rustfmt, cargo | `home/common/dev-lsp.nix` |
 | Office | wps-office-cn, nextcloud-client | `home/common/apps.nix` |
 
@@ -411,23 +415,25 @@ This configuration includes comprehensive Chinese font support, optimized for WP
 - **Default Font**: Noto Sans (English), with FontConfig fallback for Chinese
 - **Base Font Packages**:
   - `noto-fonts` - Noto base fonts
-  - `noto-fonts-emoji` - Noto Emoji fonts
-  - `noto-fonts-color-emoji` - Noto Color Emoji fonts
+  - `noto-fonts-color-emoji` - Noto Color Emoji fonts (replaces the deprecated `noto-fonts-emoji`)
 - **Chinese Font Packages**:
-  - `noto-fonts-cjk` - Noto CJK (Chinese, Japanese, Korean)
+  - `noto-fonts-cjk-sans` - Noto CJK sans-serif (replaces `noto-fonts-cjk`)
+  - `noto-fonts-cjk-serif` - Noto CJK serif
   - `source-han-sans` - Source Han Sans
   - `source-han-serif` - Source Han Serif
   - `source-han-mono` - Source Han Mono
   - `wqy_microhei` - WenQuanYi Micro Hei
   - `wqy_zenhei` - WenQuanYi Zen Hei
-  - `wqy_bitmapfont` - WenQuanYi Bitmap Font
 - **Programming Font Packages**:
   - `jetbrains-mono` - JetBrains Mono monospace font
+  - `nerd-fonts.jetbrains-mono` - JetBrains Mono Nerd Font (terminal/editor icon support)
   - `fira-code` - Fira Code programming font (ligature support)
   - `source-code-pro` - Source Code Pro programming font
   - `iosevka` - Iosevka programming font (highly customizable)
 - **Icon Fonts**:
   - `font-awesome` - Font Awesome icon font
+- **Other Fonts**:
+  - `ipaexfont` - IPA Japanese font
 
 - **Font Alias Mapping** (WPS Office CN compatibility):
   - SimSun → Noto Serif CJK SC
@@ -472,8 +478,8 @@ This configuration uses **Lix** as an alternative implementation of the Nix pack
 
 - **Configuration**:
   ```nix
-  # Use Lix stable version
-  nix.package = pkgs.lixPackageSets.stable.lix;
+  # Use Lix (the pkgs.lix attribute in nixpkgs)
+  nix.package = pkgs.lix;
   ```
 
 - **Overlay Configuration**: Use `nixpkgs.overlays` to ensure Nix-dependent tools (like nixpkgs-review, nix-eval-jobs) also use Lix
@@ -517,13 +523,25 @@ This configuration supports mouse side buttons (Button 8/9) for back/forward nav
 
 ## Secrets Management
 
-Secrets are managed using `agenix`. Encrypted files are stored in `secrets/` and decrypted during deployment.
+The `secrets/` directory is reserved for agenix-managed secrets (`.age` encrypted files), but the agenix module is not enabled in this flake; integrate the input and module per `secrets/README.md` before use.
 
 ## Build Process
 
 ### Initial Installation
 
+Fresh install (NixOS ISO environment, root required):
+
 ```bash
+sudo ./scripts/setup-disk.sh -T desktop -W hyprland -S dms /dev/nvme0n1 my-hostname myuser
+sudo nixos-install --flake .#my-hostname
+```
+
+Existing system, host configuration only:
+
+```bash
+# Generate flake.lock before the first build (includes the oh-my-rime input)
+nix flake update
+
 # Use installation script for initial installation
 ./scripts/install.sh
 ```
@@ -553,7 +571,7 @@ nix flake update
 nix flake check
 
 # Test build (no deployment)
-nix build .#<hostname>
+nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 
 # Preview changes
 nixos-rebuild dry-activate --flake .#<hostname>

@@ -97,15 +97,16 @@ This document details the keyboard shortcuts for Hyprland and Niri window manage
 
 In this configuration, the `Super` key typically refers to the **Windows key** or **Command key** (on macOS keyboards).
 
-### Keyboard Layout Switching
+### Keyboard Layout
 
-- Switch keyboard layout: `Alt + Shift`
-- Supports English (US) and Chinese (CN) layouts
+- Hyprland's XKB layout is set to `us` (`kb_layout = "us"`); Chinese input is handled by Fcitx5, so no separate CN layout is needed
+- `Alt + Shift` is kept as the layout/IME toggle (`kb_options = "grp:alt_shift_toggle"`)
 
 ### Floating Window Rules
 
-The following applications open in floating mode by default:
+The following applications open in floating mode by default (`windowrulev2`, matched by `class`):
 
+- Foot terminal (default terminal)
 - Kitty terminal
 - Alacritty terminal
 - Rofi (application launcher, power menu)
@@ -117,5 +118,5 @@ The following applications open in floating mode by default:
 
 To modify shortcuts, edit the corresponding window manager configuration files:
 
-- Hyprland: `modules/desktops/hyprland.nix`
-- Niri: `modules/desktops/niri.nix`
+- Hyprland: `home/common/hyprland.nix` (keybinds and window rules); system-level enablement in `modules/desktops/hyprland.nix`
+- Niri: `home/common/niri.nix` (`keybindings`); system-level enablement in `modules/desktops/niri.nix`

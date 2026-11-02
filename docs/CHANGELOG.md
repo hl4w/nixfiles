@@ -16,7 +16,7 @@
   - `install.sh` / `install_en.sh`：`youruser` 占位符替换加入 sed 转义与替换后校验；`POWER_MANAGEMENT` 显式初始化；非交互模式（`-y`）缺失必需参数时直接报错而非阻塞提问；新增主机类型/窗口管理器/桌面 Shell/polkit 代理取值校验；`nixos-generate-config` 在安装介质下自动追加 `--root /mnt`；移除 Intel `i915.enable_psr=0` 内核参数；构建提示改用完整属性路径
 - **修复 NixOS 与 Home Manager 模块边界混淆（致命级）**:
   - `wayland.windowManager.hyprland` / `wayland.windowManager.niri` 是 Home Manager 模块，在 NixOS 系统层不存在 → 重构：NixOS 层用 `programs.hyprland`/`programs.niri` 负责安装，详细配置移至 `home/common/hyprland.nix`/`niri.nix`
-  - `gtk.*` / `xdg.iconTheme` 是 Home Manager 选项 → 从 `modules/desktops/unified-theme.nix` 移至 `home/common/unified-theme.nix`，系统层仅保留 `qt`/`services.sddm`/`environment.*`
+  - `gtk.*` / `xdg.iconTheme` 是 Home Manager 选项 → 从 `modules/desktops/unified-theme.nix` 移至 `home/common/unified-theme.nix`，系统层仅保留 `qt`/`services.displayManager.sddm`/`environment.*`
   - NixOS `qt` 模块仅支持 `enable`/`platformTheme`/`style`，移除不存在的 `qt.iconTheme`/`qt.font`
 - **移除不存在的 NixOS 选项（致命级）**:
   - 删除 `security.pam.enableSSS = false` — NixOS 中不存在此选项
@@ -24,6 +24,7 @@
   - 删除 `programs.noctalia-shell.enable` / `programs.dms-shell.enable` — 是 Wayland shell 包，非模块选项
 - **修复 Nix 语法错误（致命级）**:
   - `services.display-manager` → `services.displayManager`（连字符非合法 Nix 标识符，会被解析为减法）
+  - `services.sddm` → `services.displayManager.sddm`（`services.sddm` 在 NixOS 中不存在，会导致求值失败）
 - **修复 Hyprland 0.55 (NixOS 26.05) 兼容性**:
   - 移除 `hyprnix` flake input，使用 NixOS 原生模块
   - 添加 `configType = "hyprlang"`（0.55+ 默认 Lua）
@@ -70,6 +71,7 @@
 ### Documentation
 - **新增术语对照表**: `docs/glossary.md` 与 `docs/glossary_en.md` 定义规范术语、代码标识符与书写规则
 - **统一文档术语**: README、架构、FAQ、迁移与快捷键文档统一使用 `DMS Shell` / `Noctalia Shell`、`Home Manager`、`系统代`、`flake 配置名称` 等表述；`CHANGELOG` 保留历史表述不做回改
+- **同步文档内容**: 架构文档更新 flake 输入（oh-my-rime 替代 hyprnix）与字体包名（`noto-fonts-cjk-sans`/`serif`），补充 glossary 文档索引与 `pkgs.lix` 写法；FAQ 与迁移文档补充 `setup-disk.sh` 安装路径、`nix flake update` 前置步骤、`nixosConfigurations` 完整构建属性路径及 `clean.sh` 参数；壁纸命令统一为 `wp-color -s/-d/-a/-l/-c`（删除不存在的 `wp-apply`/`wp-list`，修正 `wp-color -s` 无参数用法）；SDDM 选项路径修正为 `services.displayManager.sddm`；`powerManagement.cpuFreqGovernor` 去掉错误的 `services` 前缀；快捷键文档修正 Hyprland/Niri 配置位置为 `home/common/`，补充浮动规则（含 Foot）与键盘布局说明
 
 ## [v0.0.5] - 2026-06-16
 ### Added
