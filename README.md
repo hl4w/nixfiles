@@ -82,7 +82,7 @@ sudo nixos-install --flake .#<hostname>
 reboot
 ```
 
-`setup-disk.sh` 依次完成：GPT 分区表 → EFI 分区 → LUKS2 加密容器 → LVM（root/swap/home）→ 格式化 → 挂载 → 克隆配置仓库 → 调用 `install.sh` 生成主机配置。非加密模式跳过 LUKS/LVM，按 60% / 40% 拆分 `/` 与 `/home` 并创建 swapfile。
+`setup-disk.sh` 依次完成：GPT 分区表 → EFI 分区 → 数据分区（启用加密时为 LUKS2 容器）→ LVM（swap/root 逻辑卷）→ 格式化 → 挂载 → 克隆配置仓库 → 调用 `install.sh` 生成主机配置。无论是否加密都使用 LVM：磁盘只划分 EFI 与数据两个分区，`/` 与 swap 均为逻辑卷，`/home` 位于 `/` 下；swap 大小取磁盘容量的 10%（限制 2–16 GiB）。
 
 `-T`（`desktop`/`laptop`/`server`）、`-W`（`hyprland`/`niri`）、`-S`（`dms`/`noctalia`）用于指定组件；省略时脚本在交互终端中依次提示选择（回车使用默认 `desktop`/`hyprland`/`dms`），`-y` 或 stdin 非终端时直接采用默认值，不会阻塞自动化流程；选择 `server` 会跳过窗口管理器与桌面 Shell 的询问。非法取值会直接报错。
 

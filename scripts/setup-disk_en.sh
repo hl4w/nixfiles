@@ -270,29 +270,22 @@ info "Creating EFI partition..."
 parted -s "$DISK" -- mkpart ESP fat32 1MiB 512MiB
 parted -s "$DISK" -- set 1 esp on
 
-# Create root partition (with encryption the whole disk is a LUKS container;
-# without encryption split the remaining space between / and home)
-if [ "$USE_ENCRYPTION" = true ]; then
-    info "Creating LUKS partition..."
-    parted -s "$DISK" -- mkpart primary 512MiB 100%
-else
-    info "Creating root and home partitions..."
-    parted -s "$DISK" -- mkpart primary ext4 512MiB 60%
-    parted -s "$DISK" -- mkpart primary ext4 60% 100%
-fi
+# Create the data partition (a LUKS container with encryption, otherwise a plain LVM PV)
+info "Creating data partition..."
+parted -s "$DISK" -- mkpart primary 512MiB 100%
 
 # Notify the kernel to reload the partition table
 partprobe "$DISK" 2>/dev/null || true
 udevadm settle
 
 EFI_PART="$(part_name "$DISK" 1)"
-ROOT_PART="$(part_name "$DISK" 2)"
+DATA_PART="$(part_name "$DISK" 2)"
 
 info "EFI partition:  $EFI_PART"
-info "Root partition: $ROOT_PART"
+info "Data partition: $DATA_PART"
 
 [ -b "$EFI_PART" ] || error "EFI partition device did not appear: $EFI_PART"
-[ -b "$ROOT_PART" ] || error "Root partition device did not appear: $ROOT_PART"
+[ -b "$DATA_PART" ] || error "Data partition device did not appear: $DATA_PART"
 
 # Format EFI partition
 info "Formatting EFI partition..."
@@ -311,58 +304,55 @@ if [ "$USE_ENCRYPTION" = true ]; then
     [ -n "$CRYPT_PASSWORD" ] || error "Encryption password must not be empty"
 
     info "Creating encrypted partition..."
-    printf '%s' "$CRYPT_PASSWORD" | cryptsetup luksFormat -q --type=luks2 --key-file=- "$ROOT_PART"
-    printf '%s' "$CRYPT_PASSWORD" | cryptsetup luksOpen --key-file=- "$ROOT_PART" cryptroot
+    printf '%s' "$CRYPT_PASSWORD" | cryptsetup luksFormat -q --type=luks2 --key-file=- "$DATA_PART"
+    printf '%s' "$CRYPT_PASSWORD" | cryptsetup luksOpen --key-file=- "$DATA_PART" cryptroot
     unset CRYPT_PASSWORD CRYPT_PASSWORD_CONFIRM
 
-    # Create LVM volume group
-    info "Creating LVM volume group..."
-    pvcreate /dev/mapper/cryptroot
-    vgcreate vg /dev/mapper/cryptroot
-
-    info "Creating logical volumes (root 60% / swap / home remainder)..."
-    lvcreate -l 60%FREE vg -n root
-    lvcreate -L 16G vg -n swap
-    lvcreate -l 100%FREE vg -n home
-
-    ROOT_DEV="/dev/vg/root"
-    HOME_DEV="/dev/vg/home"
-    SWAP_DEV="/dev/vg/swap"
+    PV_DEV="/dev/mapper/cryptroot"
 else
-    # Unencrypted: p2 is /, p3 is home
-    ROOT_DEV="$ROOT_PART"
-    HOME_DEV="$(part_name "$DISK" 3)"
-    [ -b "$HOME_DEV" ] || error "Home partition device did not appear: $HOME_DEV"
-    SWAP_DEV=""
+    info "Unencrypted mode: creating an LVM physical volume on the data partition"
+    PV_DEV="$DATA_PART"
 fi
+
+# Both modes use LVM: / and swap are logical volumes; /home lives under / with no separate partition
+info "Creating LVM physical volume and volume group..."
+pvcreate -y "$PV_DEV"
+vgcreate vg "$PV_DEV"
+
+# Swap size scales with the disk: 10% of capacity, clamped to 2GiB-16GiB
+PV_SIZE_BYTES="$(blockdev --getsize64 "$PV_DEV")"
+SWAP_MB=$(( PV_SIZE_BYTES / 1024 / 1024 / 10 ))
+if [ "$SWAP_MB" -gt 16384 ]; then
+    SWAP_MB=16384
+fi
+if [ "$SWAP_MB" -lt 2048 ]; then
+    SWAP_MB=2048
+fi
+
+info "Creating logical volumes (swap ${SWAP_MB}MiB / root fills the remainder)..."
+lvcreate -y -L "${SWAP_MB}M" vg -n swap
+lvcreate -y -l 100%FREE vg -n root
+
+ROOT_DEV="/dev/vg/root"
+SWAP_DEV="/dev/vg/swap"
+
+for dev in "$ROOT_DEV" "$SWAP_DEV"; do
+    [ -b "$dev" ] || error "Logical volume did not appear: $dev"
+done
 
 # Format filesystems (each device formatted exactly once)
 info "Formatting filesystems..."
 mkfs.ext4 -F -L nixos "$ROOT_DEV"
-mkfs.ext4 -F -L home "$HOME_DEV"
-
-if [ "$USE_ENCRYPTION" = true ]; then
-    mkswap -L swap "$SWAP_DEV"
-fi
+mkswap -L swap "$SWAP_DEV"
 
 # Mount partitions
 info "Mounting partitions..."
 mount "$ROOT_DEV" /mnt
 mkdir -p /mnt/boot
 mount "$EFI_PART" /mnt/boot
-mkdir -p /mnt/home
-mount "$HOME_DEV" /mnt/home
 
-# Swap: use the LV when encrypted; otherwise create a swapfile after mounting /
-if [ "$USE_ENCRYPTION" = true ]; then
-    swapon "$SWAP_DEV"
-else
-    info "Creating swap file..."
-    fallocate -l 16G /mnt/swapfile
-    chmod 600 /mnt/swapfile
-    mkswap /mnt/swapfile
-    swapon /mnt/swapfile
-fi
+# Swap lives on the LVM logical volume
+swapon "$SWAP_DEV"
 
 success "Partition and mount complete!"
 

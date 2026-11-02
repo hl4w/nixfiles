@@ -59,6 +59,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - `.github/workflows/build.yml` dropped the standalone `nix flake lock` step (committing `flake.lock` to the repo is recommended to pin dependencies) and enabled the `auto-allocate-uids` experimental feature
   - `Makefile` `switch-home` hardcoded placeholder `youruser@desktop` → now `USER`/`HOST` variables, supporting `make USER=<name> HOST=<host>`
   - `Makefile` `build` target `nix build .#$(HOST)` (non-existent flake output) → `nix build .#nixosConfigurations.$(HOST).config.system.build.toplevel`
+- **Unified disk layout on LVM**:
+  - `setup-disk.sh` / `setup-disk_en.sh` create only an EFI and a data partition (the data partition is a LUKS2 container when encryption is enabled); `/` and `/home` are no longer separate partitions, `/` and swap are LVM logical volumes and `/home` lives under `/`
+  - Swap LV size now scales with disk capacity (10% of the disk, clamped to 2–16 GiB) instead of a fixed 16 GiB
+  - Added logical volume existence checks and `-y` on `pvcreate`/`lvcreate` so the script can be re-run safely
 - **Removed duplicated theme environment variables at system level**:
   - Removed `GTK_THEME`/`GTK2_RC_FILES`/`QT_STYLE_OVERRIDE`/`XDG_ICON_THEME` (higher priority than Home Manager user-level config; would override `gtk`/`xdg.iconTheme` modules)
 - **Fixed desktop shell modules**:

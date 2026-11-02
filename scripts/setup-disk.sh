@@ -269,28 +269,22 @@ info "创建 EFI 分区..."
 parted -s "$DISK" -- mkpart ESP fat32 1MiB 512MiB
 parted -s "$DISK" -- set 1 esp on
 
-# 创建根分区（加密时整盘作为 LUKS 容器；非加密时按比例拆分 / 与 home）
-if [ "$USE_ENCRYPTION" = true ]; then
-    info "创建 LUKS 分区..."
-    parted -s "$DISK" -- mkpart primary 512MiB 100%
-else
-    info "创建根分区与 home 分区..."
-    parted -s "$DISK" -- mkpart primary ext4 512MiB 60%
-    parted -s "$DISK" -- mkpart primary ext4 60% 100%
-fi
+# 创建数据分区（加密时整盘作为 LUKS 容器，非加密时直接作为 LVM 物理卷）
+info "创建数据分区..."
+parted -s "$DISK" -- mkpart primary 512MiB 100%
 
 # 通知内核刷新分区表
 partprobe "$DISK" 2>/dev/null || true
 udevadm settle
 
 EFI_PART="$(part_name "$DISK" 1)"
-ROOT_PART="$(part_name "$DISK" 2)"
+DATA_PART="$(part_name "$DISK" 2)"
 
-info "EFI 分区: $EFI_PART"
-info "根分区:   $ROOT_PART"
+info "EFI 分区:  $EFI_PART"
+info "数据分区: $DATA_PART"
 
 [ -b "$EFI_PART" ] || error "EFI 分区设备未出现: $EFI_PART"
-[ -b "$ROOT_PART" ] || error "根分区设备未出现: $ROOT_PART"
+[ -b "$DATA_PART" ] || error "数据分区设备未出现: $DATA_PART"
 
 # 格式化 EFI 分区
 info "格式化 EFI 分区..."
@@ -309,58 +303,55 @@ if [ "$USE_ENCRYPTION" = true ]; then
     [ -n "$CRYPT_PASSWORD" ] || error "加密密码不能为空"
 
     info "创建加密分区..."
-    printf '%s' "$CRYPT_PASSWORD" | cryptsetup luksFormat -q --type=luks2 --key-file=- "$ROOT_PART"
-    printf '%s' "$CRYPT_PASSWORD" | cryptsetup luksOpen --key-file=- "$ROOT_PART" cryptroot
+    printf '%s' "$CRYPT_PASSWORD" | cryptsetup luksFormat -q --type=luks2 --key-file=- "$DATA_PART"
+    printf '%s' "$CRYPT_PASSWORD" | cryptsetup luksOpen --key-file=- "$DATA_PART" cryptroot
     unset CRYPT_PASSWORD CRYPT_PASSWORD_CONFIRM
 
-    # 创建 LVM 卷组
-    info "创建 LVM 卷组..."
-    pvcreate /dev/mapper/cryptroot
-    vgcreate vg /dev/mapper/cryptroot
-
-    info "创建逻辑卷 (root 60% / swap / home 剩余空间)..."
-    lvcreate -l 60%FREE vg -n root
-    lvcreate -L 16G vg -n swap
-    lvcreate -l 100%FREE vg -n home
-
-    ROOT_DEV="/dev/vg/root"
-    HOME_DEV="/dev/vg/home"
-    SWAP_DEV="/dev/vg/swap"
+    PV_DEV="/dev/mapper/cryptroot"
 else
-    # 非加密：p2 为 /，p3 为 home
-    ROOT_DEV="$ROOT_PART"
-    HOME_DEV="$(part_name "$DISK" 3)"
-    [ -b "$HOME_DEV" ] || error "home 分区设备未出现: $HOME_DEV"
-    SWAP_DEV=""
+    info "非加密模式：直接在数据分区上创建 LVM 物理卷"
+    PV_DEV="$DATA_PART"
 fi
+
+# 两种模式统一使用 LVM：/ 与 swap 均为逻辑卷，/home 位于 / 下，不再划分独立分区
+info "创建 LVM 物理卷与卷组..."
+pvcreate -y "$PV_DEV"
+vgcreate vg "$PV_DEV"
+
+# swap 大小随磁盘容量调整：取磁盘容量的 10%，限制在 2GiB~16GiB
+PV_SIZE_BYTES="$(blockdev --getsize64 "$PV_DEV")"
+SWAP_MB=$(( PV_SIZE_BYTES / 1024 / 1024 / 10 ))
+if [ "$SWAP_MB" -gt 16384 ]; then
+    SWAP_MB=16384
+fi
+if [ "$SWAP_MB" -lt 2048 ]; then
+    SWAP_MB=2048
+fi
+
+info "创建逻辑卷 (swap ${SWAP_MB}MiB / root 占满剩余空间)..."
+lvcreate -y -L "${SWAP_MB}M" vg -n swap
+lvcreate -y -l 100%FREE vg -n root
+
+ROOT_DEV="/dev/vg/root"
+SWAP_DEV="/dev/vg/swap"
+
+for dev in "$ROOT_DEV" "$SWAP_DEV"; do
+    [ -b "$dev" ] || error "逻辑卷未出现: $dev"
+done
 
 # 格式化文件系统（每个设备只格式化一次）
 info "格式化文件系统..."
 mkfs.ext4 -F -L nixos "$ROOT_DEV"
-mkfs.ext4 -F -L home "$HOME_DEV"
-
-if [ "$USE_ENCRYPTION" = true ]; then
-    mkswap -L swap "$SWAP_DEV"
-fi
+mkswap -L swap "$SWAP_DEV"
 
 # 挂载分区
 info "挂载分区..."
 mount "$ROOT_DEV" /mnt
 mkdir -p /mnt/boot
 mount "$EFI_PART" /mnt/boot
-mkdir -p /mnt/home
-mount "$HOME_DEV" /mnt/home
 
-# swap：加密时使用 LV；非加密时在挂载后的根分区上创建 swapfile
-if [ "$USE_ENCRYPTION" = true ]; then
-    swapon "$SWAP_DEV"
-else
-    info "创建 swap 文件..."
-    fallocate -l 16G /mnt/swapfile
-    chmod 600 /mnt/swapfile
-    mkswap /mnt/swapfile
-    swapon /mnt/swapfile
-fi
+# swap 使用 LVM 逻辑卷
+swapon "$SWAP_DEV"
 
 success "分区和挂载完成！"
 

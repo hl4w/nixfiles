@@ -59,6 +59,10 @@
   - `.github/workflows/build.yml` 移除单独的 `nix flake lock` 步骤（建议将 `flake.lock` 提交到仓库以固定依赖版本），并启用 `auto-allocate-uids` 实验特性
   - `Makefile` 的 `switch-home` 硬编码占位符 `youruser@desktop` → 改为 `USER`/`HOST` 变量，支持 `make USER=<name> HOST=<host>`
   - `Makefile` 的 `build` 目标 `nix build .#$(HOST)`（不存在的 flake 输出）→ `nix build .#nixosConfigurations.$(HOST).config.system.build.toplevel`
+- **统一磁盘布局为 LVM**:
+  - `setup-disk.sh` / `setup-disk_en.sh` 磁盘只划分 EFI 与数据两个分区（启用加密时数据分区为 LUKS2 容器），不再为 `/` 与 `/home` 单独分区；`/` 与 swap 统一为 LVM 逻辑卷，`/home` 位于 `/` 下
+  - swap 逻辑卷大小随磁盘容量动态调整（取磁盘容量的 10%，限制 2–16 GiB），取代固定 16 GiB
+  - 新增逻辑卷存在性校验，`pvcreate`/`lvcreate` 增加 `-y` 以支持重复执行
 - **移除系统层重复的主题环境变量**:
   - 删除 `GTK_THEME`/`GTK2_RC_FILES`/`QT_STYLE_OVERRIDE`/`XDG_ICON_THEME`（优先级高于 Home Manager 用户级配置，会覆盖 `gtk`/`xdg.iconTheme` 模块）
 - **修复桌面 Shell 模块**:

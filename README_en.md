@@ -82,7 +82,7 @@ sudo nixos-install --flake .#<hostname>
 reboot
 ```
 
-`setup-disk.sh` runs: GPT partition table → EFI partition → LUKS2 container → LVM (root/swap/home) → formatting → mounting → repository clone → `install.sh` host generation. Without encryption it skips LUKS/LVM, splits the disk 60%/40% between `/` and `/home`, and creates a swapfile.
+`setup-disk.sh` runs: GPT partition table → EFI partition → data partition (a LUKS2 container when encryption is enabled) → LVM (swap/root logical volumes) → formatting → mounting → repository clone → `install.sh` host generation. LVM is used with or without encryption: the disk has only an EFI and a data partition, `/` and swap are logical volumes, and `/home` lives under `/`; swap takes 10% of the disk capacity (clamped to 2–16 GiB).
 
 `-T` (`desktop`/`laptop`/`server`), `-W` (`hyprland`/`niri`) and `-S` (`dms`/`noctalia`) select the components. When omitted, an interactive terminal prompts for them (Enter keeps the defaults `desktop`/`hyprland`/`dms`); with `-y` or non-TTY stdin the defaults are used and automation never blocks; choosing `server` skips the window manager and desktop shell prompts. Invalid values fail fast.
 
