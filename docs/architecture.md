@@ -572,12 +572,6 @@ nix flake update
 ./scripts/update.sh
 ```
 
-### 持续集成
-
-`.github/workflows/build.yml` 在 push / PR 到 `master` 时运行：先执行 `nix flake check --no-build` 做纯求值检查，再通过 `nix eval --apply` 动态读取 `nixosConfigurations`，逐个构建 `nixosConfigurations.<host>.config.system.build.toplevel`；未声明主机时仅输出告警并跳过构建。
-
-仓库当前未提交 `flake.lock`，CI 每次都会重新解析输入版本。建议在本地执行 `nix flake lock` 后提交锁文件，以固定依赖并提高二进制缓存命中率。
-
 ### 验证与回滚
 
 ```bash

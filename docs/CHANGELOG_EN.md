@@ -13,6 +13,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Swap LV size now scales with disk capacity (10% of the disk, clamped to 2–16 GiB) instead of a fixed 16 GiB
   - Added logical volume existence checks and `-y` on `pvcreate`/`lvcreate` so the script can be re-run safely
 
+### Changed
+- **Removed GitHub Actions CI**: Deleted `.github/workflows/build.yml` (remote CI is not needed at this stage); synced — removed the "Continuous Integration" section from `architecture.md` / `architecture_en.md`, and dropped the CI mentions from the README directory tree and documentation index
+
 ### Documentation
 - **FAQ rewritten**: Added practical new questions — regenerating flake.lock, adding custom fonts, switching Catppuccin flavor, DMS Shell / Noctalia Shell configuration — and consolidated the previously scattered single-tool sections (dust, duf, tokei, hyperfine, procs) into one quick-reference table. Added non-interactive install.sh flag documentation; the desktop-shell section now points to the `desktop.shell` option and the actual NixOS module names; the wallpaper-colors-not-applying section gained a full troubleshooting checklist; troubleshooting expanded with more NixOS 26.05-specific issues (kdePackages/qt6Packages prefixes, etc.)
 - **Shortcuts docs aligned with actual config**: Hyprland shortcut table now uses physical key names (`Super + F11` instead of Hyprland's internal `FULL` alias); floating rules document matched by `class`; each WM section gained a config summary (master layout, gaps, animations, XWayland); mouse bindings explain side-button passthrough to apps; Niri notes the top workspace strip; the whole file now states that it mirrors the Nix configuration and reminds users to run `home-manager switch` after edits

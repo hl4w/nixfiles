@@ -188,10 +188,9 @@ nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 ├── scripts/                  # Install and maintenance scripts (Chinese and English variants)
 ├── templates/                # Template files
 │   └── host-template/        # Host configuration template
-├── wallpapers/               # Wallpapers
+├── wallpapers/               # Desktop wallpapers (auto-synced to ~/.wallpapers)
 ├── docs/                     # Documentation
 ├── secrets/                  # Sensitive configuration (not tracked)
-├── .github/                  # CI workflows
 └── flake.nix                 # Entry point (run nix flake update first to generate flake.lock)
 ```
 

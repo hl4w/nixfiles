@@ -573,12 +573,6 @@ nix flake update
 ./scripts/update.sh
 ```
 
-### Continuous Integration
-
-`.github/workflows/build.yml` runs on push / pull request to `master`: it first evaluates the flake with `nix flake check --no-build`, then reads `nixosConfigurations` dynamically via `nix eval --apply` and builds `nixosConfigurations.<host>.config.system.build.toplevel` for each host; when no host is declared it only emits a warning and skips building.
-
-`flake.lock` is not committed yet, so CI re-resolves input versions on every run. Run `nix flake lock` locally and commit the lock file to pin dependencies and improve binary cache hits.
-
 ### Verification and Rollback
 
 ```bash

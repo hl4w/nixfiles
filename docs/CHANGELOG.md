@@ -13,6 +13,9 @@
   - swap 逻辑卷大小随磁盘容量动态调整（取磁盘容量的 10%，限制 2–16 GiB），取代固定 16 GiB
   - 新增逻辑卷存在性校验，`pvcreate`/`lvcreate` 增加 `-y` 以支持重复执行
 
+### Changed
+- **移除 GitHub Actions CI**: 删除 `.github/workflows/build.yml`（仓库当前不需要远端构建）；同步删除 architecture.md / architecture_en.md 的「持续集成」小节、README 目录树与文档索引中的 CI 提及
+
 ### Documentation
 - **FAQ 重写**: 新增「重建 flake.lock」「添加自定义字体」「切换 Catppuccin flavor」「DMS Shell / Noctalia Shell 配置」等实用新问题；将之前分散的 5 个 CLI 工具单节（dust、duf、tokei、hyperfine、procs）合并为一张速查表；补充 install.sh 非交互模式参数说明；桌面 Shell 小节明确标注 `desktop.shell` 选项位置与模块名；壁纸颜色不生效新增完整排查清单；故障排除补充更多 NixOS 26.05 特有问题（如 kdePackages/qt6Packages 包名）
 - **shortcuts 文档与实际配置对齐**: Hyprland 快捷键表改为物理键名（`Super + F11` 对应 Hyprland 内部键名 `FULL`）；浮动窗口规则明确 `class` 匹配；新增配置摘要（master 布局、gaps、动画、XWayland）；鼠标绑定表补充侧键透传说明；Niri 补充 workspace-strip 在顶部；整体新增"本文档与配置文件一一对应"声明与 `home-manager switch` 应用提示

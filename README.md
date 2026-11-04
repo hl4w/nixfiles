@@ -187,10 +187,9 @@ nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 ├── scripts/                  # 安装与维护脚本（中英文各一套）
 ├── templates/                # 模板文件
 │   └── host-template/        # 主机配置模板
-├── wallpapers/               # 壁纸文件
+├── wallpapers/               # 桌面壁纸（自动同步到 ~/.wallpapers）
 ├── docs/                     # 文档
 ├── secrets/                  # 敏感配置（不纳入版本控制）
-├── .github/                  # CI 工作流
 └── flake.nix                 # 入口配置（首次构建前需运行 nix flake update 生成 flake.lock）
 ```
 
@@ -249,7 +248,7 @@ nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 
 | 文档 | 说明 |
 |------|------|
-| `docs/architecture.md` / `docs/architecture_en.md` | 架构说明、模块结构、配置流程与持续集成 |
+| `docs/architecture.md` / `docs/architecture_en.md` | 架构说明、模块结构、配置流程与构建验证 |
 | `docs/migration.md` / `docs/migration_en.md` | 迁移与安装指南 |
 | `docs/faq.md` / `docs/faq_en.md` | 常见问题与故障排除 |
 | `docs/shortcuts.md` / `docs/shortcuts_en.md` | 快捷键速查（Hyprland / Niri） |
