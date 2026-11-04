@@ -4,6 +4,19 @@ All significant project changes will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+> Convention: when the version number stays the same, each commit opens a new section with the current date. All changes made on the same day are grouped under that section, so commits can be traced back to their day even before the next release is cut.
+
+## [v0.0.6] - 2026-11-04
+### Fixed
+- **Unified disk layout on LVM**:
+  - `setup-disk.sh` / `setup-disk_en.sh` create only an EFI and a data partition (the data partition is a LUKS2 container when encryption is enabled); `/` and `/home` are no longer separate partitions, `/` and swap are LVM logical volumes and `/home` lives under `/`
+  - Swap LV size now scales with disk capacity (10% of the disk, clamped to 2–16 GiB) instead of a fixed 16 GiB
+  - Added logical volume existence checks and `-y` on `pvcreate`/`lvcreate` so the script can be re-run safely
+
+### Documentation
+- **Reconciled the three install paths and script call chain**: README option 1 removed the redundant pre-clone step (`setup-disk.sh` clones into `/mnt/etc/nixos` and invokes `install.sh` itself), replaced with "download `setup-disk.sh` from the ISO → run it → cd to `/mnt/etc/nixos` and run `nixos-install`"; option 2 now lists every follow-up step explicitly (`nix flake update` on the first run, auto-generated `flake.lock`/hardware config, `nixos-rebuild switch --flake .#<hostname>`, optional `home-manager switch`); the closing banner of `setup-disk.sh`/`setup-disk_en.sh` now prints the repository location `/mnt/etc/nixos` explicitly so users do not run `nixos-install` from the wrong directory
+- **Docs synced with the disk layout and call chain**: `glossary.md` logical-volume entry updated to `root`/`swap` with a note that `/home` lives under `/`; `migration.md` hardware-config check items now read "root LV `/dev/vg/root` / swap LV `/dev/vg/swap` / EFI boot partition"; `architecture.md` and `faq.md` initial-install examples describe the full chain: setup-disk.sh clones into `/mnt/etc/nixos` then calls install.sh to finish host config and hardware generation, so the ISO flow no longer requires a pre-cloned repo
+
 ## [v0.0.6] - 2026-11-02
 ### Fixed
 - **Script robustness (all 14 scripts under `scripts/`)**:
@@ -59,10 +72,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - `.github/workflows/build.yml` dropped the standalone `nix flake lock` step (committing `flake.lock` to the repo is recommended to pin dependencies) and enabled the `auto-allocate-uids` experimental feature
   - `Makefile` `switch-home` hardcoded placeholder `youruser@desktop` → now `USER`/`HOST` variables, supporting `make USER=<name> HOST=<host>`
   - `Makefile` `build` target `nix build .#$(HOST)` (non-existent flake output) → `nix build .#nixosConfigurations.$(HOST).config.system.build.toplevel`
-- **Unified disk layout on LVM**:
-  - `setup-disk.sh` / `setup-disk_en.sh` create only an EFI and a data partition (the data partition is a LUKS2 container when encryption is enabled); `/` and `/home` are no longer separate partitions, `/` and swap are LVM logical volumes and `/home` lives under `/`
-  - Swap LV size now scales with disk capacity (10% of the disk, clamped to 2–16 GiB) instead of a fixed 16 GiB
-  - Added logical volume existence checks and `-y` on `pvcreate`/`lvcreate` so the script can be re-run safely
 - **Removed duplicated theme environment variables at system level**:
   - Removed `GTK_THEME`/`GTK2_RC_FILES`/`QT_STYLE_OVERRIDE`/`XDG_ICON_THEME` (higher priority than Home Manager user-level config; would override `gtk`/`xdg.iconTheme` modules)
 - **Fixed desktop shell modules**:
@@ -84,8 +93,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Generic documentation examples**: `setup-disk.sh` examples in README, architecture and FAQ now use `<disk>`/`<hostname>`/`<username>` placeholders and explain the interactive `-T/-W/-S` prompt and the `-c` no-encryption flag
 - **README restructured**: features grouped into "Desktop & Appearance / Installation & System / Chinese & Office / Terminal & Development", new "Pre-deployment verification" and "Daily Operations" sections, unified terminology and full attribute-path guidance with duplicated paragraphs removed; the Chinese and English versions now share the same layout
 - **Documented interactive selection and CI**: README and architecture describe the interactive `-T/-W/-S` prompts of `setup-disk.sh` and the `-y`/non-TTY fallbacks; architecture gained a "Continuous Integration" section covering `nix flake check --no-build`, dynamic host discovery and the full build attribute path, plus a recommendation to commit `flake.lock`
-- **Reconciled the three install paths and script call chain**: README option 1 removed the redundant pre-clone step (`setup-disk.sh` clones into `/mnt/etc/nixos` and invokes `install.sh` itself), replaced with "download `setup-disk.sh` from the ISO → run it → cd to `/mnt/etc/nixos` and run `nixos-install`"; option 2 now lists every follow-up step explicitly (`nix flake update` on the first run, auto-generated `flake.lock`/hardware config, `nixos-rebuild switch --flake .#<hostname>`, optional `home-manager switch`); the closing banner of `setup-disk.sh`/`setup-disk_en.sh` now prints the repository location `/mnt/etc/nixos` explicitly so users do not run `nixos-install` from the wrong directory
-- **Docs synced with the disk layout and call chain**: `glossary.md` logical-volume entry updated to `root`/`swap` with a note that `/home` lives under `/`; `migration.md` hardware-config check items now read "root LV `/dev/vg/root` / swap LV `/dev/vg/swap` / EFI boot partition"; `architecture.md` and `faq.md` initial-install examples describe the full chain: setup-disk.sh clones into `/mnt/etc/nixos` then calls install.sh to finish host config and hardware generation, so the ISO flow no longer requires a pre-cloned repo
 
 ## [v0.0.5] - 2026-06-16
 ### Added

@@ -4,6 +4,19 @@
 
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。
 
+> 约定：版本号不变时，每次提交均以**当日日期**开一个新的小节，当日所有改动聚合在该节下，便于按日期追踪未发布版本的变更。
+
+## [v0.0.6] - 2026-11-04
+### Fixed
+- **统一磁盘布局为 LVM**:
+  - `setup-disk.sh` / `setup-disk_en.sh` 磁盘只划分 EFI 与数据两个分区（启用加密时数据分区为 LUKS2 容器），不再为 `/` 与 `/home` 单独分区；`/` 与 swap 统一为 LVM 逻辑卷，`/home` 位于 `/` 下
+  - swap 逻辑卷大小随磁盘容量动态调整（取磁盘容量的 10%，限制 2–16 GiB），取代固定 16 GiB
+  - 新增逻辑卷存在性校验，`pvcreate`/`lvcreate` 增加 `-y` 以支持重复执行
+
+### Documentation
+- **梳理三种安装路径与脚本调用链**: README 方式一去除冗余的预先 clone 步骤（`setup-disk.sh` 内部会把仓库克隆到 `/mnt/etc/nixos` 并自行调用 `install.sh`），改为「ISO 直接下载 setup-disk.sh 执行 + cd 到 `/mnt/etc/nixos` 执行 `nixos-install`」；方式二补充完整的后续步骤（`nix flake update` 首次运行、`nix flake lock`/`nixos-generate-config --root /` 自动生成、`nixos-rebuild switch --flake .#<hostname>`、`home-manager switch`）；`setup-disk.sh`/`setup-disk_en.sh` 末尾提示明确标注仓库位置 `/mnt/etc/nixos`，避免用户在错误目录下执行 `nixos-install`
+- **docs 全量同步磁盘布局与调用链**: `glossary.md` 逻辑卷条目更新为 `root`/`swap` 并说明 `/home` 位于 `/` 下；`migration.md` 硬件配置检查说明改为「根逻辑卷 `/dev/vg/root` / 交换逻辑卷 `/dev/vg/swap` / EFI 启动分区」；`architecture.md` 与 `faq.md` 初始安装示例补充 setup-disk.sh 内部自动 clone 到 `/mnt/etc/nixos`、调用 install.sh 完成主机配置与硬件生成的完整链路，ISO 场景不再要求预先 clone
+
 ## [v0.0.6] - 2026-11-02
 ### Fixed
 - **脚本健壮性修复（`scripts/` 全部 14 个脚本）**:
@@ -59,10 +72,6 @@
   - `.github/workflows/build.yml` 移除单独的 `nix flake lock` 步骤（建议将 `flake.lock` 提交到仓库以固定依赖版本），并启用 `auto-allocate-uids` 实验特性
   - `Makefile` 的 `switch-home` 硬编码占位符 `youruser@desktop` → 改为 `USER`/`HOST` 变量，支持 `make USER=<name> HOST=<host>`
   - `Makefile` 的 `build` 目标 `nix build .#$(HOST)`（不存在的 flake 输出）→ `nix build .#nixosConfigurations.$(HOST).config.system.build.toplevel`
-- **统一磁盘布局为 LVM**:
-  - `setup-disk.sh` / `setup-disk_en.sh` 磁盘只划分 EFI 与数据两个分区（启用加密时数据分区为 LUKS2 容器），不再为 `/` 与 `/home` 单独分区；`/` 与 swap 统一为 LVM 逻辑卷，`/home` 位于 `/` 下
-  - swap 逻辑卷大小随磁盘容量动态调整（取磁盘容量的 10%，限制 2–16 GiB），取代固定 16 GiB
-  - 新增逻辑卷存在性校验，`pvcreate`/`lvcreate` 增加 `-y` 以支持重复执行
 - **移除系统层重复的主题环境变量**:
   - 删除 `GTK_THEME`/`GTK2_RC_FILES`/`QT_STYLE_OVERRIDE`/`XDG_ICON_THEME`（优先级高于 Home Manager 用户级配置，会覆盖 `gtk`/`xdg.iconTheme` 模块）
 - **修复桌面 Shell 模块**:
@@ -84,8 +93,6 @@
 - **文档示例通用化**: README、架构与 FAQ 中的 `setup-disk.sh` 示例改用 `<disk>`/`<hostname>`/`<username>` 占位符，并说明 `-T/-W/-S` 省略时交互选择、`-c` 关闭加密的用法
 - **README 重排**: 特性按「桌面与外观 / 安装与系统 / 中文与办公 / 终端与开发」分组，新增「部署前验证」与「日常管理」小节，统一术语与完整属性路径说明并去除重复段落，中英文版结构保持一致
 - **补充交互选择与 CI 说明**: README 与架构文档说明 `setup-disk.sh` 省略 `-T/-W/-S` 时的交互式选择与 `-y`/非终端回退规则；架构文档新增「持续集成」小节，说明 `build.yml` 的 `nix flake check --no-build`、动态主机发现与完整构建属性路径，并提示提交 `flake.lock`
-- **梳理三种安装路径与脚本调用链**: README 方式一去除冗余的预先 clone 步骤（`setup-disk.sh` 内部会把仓库克隆到 `/mnt/etc/nixos` 并自行调用 `install.sh`），改为「ISO 直接下载 setup-disk.sh 执行 + cd 到 `/mnt/etc/nixos` 执行 `nixos-install`」；方式二补充完整的后续步骤（`nix flake update` 首次运行、`nix flake lock`/`nixos-generate-config --root /` 自动生成、`nixos-rebuild switch --flake .#<hostname>`、`home-manager switch`）；`setup-disk.sh`/`setup-disk_en.sh` 末尾提示明确标注仓库位置 `/mnt/etc/nixos`，避免用户在错误目录下执行 `nixos-install`
-- **docs 全量同步磁盘布局与调用链**: `glossary.md` 逻辑卷条目更新为 `root`/`swap` 并说明 `/home` 位于 `/` 下；`migration.md` 硬件配置检查说明改为「根逻辑卷 `/dev/vg/root` / 交换逻辑卷 `/dev/vg/swap` / EFI 启动分区」；`architecture.md` 与 `faq.md` 初始安装示例补充 setup-disk.sh 内部自动 clone 到 `/mnt/etc/nixos`、调用 install.sh 完成主机配置与硬件生成的完整链路，ISO 场景不再要求预先 clone
 
 ## [v0.0.5] - 2026-06-16
 ### Added
@@ -423,7 +430,7 @@
 - 配置 Hyprland 使用 Lua 语法
 - 添加 Niri 窗口管理器模块
 - 添加 DMS-Shell 和 Noctalia-Shell 模块
-- 添加主题统一配置（GTK/Qt/图标）
+- 优化主题统一配置（GTK/Qt/图标）
 
 ### Changed
 
@@ -437,3 +444,4 @@
 - 添加基础系统模块（common.nix、security.nix、network.nix）
 - 添加硬件模块（蓝牙、输入法）
 - 添加 Home Manager 用户配置
+
