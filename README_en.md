@@ -57,52 +57,71 @@ Pick the path that matches your situation: option 1 for a fresh machine, option 
 
 ### Option 1: Fresh install (boot from NixOS ISO)
 
+No repository needs to be pre-cloned inside the ISO environment—`setup-disk.sh` clones the configuration repository to `/mnt/etc/nixos` after mounting the target disk, then calls `install.sh` non-interactively to generate the host configuration, `nix flake lock` to pin dependencies, and `nixos-generate-config --root /mnt` to write the hardware configuration. The user only needs to review the generated files and run `nixos-install`.
+
 ```bash
-# 1. Clone repository (Gitee mirror for China, GitHub elsewhere)
-git clone https://gitee.com/hl4w/nixfiles.git
-# git clone https://github.com/hl4w/nixfiles.git
-cd nixfiles
+# 1. Download setup-disk.sh from Gitee or GitHub
+curl -fsSL -o setup-disk.sh https://gitee.com/hl4w/nixfiles/raw/master/scripts/setup-disk.sh
+# curl -fsSL -o setup-disk.sh https://raw.githubusercontent.com/hl4w/nixfiles/master/scripts/setup-disk.sh
+chmod +x setup-disk.sh
 
 # 2. Partition + encrypt + deploy config in one command (wipes the target disk)
 #    <disk>      target disk device (e.g. /dev/nvme0n1, /dev/sda); partition names are derived
 #    <hostname>  host name (also used as the flake configuration name)
 #    <username>  user name
-sudo ./scripts/setup-disk.sh <disk> <hostname> <username>
+sudo ./setup-disk.sh <disk> <hostname> <username>
 
 # Components are chosen interactively when omitted; they can also be passed explicitly
-# sudo ./scripts/setup-disk.sh -T desktop -W hyprland -S dms <disk> <hostname> <username>
+# sudo ./setup-disk.sh -T desktop -W hyprland -S dms <disk> <hostname> <username>
 
 # To skip disk encryption (not recommended): add -c before the positional arguments
-# sudo ./scripts/setup-disk.sh -c <disk> <hostname> <username>
+# sudo ./setup-disk.sh -c <disk> <hostname> <username>
 
-# 3. Review the generated hardware configuration, then install
+# 3. When the script finishes, the repository is already at /mnt/etc/nixos;
+#    review the hardware configuration, then install the system
+cd /mnt/etc/nixos
+# The first run may need `nix flake update` to refresh from your chosen mirror
 sudo nixos-install --flake .#<hostname>
 
 # 4. Reboot into the new system
 reboot
 ```
 
-`setup-disk.sh` runs: GPT partition table → EFI partition → data partition (a LUKS2 container when encryption is enabled) → LVM (swap/root logical volumes) → formatting → mounting → repository clone → `install.sh` host generation. LVM is used with or without encryption: the disk has only an EFI and a data partition, `/` and swap are logical volumes, and `/home` lives under `/`; swap takes 10% of the disk capacity (clamped to 2–16 GiB).
+`setup-disk.sh` runs: GPT partition table → EFI partition → data partition (a LUKS2 container when encryption is enabled) → LVM (swap/root logical volumes) → formatting → mounting → clone the repository to `/mnt/etc/nixos` → call `install.sh` with `-y` to generate host configuration and hardware configuration. LVM is used with or without encryption: the disk has only an EFI and a data partition, `/` and swap are logical volumes, and `/home` lives under `/`; swap takes 10% of the disk capacity (clamped to 2–16 GiB).
 
 `-T` (`desktop`/`laptop`/`server`), `-W` (`hyprland`/`niri`) and `-S` (`dms`/`noctalia`) select the components. When omitted, an interactive terminal prompts for them (Enter keeps the defaults `desktop`/`hyprland`/`dms`); with `-y` or non-TTY stdin the defaults are used and automation never blocks; choosing `server` skips the window manager and desktop shell prompts. Invalid values fail fast.
+
+> If you have already cloned the repository you can run `sudo ./scripts/setup-disk.sh` directly from the repo root—behavior is identical; the script always clones into `/mnt/etc/nixos` and continues the install flow from there.
 
 ### Option 2: Existing NixOS system, host configuration only
 
 ```bash
+# 1. Clone the repository and cd into it
 git clone https://gitee.com/hl4w/nixfiles.git
+# git clone https://github.com/hl4w/nixfiles.git
 cd nixfiles
 
+# 2. First run: generate flake.lock to pin dependencies (includes the oh-my-rime input)
+nix flake update
+
+# 3. Run install.sh to generate the host configuration (prompts interactively)
 chmod +x scripts/install.sh
 ./scripts/install.sh
+
+# Or pass every argument in one go
+# ./scripts/install.sh -y -U myuser -H my-hostname -T desktop -W hyprland -S dms -P kde
+
+# 4. After install.sh finishes, confirm the hardware configuration exists
+ls hosts/<hostname>/hardware-configuration.nix || sudo nixos-generate-config --show-hardware-config > hosts/<hostname>/hardware-configuration.nix
+
+# 5. Deploy the system configuration (the first build is slower)
+sudo nixos-rebuild switch --flake .#<hostname>
+
+# 6. Deploy the user configuration (optional; may need to wait for the previous step)
+home-manager switch --flake .#<username>@<hostname>
 ```
 
-Interactive mode asks for username, hostname, host type, window manager, desktop shell and polkit agent; values can also be passed directly:
-
-```bash
-./scripts/install.sh -y -U myuser -H my-hostname -T desktop -W hyprland -S dms -P kde
-```
-
-> `-y` runs non-interactively: missing required arguments cause an immediate error instead of a hanging prompt.
+`install.sh` replaces the `USERNAME = "youruser"` placeholder in `flake.nix`, inserts a new host into `nixosConfigurations`, updates the Git username and email in `home/common/git.nix`, generates `flake.lock` with `nix flake lock`, writes the hardware configuration via `nixos-generate-config --root /` (existing system), and finishes with `nix flake check` to validate syntax.
 
 ### Option 3: Manual deployment
 
