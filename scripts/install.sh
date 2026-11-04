@@ -17,6 +17,13 @@ if [ -z "$BASH_VERSION" ]; then
 fi
 set -e
 
+# 显式启用 flakes / nix-command
+# 安装介质（ISO）或尚未启用 flakes 的系统，nix.conf 里通常没有这两个实验性特性，
+# 直接执行 nix flake / nixos-install --flake 会报:
+#   experimental Nix feature 'nix-command' is disabled
+# 脚本内所有 nix 调用统一走该数组，不依赖目标环境的 nix.conf
+NIX=(nix --extra-experimental-features "nix-command flakes")
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -625,7 +632,7 @@ fi
 # 生成 flake.lock
 # =============================================
 info "生成 flake.lock..."
-nix flake lock
+"${NIX[@]}" flake lock
 
 # =============================================
 # 生成硬件配置
@@ -666,7 +673,7 @@ fi
 echo
 if confirm "是否验证配置是否正确？"; then
     info "验证 flake 配置..."
-    if nix flake check; then
+    if "${NIX[@]}" flake check; then
         info "✅ flake 配置验证通过"
     else
         warn "❌ flake 配置验证失败，请检查错误信息"
@@ -708,6 +715,9 @@ echo "  nix build .#nixosConfigurations.\"$FLAKE_NAME\".config.system.build.topl
 echo ""
 echo "# 回滚到上一代:"
 echo "  sudo nixos-rebuild switch --rollback"
+echo ""
+echo "# 如提示 experimental Nix feature 'nix-command' is disabled，请将命令写成:"
+echo "  nix --extra-experimental-features \"nix-command flakes\" flake lock"
 echo ""
 echo "📝 后续步骤:"
 echo "------------------------------------------"

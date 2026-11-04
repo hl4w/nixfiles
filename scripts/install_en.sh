@@ -17,6 +17,13 @@ if [ -z "$BASH_VERSION" ]; then
 fi
 set -e
 
+# Explicitly enable flakes / nix-command
+# The installer ISO (or a system that has not enabled flakes yet) usually lacks
+# these experimental features in nix.conf, so `nix flake` / `nixos-install --flake`
+# fails with: experimental Nix feature 'nix-command' is disabled
+# All nix invocations in this script go through this array, independent of nix.conf
+NIX=(nix --extra-experimental-features "nix-command flakes")
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -625,7 +632,7 @@ fi
 # Generate flake.lock
 # =============================================
 info "Generating flake.lock..."
-nix flake lock
+"${NIX[@]}" flake lock
 
 # =============================================
 # Generate hardware configuration
@@ -666,7 +673,7 @@ fi
 echo
 if confirm "Verify configuration correctness?"; then
     info "Verifying flake configuration..."
-    if nix flake check; then
+    if "${NIX[@]}" flake check; then
         info "✅ Flake configuration verified successfully"
     else
         warn "❌ Flake configuration verification failed, please check error messages"
@@ -708,6 +715,9 @@ echo "  nix build .#nixosConfigurations.\"$FLAKE_NAME\".config.system.build.topl
 echo ""
 echo "# Rollback to previous generation:"
 echo "  sudo nixos-rebuild switch --rollback"
+echo ""
+echo "# If you see experimental Nix feature 'nix-command' is disabled, prefix the command with:"
+echo "  nix --extra-experimental-features \"nix-command flakes\" flake lock"
 echo ""
 echo "📝 Next Steps:"
 echo "------------------------------------------"

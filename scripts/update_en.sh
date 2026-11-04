@@ -17,6 +17,10 @@ if [ -z "$BASH_VERSION" ]; then
 fi
 set -e
 
+# Explicitly enable flakes / nix-command so the script works even when the
+# target system has not enabled them in nix.conf
+NIX=(nix --extra-experimental-features "nix-command flakes")
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -82,13 +86,13 @@ info "=========================================="
 echo
 
 info "Updating flake inputs..."
-nix flake update
+"${NIX[@]}" flake update
 
 info "Building system configuration..."
 info "Target host: $TARGET_HOSTNAME"
 # nixosConfigurations build outputs require the full attribute path;
 # `nix build .#host` only works when flakes expose packages.<system>.<host>
-nix build ".#nixosConfigurations.\"${TARGET_HOSTNAME}\".config.system.build.toplevel"
+"${NIX[@]}" build ".#nixosConfigurations.\"${TARGET_HOSTNAME}\".config.system.build.toplevel"
 
 echo
 info "=========================================="

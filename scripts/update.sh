@@ -17,6 +17,10 @@ if [ -z "$BASH_VERSION" ]; then
 fi
 set -e
 
+# 显式启用 flakes / nix-command，避免目标系统未启用时
+# 报 experimental Nix feature 'nix-command' is disabled
+NIX=(nix --extra-experimental-features "nix-command flakes")
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -82,13 +86,13 @@ info "=========================================="
 echo
 
 info "更新 flake 依赖..."
-nix flake update
+"${NIX[@]}" flake update
 
 info "构建系统配置..."
 info "目标主机: $TARGET_HOSTNAME"
 # nixosConfigurations 的构建产物需走完整属性路径；
 # `nix build .#host` 只在 flakes 暴露 packages.<system>.<host> 时才有效
-nix build ".#nixosConfigurations.\"${TARGET_HOSTNAME}\".config.system.build.toplevel"
+"${NIX[@]}" build ".#nixosConfigurations.\"${TARGET_HOSTNAME}\".config.system.build.toplevel"
 
 echo
 info "=========================================="

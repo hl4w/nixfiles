@@ -297,6 +297,24 @@ substituters = [
 
 ## 故障排除
 
+### 提示 experimental Nix feature 'nix-command' is disabled
+
+说明当前环境（安装介质 ISO 或未启用 flakes 的旧系统）未开启实验性特性。三种处理方式：
+
+```bash
+# 方式一：单条命令临时启用（nix 命令通用）
+nix --extra-experimental-features "nix-command flakes" flake lock
+
+# 方式二：本次会话临时启用（之后的 nix / nixos-install 都生效）
+export NIX_CONFIG='experimental-features = nix-command flakes'
+sudo NIX_CONFIG='experimental-features = nix-command flakes' nixos-install --flake .#<hostname>
+
+# 方式三：系统级永久启用（安装完成后写入 configuration.nix）
+nix.settings.experimental-features = [ "nix-command" "flakes" ];
+```
+
+本仓库的 `scripts/install.sh`、`scripts/update.sh` 已在内部自动带上该参数，模块 `modules/system/default.nix` 也已为安装后的系统启用 flakes。
+
 ### Flake 构建失败
 
 检查错误消息以查找缺失的依赖或语法错误。运行以下命令定位问题：

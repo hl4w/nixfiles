@@ -297,6 +297,24 @@ substituters = [
 
 ## Troubleshooting
 
+### Message: experimental Nix feature 'nix-command' is disabled
+
+The current environment (installer ISO or an older system without flakes) has not enabled the experimental features. Three ways to handle it:
+
+```bash
+# 1. Enable per command (works for any nix command)
+nix --extra-experimental-features "nix-command flakes" flake lock
+
+# 2. Enable for the current session (also applies to nixos-install)
+export NIX_CONFIG='experimental-features = nix-command flakes'
+sudo NIX_CONFIG='experimental-features = nix-command flakes' nixos-install --flake .#<hostname>
+
+# 3. Enable system-wide after installation (in configuration.nix)
+nix.settings.experimental-features = [ "nix-command" "flakes" ];
+```
+
+The repo's `scripts/install.sh` and `scripts/update.sh` already pass this flag internally, and `modules/system/default.nix` enables flakes for the installed system.
+
 ### Flake build fails
 
 Identify the problem with:
