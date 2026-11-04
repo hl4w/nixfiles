@@ -25,8 +25,8 @@
     ];
     # 实验性功能（flakes + nix-command 是必需的）
     experimental-features = [ "nix-command" "flakes" ];
-    # 自动优化 Nix store 存储
-    auto-optimise-store = true;
+    # 注意: auto-optimise-store 属于 restricted setting，不能由 flake 的 nixConfig 下发
+    # （会输出 "ignoring the client-specified setting" 警告），改由系统配置 modules/system/default.nix 设置
   };
 
   # ============================================================
