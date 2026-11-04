@@ -151,6 +151,24 @@ info "       HL4W NixOS Configuration Installer"
 info "=========================================="
 echo
 
+# Pre-flight: cd into the repository root
+# Every path used below (flake.nix, hosts/, home/, modules/) is relative to the
+# repository root. Running from another directory (e.g. sudo /path/to/scripts/install_en.sh)
+# writes host config to the wrong place and fails the flake.nix host-entry insertion,
+# which ultimately surfaces as "does not provide attribute 'nixosConfigurations.<host>'"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")" >/dev/null 2>&1 && pwd)"
+REPO_ROOT="$(cd -- "$SCRIPT_DIR/.." >/dev/null 2>&1 && pwd)"
+if [ -z "$REPO_ROOT" ] || [ ! -d "$REPO_ROOT" ]; then
+    error "Unable to locate the script directory: ${SCRIPT_DIR:-unknown}"
+fi
+cd "$REPO_ROOT" || error "Unable to cd into the repository root: $REPO_ROOT"
+info "Working directory: $REPO_ROOT"
+
+# Validate the repository layout so we never continue on an incomplete copy
+if [ ! -f flake.nix ] || [ ! -d hosts ] || [ ! -d home ]; then
+    error "Incomplete repository layout (missing flake.nix / hosts / home): $REPO_ROOT"
+fi
+
 # Non-interactive mode: fail fast on missing required arguments instead of blocking on prompts
 if [ "$NON_INTERACTIVE" = "true" ]; then
     [ -n "$USERNAME" ] || error "Non-interactive mode requires -U/--username"

@@ -159,11 +159,15 @@ home-manager switch --flake .#<username>@<hostname>
 # 求值检查（不编译）
 nix flake check
 
+# 查看已声明的主机列表（排查 does not provide attribute 'nixosConfigurations.<host>'）
+nix eval --apply builtins.attrNames .#nixosConfigurations
+
 # 测试构建（不部署）
 nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 ```
 
 > 本仓库通过 `nixosConfigurations` 暴露主机，务必使用完整属性路径；`nix build .#<hostname>` 仅在 flake 额外暴露 `packages.<system>.<hostname>` 时可用。
+> `nixosConfigurations` 初始为空集合，主机条目由 `install.sh` 在**仓库根目录**运行时写入 `flake.nix`；若上一条命令输出为空，说明尚未执行 `install.sh`（或未在仓库根目录执行）。
 
 ## 项目结构
 

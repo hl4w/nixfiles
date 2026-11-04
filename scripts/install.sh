@@ -151,6 +151,24 @@ info "       HL4W NixOS Configuration Installer"
 info "=========================================="
 echo
 
+# 前置定位：切换到仓库根目录
+# 脚本内所有路径（flake.nix、hosts/、home/、modules/）均相对仓库根目录；
+# 若在其他目录执行（例如 sudo /path/to/scripts/install.sh），
+# 会把主机配置写到错误位置，并在插入条目时失败，
+# 最终表现为 flake does not provide attribute 'nixosConfigurations.<host>'
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")" >/dev/null 2>&1 && pwd)"
+REPO_ROOT="$(cd -- "$SCRIPT_DIR/.." >/dev/null 2>&1 && pwd)"
+if [ -z "$REPO_ROOT" ] || [ ! -d "$REPO_ROOT" ]; then
+    error "无法定位脚本所在目录: ${SCRIPT_DIR:-未知}"
+fi
+cd "$REPO_ROOT" || error "无法切换到仓库根目录: $REPO_ROOT"
+info "工作目录: $REPO_ROOT"
+
+# 仓库根目录结构校验，避免在残缺副本上继续执行
+if [ ! -f flake.nix ] || [ ! -d hosts ] || [ ! -d home ]; then
+    error "仓库结构不完整（缺少 flake.nix / hosts / home）: $REPO_ROOT"
+fi
+
 # 非交互模式：缺失的必需参数直接报错，绝不进入阻塞式输入
 if [ "$NON_INTERACTIVE" = "true" ]; then
     [ -n "$USERNAME" ] || error "非交互模式必须通过 -U/--username 指定用户名"

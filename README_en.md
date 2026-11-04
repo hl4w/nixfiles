@@ -160,11 +160,15 @@ home-manager switch --flake .#<username>@<hostname>
 # Evaluation check (no compilation)
 nix flake check
 
+# List declared hosts (troubleshoot "does not provide attribute 'nixosConfigurations.<host>'")
+nix eval --apply builtins.attrNames .#nixosConfigurations
+
 # Test build (no deployment)
 nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 ```
 
 > This repository exposes hosts via `nixosConfigurations`, so always use the full attribute path; `nix build .#<hostname>` only works when the flake additionally exposes `packages.<system>.<hostname>`.
+> `nixosConfigurations` starts as an empty set; host entries are written into `flake.nix` by `install.sh` when it runs from the **repository root**. An empty list above means `install.sh` has not been run (or was run from the wrong directory).
 
 ## Project Structure
 
