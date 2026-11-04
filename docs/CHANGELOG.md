@@ -13,6 +13,9 @@
   - swap 逻辑卷大小随磁盘容量动态调整（取磁盘容量的 10%，限制 2–16 GiB），取代固定 16 GiB
   - 新增逻辑卷存在性校验，`pvcreate`/`lvcreate` 增加 `-y` 以支持重复执行
 
+### Added
+- **安装指南网站**: 新增 `hl4w-install/` 目录，包含中英双语独立 HTML 页面（`index.html` / `index_en.html`）。技术安装指南风格，带粘性侧边导航、三方式切换标签、步骤卡片、参数表、FAQ 折叠卡片、TOC 高亮与移动端自适应
+
 ### Changed
 - **移除 GitHub Actions CI**: 删除 `.github/workflows/build.yml`（仓库当前不需要远端构建）；同步删除 architecture.md / architecture_en.md 的「持续集成」小节、README 目录树与文档索引中的 CI 提及
 

@@ -13,6 +13,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Swap LV size now scales with disk capacity (10% of the disk, clamped to 2–16 GiB) instead of a fixed 16 GiB
   - Added logical volume existence checks and `-y` on `pvcreate`/`lvcreate` so the script can be re-run safely
 
+### Added
+- **Installation guide website**: New `hl4w-install/` directory with two standalone bilingual HTML pages (`index.html` / `index_en.html`). Technical-installation-guide style with sticky sidebar TOC, three-option tabs, step cards, flag tables, collapsible FAQ, scroll-spy highlight and mobile-responsive layout
+
 ### Changed
 - **Removed GitHub Actions CI**: Deleted `.github/workflows/build.yml` (remote CI is not needed at this stage); synced — removed the "Continuous Integration" section from `architecture.md` / `architecture_en.md`, and dropped the CI mentions from the README directory tree and documentation index
 
