@@ -8,6 +8,7 @@
 
 ## [v0.0.6] - 2026-11-04
 ### Fixed
+- **Nix 选项路径错误**: `modules/desktops/unified-theme.nix` 的 SDDM 配置用了 `services.sddm`（NixOS 26.05 中不存在），改为 `services.displayManager.sddm`；同时修正 `config.services.sddm.enable` → `config.services.displayManager.sddm.enable`。此错误会导致 Nix 求值直接失败
 - **统一磁盘布局为 LVM**:
   - `setup-disk.sh` / `setup-disk_en.sh` 磁盘只划分 EFI 与数据两个分区（启用加密时数据分区为 LUKS2 容器），不再为 `/` 与 `/home` 单独分区；`/` 与 swap 统一为 LVM 逻辑卷，`/home` 位于 `/` 下
   - swap 逻辑卷大小随磁盘容量动态调整（取磁盘容量的 10%，限制 2–16 GiB），取代固定 16 GiB

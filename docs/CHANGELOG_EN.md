@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [v0.0.6] - 2026-11-04
 ### Fixed
+- **Wrong Nix option path**: The SDDM config in `modules/desktops/unified-theme.nix` used `services.sddm` (does not exist in NixOS 26.05). Changed to `services.displayManager.sddm`, and fixed `config.services.sddm.enable` → `config.services.displayManager.sddm.enable`. This mistake would make Nix evaluation fail immediately
 - **Unified disk layout on LVM**:
   - `setup-disk.sh` / `setup-disk_en.sh` create only an EFI and a data partition (the data partition is a LUKS2 container when encryption is enabled); `/` and `/home` are no longer separate partitions, `/` and swap are LVM logical volumes and `/home` lives under `/`
   - Swap LV size now scales with disk capacity (10% of the disk, clamped to 2–16 GiB) instead of a fixed 16 GiB

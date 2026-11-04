@@ -89,7 +89,8 @@ in
     };
 
     # ==================== SDDM 登录界面主题 ====================
-    services.sddm = lib.mkIf config.services.sddm.enable {
+    # 注意: SDDM 选项路径为 services.displayManager.sddm（驼峰命名）
+    services.displayManager.sddm = lib.mkIf config.services.displayManager.sddm.enable {
       theme = "breeze";
       greeterEnvironment = {
         QT_QPA_PLATFORM = "wayland";
