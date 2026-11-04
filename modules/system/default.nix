@@ -77,9 +77,10 @@
   time.timeZone = "Asia/Shanghai";    # 时区：上海
   i18n = {
     defaultLocale = "zh_CN.UTF-8";    # 默认语言：中文
-    locales = [                       # 支持的语言环境
-      "zh_CN.UTF-8 UTF-8"
-      "en_US.UTF-8 UTF-8"
+    # NixOS 24.11+ 已移除 i18n.locales，改用 extraLocales（仅 locale 名，不含编码段）
+    extraLocales = [                  # 额外构建的语言环境
+      "zh_CN.UTF-8"
+      "en_US.UTF-8"
     ];
   };
   
