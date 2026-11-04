@@ -140,12 +140,15 @@ cp -r templates/host-template hosts/<hostname>
 nixos-generate-config --show-hardware-config > hosts/<hostname>/hardware-configuration.nix
 
 # 5. 在 flake.nix 的 nixosConfigurations 中添加主机条目
-#    my-hostname = mkHost "my-hostname";
+#    "<hostname>" = mkHost "<hostname>";
 
 # 6. 创建 Home Manager 用户配置
 touch home/hosts/<hostname>.nix
 
-# 7. 测试构建、部署系统、更新用户配置
+# 7. 把新建文件加入 Git 索引（Nix 对 git 仓库只读取已跟踪文件，否则报 not tracked by Git）
+git add flake.nix hosts/<hostname> home/hosts/<hostname>.nix
+
+# 8. 测试构建、部署系统、更新用户配置
 nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 sudo nixos-rebuild switch --flake .#<hostname>
 home-manager switch --flake .#<username>@<hostname>

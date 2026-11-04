@@ -141,12 +141,15 @@ cp -r templates/host-template hosts/<hostname>
 nixos-generate-config --show-hardware-config > hosts/<hostname>/hardware-configuration.nix
 
 # 5. Add the host entry to nixosConfigurations in flake.nix
-#    my-hostname = mkHost "my-hostname";
+#    "<hostname>" = mkHost "<hostname>";
 
 # 6. Create the Home Manager user configuration
 touch home/hosts/<hostname>.nix
 
-# 7. Test build, deploy the system, update the user profile
+# 7. Stage the new files (Nix only reads tracked files in a git repo, otherwise "not tracked by Git")
+git add flake.nix hosts/<hostname> home/hosts/<hostname>.nix
+
+# 8. Test build, deploy the system, update the user profile
 nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 sudo nixos-rebuild switch --flake .#<hostname>
 home-manager switch --flake .#<username>@<hostname>

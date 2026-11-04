@@ -315,6 +315,17 @@ nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
 本仓库的 `scripts/install.sh`、`scripts/update.sh` 已在内部自动带上该参数，模块 `modules/system/default.nix` 也已为安装后的系统启用 flakes。
 
+### 提示 Path '...' in the repository is not tracked by Git
+
+Nix 对 **git 仓库**中的 flake 只读取「已被 Git 跟踪」的文件（.git 之外的未跟踪文件会被忽略），新建的主机配置必须加入索引：
+
+```bash
+git add flake.nix hosts/<hostname> home/hosts/<hostname>.nix
+git status          # 确认文件处于 staged / to be committed
+```
+
+若单独生成硬件配置，也要一并加入：`git add hosts/<hostname>/hardware-configuration.nix`。仓库中的 `scripts/install.sh` 已在生成配置后自动执行 `git add`，手动部署（方式三）时需要自己执行。
+
 ### Flake 构建失败
 
 检查错误消息以查找缺失的依赖或语法错误。运行以下命令定位问题：

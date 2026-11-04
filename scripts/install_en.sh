@@ -42,6 +42,19 @@ error() {
     exit 1
 }
 
+# Stage generated/modified files into the Git index
+# This repository is a Git repo, and Nix only sees tracked files for git-type flakes.
+# Untracked files fail with: Path '...' in the repository is not tracked by Git
+git_track() {
+    git rev-parse --is-inside-work-tree >/dev/null 2>&1 || return 0
+    local path
+    for path in "$@"; do
+        if [ -e "$path" ]; then
+            git add -- "$path" 2>/dev/null || true
+        fi
+    done
+}
+
 # Escape sed replacement special characters (/ & \)
 # Prevents sed substitution breakage when username/email/hostname contain metacharacters
 sed_escape_replacement() {
@@ -628,11 +641,15 @@ else
     error "flake.nix host configuration insertion failed, please manually check the nixosConfigurations block in flake.nix"
 fi
 
+# Generated files must be staged; otherwise nix reports "is not tracked by Git"
+git_track flake.nix "hosts/$HOSTNAME/configuration.nix" "home/hosts/$HOSTNAME.nix" hosts/common/default.nix home/common/git.nix
+
 # =============================================
 # Generate flake.lock
 # =============================================
 info "Generating flake.lock..."
 "${NIX[@]}" flake lock
+git_track flake.lock
 
 # =============================================
 # Generate hardware configuration
@@ -651,6 +668,7 @@ if confirm "Generate hardware configuration now? (requires sudo)"; then
         if sudo nixos-generate-config "${GEN_ARGS[@]}" > "hosts/$HOSTNAME/hardware-configuration.nix"; then
             info "Hardware configuration generated: hosts/$HOSTNAME/hardware-configuration.nix"
             info "Recommended: Check and edit hardware configuration file to ensure disk UUIDs and mount points are correct"
+            git_track "hosts/$HOSTNAME/hardware-configuration.nix"
         else
             error "Failed to generate hardware configuration, please run manually: sudo nixos-generate-config --show-hardware-config > hosts/$HOSTNAME/hardware-configuration.nix"
         fi
@@ -658,6 +676,7 @@ if confirm "Generate hardware configuration now? (requires sudo)"; then
         warn "nixos-generate-config command not available (may not be in NixOS installer)"
         info "Please run the following in NixOS installer:"
         info "  sudo nixos-generate-config --show-hardware-config > hosts/$HOSTNAME/hardware-configuration.nix"
+        info "  git add hosts/$HOSTNAME/hardware-configuration.nix   # Nix only reads tracked files"
         exit 1
     fi
 else
@@ -665,6 +684,7 @@ else
     warn "⚠️ Hardware configuration file has not been created!"
     info "Please generate manually in NixOS installer:"
     info "  sudo nixos-generate-config --show-hardware-config > hosts/$HOSTNAME/hardware-configuration.nix"
+    info "  git add hosts/$HOSTNAME/hardware-configuration.nix   # Nix only reads tracked files"
 fi
 
 # =============================================
@@ -673,6 +693,8 @@ fi
 echo
 if confirm "Verify configuration correctness?"; then
     info "Verifying flake configuration..."
+    # Safety net: make sure every generated file is tracked to avoid "Path ... is not tracked by Git"
+    git_track "hosts/$HOSTNAME" "home/hosts/$HOSTNAME.nix" flake.nix flake.lock
     if "${NIX[@]}" flake check; then
         info "✅ Flake configuration verified successfully"
     else
@@ -721,8 +743,9 @@ echo "  nix --extra-experimental-features \"nix-command flakes\" flake lock"
 echo ""
 echo "📝 Next Steps:"
 echo "------------------------------------------"
-echo "1. Ensure hardware configuration is generated:"
+echo "1. Ensure hardware configuration is generated and staged in Git:"
 echo "   hosts/$HOSTNAME/hardware-configuration.nix"
+echo "   git add hosts/$HOSTNAME"
 echo ""
 echo "2. Edit hardware-configuration.nix and verify:"
 echo "   - Ensure root partition device points to correct disk/partition"

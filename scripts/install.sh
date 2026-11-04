@@ -42,6 +42,19 @@ error() {
     exit 1
 }
 
+# 把生成/修改的文件加入 Git 索引
+# 本仓库是 Git 仓库，Nix 对 git 类型的 flake 只读取「已跟踪」的文件，
+# 未经 git add 的新文件会直接报: Path '...' in the repository is not tracked by Git
+git_track() {
+    git rev-parse --is-inside-work-tree >/dev/null 2>&1 || return 0
+    local path
+    for path in "$@"; do
+        if [ -e "$path" ]; then
+            git add -- "$path" 2>/dev/null || true
+        fi
+    done
+}
+
 # 转义 sed 替换字符串中的特殊字符（/ & \）
 # 避免用户名、邮箱、主机名等包含元字符时破坏 sed 替换
 sed_escape_replacement() {
@@ -628,11 +641,15 @@ else
     error "flake.nix 主机配置插入失败，请手动检查 flake.nix 中的 nixosConfigurations 块"
 fi
 
+# 生成的新文件必须加入 Git 索引，否则 nix 读取 flake 时会报 not tracked by Git
+git_track flake.nix "hosts/$HOSTNAME/configuration.nix" "home/hosts/$HOSTNAME.nix" hosts/common/default.nix home/common/git.nix
+
 # =============================================
 # 生成 flake.lock
 # =============================================
 info "生成 flake.lock..."
 "${NIX[@]}" flake lock
+git_track flake.lock
 
 # =============================================
 # 生成硬件配置
@@ -651,6 +668,7 @@ if confirm "是否立即生成硬件配置？(需要 sudo 权限)"; then
         if sudo nixos-generate-config "${GEN_ARGS[@]}" > "hosts/$HOSTNAME/hardware-configuration.nix"; then
             info "硬件配置已生成: hosts/$HOSTNAME/hardware-configuration.nix"
             info "建议检查并编辑硬件配置文件，确保磁盘 UUID 和挂载点正确"
+            git_track "hosts/$HOSTNAME/hardware-configuration.nix"
         else
             error "生成硬件配置失败，请手动运行: sudo nixos-generate-config --show-hardware-config > hosts/$HOSTNAME/hardware-configuration.nix"
         fi
@@ -658,6 +676,7 @@ if confirm "是否立即生成硬件配置？(需要 sudo 权限)"; then
         warn "nixos-generate-config 命令不可用（可能不在 NixOS 安装介质中）"
         info "请在 NixOS 安装介质中运行以下命令:"
         info "  sudo nixos-generate-config --show-hardware-config > hosts/$HOSTNAME/hardware-configuration.nix"
+        info "  git add hosts/$HOSTNAME/hardware-configuration.nix   # Nix 只读取已跟踪文件"
         exit 1
     fi
 else
@@ -665,6 +684,7 @@ else
     warn "⚠️  硬件配置文件尚未创建!"
     info "请在 NixOS 安装介质中手动生成:"
     info "  sudo nixos-generate-config --show-hardware-config > hosts/$HOSTNAME/hardware-configuration.nix"
+    info "  git add hosts/$HOSTNAME/hardware-configuration.nix   # Nix 只读取已跟踪文件"
 fi
 
 # =============================================
@@ -673,6 +693,8 @@ fi
 echo
 if confirm "是否验证配置是否正确？"; then
     info "验证 flake 配置..."
+    # 兜底：确保所有生成文件都已跟踪，避免 "Path ... is not tracked by Git"
+    git_track "hosts/$HOSTNAME" "home/hosts/$HOSTNAME.nix" flake.nix flake.lock
     if "${NIX[@]}" flake check; then
         info "✅ flake 配置验证通过"
     else
@@ -721,8 +743,9 @@ echo "  nix --extra-experimental-features \"nix-command flakes\" flake lock"
 echo ""
 echo "📝 后续步骤:"
 echo "------------------------------------------"
-echo "1. 确保硬件配置已生成:"
+echo "1. 确保硬件配置已生成并已加入 Git 索引:"
 echo "   hosts/$HOSTNAME/hardware-configuration.nix"
+echo "   git add hosts/$HOSTNAME"
 echo ""
 echo "2. 编辑 hardware-configuration.nix，确认:"
 echo "   - 根分区 device 指向正确的磁盘/分区"

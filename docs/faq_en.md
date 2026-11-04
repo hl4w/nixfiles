@@ -315,6 +315,17 @@ nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
 The repo's `scripts/install.sh` and `scripts/update.sh` already pass this flag internally, and `modules/system/default.nix` enables flakes for the installed system.
 
+### Message: Path '...' in the repository is not tracked by Git
+
+For flakes inside a **git repository**, Nix only reads files tracked by Git (untracked files are ignored). Newly created host configs must be staged:
+
+```bash
+git add flake.nix hosts/<hostname> home/hosts/<hostname>.nix
+git status          # confirm the files are staged
+```
+
+If you generate the hardware config separately, stage it too: `git add hosts/<hostname>/hardware-configuration.nix`. The repo's `scripts/install.sh` already runs `git add` after generating files; manual deployment (option 3) requires doing it yourself.
+
 ### Flake build fails
 
 Identify the problem with:
