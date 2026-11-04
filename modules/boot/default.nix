@@ -6,15 +6,15 @@
   ];
 
   boot = {
-    efi = {
-      enable = true;
-      canTouchEfiVariables = true;  # 允许 systemd-boot 管理 EFI 变量
-    };
     loader = {
+      # EFI 相关选项位于 boot.loader.efi（不存在 boot.efi）
+      efi = {
+        canTouchEfiVariables = true;  # 允许 systemd-boot 管理 EFI 变量
+        efiSysMountPoint = "/boot";   # EFI 系统分区挂载点
+      };
       systemd-boot = {
         enable = true;
         configurationLimit = 3;  # 保留的配置数量
-        efiSysMountPoint = "/boot";  # EFI 系统分区挂载点
       };
       timeout = 0;  # 隐藏引导菜单，按任意键可显示
       # 禁用其他引导加载器
