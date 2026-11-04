@@ -130,6 +130,7 @@ git clone https://gitee.com/hl4w/nixfiles.git
 cd nixfiles
 
 # 2. 生成 flake.lock（锁定依赖版本，含 oh-my-rime 输入法框架）
+#    oh-my-rime 默认从 CNB 镜像拉取；如需改用 GitHub 上游，启用 flake.nix 中 inputs.oh-my-rime 下已注释的地址
 nix flake update
 
 # 3. 复制主机模板

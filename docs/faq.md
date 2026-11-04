@@ -215,7 +215,7 @@ desktop.shell = "dms";       // 或 "noctalia"
 - 用户级：`home/common/input.nix`（oh-my-rime 配置框架部署、方案列表、主题设置）
 
 **oh-my-rime 配置机制**：
-- oh-my-rime 作为 flake input（`github:Mintimate/oh-my-rime/main`）拉取
+- oh-my-rime 作为 flake input 拉取，默认源为 CNB 官方镜像 `git+https://cnb.cool/Mintimate/rime/oh-my-rime`（国内访问稳定）；如需切回 GitHub 上游，启用 `flake.nix` 中 `inputs.oh-my-rime` 下已注释的 `github:Mintimate/oh-my-rime/main`（并注释掉镜像地址），然后执行 `nix flake update oh-my-rime`
 - 通过 `home.file` 将 schema/dict/lua 文件符号链接到 `~/.local/share/fcitx5/rime/`
 - 用 `default.custom.yaml` 覆盖 `schema_list` 指定启用的方案（默认 rime_mint、rime_mint_flypy、terra_pinyin、stroke）
 

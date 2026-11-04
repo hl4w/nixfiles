@@ -1,6 +1,6 @@
 # 用户级输入法配置 - RIME + oh-my-rime（薄荷拼音）
 #
-# 依赖 flake input: inputs.oh-my-rime (github:Mintimate/oh-my-rime)
+# 依赖 flake input: inputs.oh-my-rime (git+https://cnb.cool/Mintimate/rime/oh-my-rime)
 #
 # 设计说明:
 # - oh-my-rime 不是 nixpkgs 包，而是 RIME 配置模板集合，通过 flake input 拉取

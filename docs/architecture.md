@@ -187,7 +187,7 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 |------|-----|------|
 | `nixpkgs` | `github:NixOS/nixpkgs/nixos-26.05` | NixOS 26.05 稳定版 |
 | `home-manager` | `github:nix-community/home-manager/release-26.05` | Home Manager 与 nixpkgs 版本同步 |
-| `oh-my-rime` | `github:Mintimate/oh-my-rime/main` | RIME 输入法配置框架（`flake = false`，仅作为源码输入） |
+| `oh-my-rime` | `git+https://cnb.cool/Mintimate/rime/oh-my-rime` | RIME 输入法配置框架（`flake = false`，仅作为源码输入）。默认使用 CNB 官方镜像，国内访问稳定（默认分支 `main`）；如需切回 GitHub 上游，启用 `inputs.oh-my-rime` 下已注释的 `github:Mintimate/oh-my-rime/main` 并注释掉镜像地址，再执行 `nix flake update oh-my-rime` 刷新锁文件 |
 
 ### 全局配置 (nixConfig)
 

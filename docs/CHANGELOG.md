@@ -20,6 +20,7 @@
 
 ### Changed
 - **flake.nix 完整审计与注释增强**: 对照 NixOS 26.05 与 Home Manager release-26.05 官方规范完整审计 flake.nix（fetch HM 源码确认 `nixosModules.home-manager` 路径正确）；确认所有 inputs 版本对齐、oh-my-rime 源码输入消费链完整（flake inputs → extraSpecialArgs → home/common/input.nix）、specialArgs 的缓存配置变量被 modules/system/default.nix 实际消费；补充 USERNAME 占位符格式约束、extraSpecialArgs / specialArgs 双重 inputs 传递说明、空 nixosConfigurations 默认值与 mkHost 追加格式注释
+- **oh-my-rime 默认改用 CNB 镜像源**: `inputs.oh-my-rime` 默认源由 `github:Mintimate/oh-my-rime/main` 改为 `git+https://cnb.cool/Mintimate/rime/oh-my-rime`（已核实镜像可访问、默认分支同为 `main`），GitHub 上游地址保留为并列注释以便切回；切换源后执行 `nix flake update oh-my-rime` 刷新锁文件条目。README、architecture、faq 同步更新说明
 - **移除 GitHub Actions CI**: 删除 `.github/workflows/build.yml`（仓库当前不需要远端构建）；同步删除 architecture.md / architecture_en.md 的「持续集成」小节、README 目录树与文档索引中的 CI 提及
 
 ### Documentation

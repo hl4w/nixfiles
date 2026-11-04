@@ -42,10 +42,17 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # ------------------------------------------------------------
     # oh-my-rime RIME 输入法配置框架（薄荷拼音）
-    # 仓库: https://github.com/Mintimate/oh-my-rime
+    # 默认源: https://cnb.cool/Mintimate/rime/oh-my-rime（CNB 官方镜像，国内访问稳定，默认分支 main）
+    # 上游仓库: https://github.com/Mintimate/oh-my-rime（默认分支 main）
+    #
+    # 如需回到 GitHub 上游，把下面第 1 行注释掉、启用第 2 行即可；
+    # 切换后需刷新该输入对应的锁文件条目: nix flake update oh-my-rime
+    # ------------------------------------------------------------
     oh-my-rime = {
-      url = "github:Mintimate/oh-my-rime/main";
+      url = "git+https://cnb.cool/Mintimate/rime/oh-my-rime";
+      # url = "github:Mintimate/oh-my-rime/main";
       flake = false;  # 非 flake 仓库，仅作为源码输入给 modules 使用
     };
   };

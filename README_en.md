@@ -131,6 +131,7 @@ git clone https://gitee.com/hl4w/nixfiles.git
 cd nixfiles
 
 # 2. Generate flake.lock (pins dependencies, includes the oh-my-rime input)
+#    oh-my-rime is fetched from the CNB mirror by default; to use the GitHub upstream instead, enable the commented URL under inputs.oh-my-rime in flake.nix
 nix flake update
 
 # 3. Copy the host template

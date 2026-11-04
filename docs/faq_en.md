@@ -215,7 +215,7 @@ The configuration uses Fcitx5 + RIME with oh-my-rime (Mint Pinyin) preset:
 - User level: `home/common/input.nix` (oh-my-rime framework deployment, schema list, theme settings)
 
 **oh-my-rime configuration mechanism**:
-- oh-my-rime is fetched as a flake input (`github:Mintimate/oh-my-rime/main`)
+- oh-my-rime is fetched as a flake input, defaulting to the CNB official mirror `git+https://cnb.cool/Mintimate/rime/oh-my-rime` (reliably reachable from mainland China); to go back to the GitHub upstream, enable the commented `github:Mintimate/oh-my-rime/main` under `inputs.oh-my-rime` in `flake.nix` (and comment out the mirror URL), then run `nix flake update oh-my-rime`
 - schema/dict/lua files are symlinked to `~/.local/share/fcitx5/rime/` via `home.file`
 - `default.custom.yaml` overrides `schema_list` to specify enabled schemes (default: rime_mint, rime_mint_flypy, terra_pinyin, stroke)
 

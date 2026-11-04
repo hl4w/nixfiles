@@ -187,7 +187,7 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 |-------|-----|-------------|
 | `nixpkgs` | `github:NixOS/nixpkgs/nixos-26.05` | NixOS 26.05 stable |
 | `home-manager` | `github:nix-community/home-manager/release-26.05` | Home Manager, synced with nixpkgs version |
-| `oh-my-rime` | `github:Mintimate/oh-my-rime/main` | RIME input method configuration framework (`flake = false`, source-only input) |
+| `oh-my-rime` | `git+https://cnb.cool/Mintimate/rime/oh-my-rime` | RIME input method configuration framework (`flake = false`, source-only input). Defaults to the CNB official mirror, which is reliably reachable from mainland China (default branch `main`); to go back to the GitHub upstream, enable the commented `github:Mintimate/oh-my-rime/main` under `inputs.oh-my-rime`, comment out the mirror URL, then run `nix flake update oh-my-rime` to refresh the lock entry |
 
 ### Global Configuration (nixConfig)
 
