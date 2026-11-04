@@ -6,7 +6,7 @@
 # - gtk、xdg.iconTheme、wayland.windowManager.* 是 Home Manager 选项
 # - NixOS 系统级主题（Qt、SDDM、环境变量）在 modules/desktops/unified-theme.nix
 # - HM 26.05+: gtk.gtk4.theme 不再默认镜像 gtk.theme，需显式设置
-{ pkgs, lib, ... }:
+{ pkgs, config, lib, ... }:
 
 {
   # ==================== GTK 主题配置 ====================

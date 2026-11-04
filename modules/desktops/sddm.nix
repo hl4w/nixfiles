@@ -35,8 +35,7 @@ in
   #       services.sddm 在 NixOS 中不存在，会导致求值失败
   services.displayManager.sddm = {
     enable = true;                 # 启用 SDDM
-    wayland.enable = true;         # 启用 Wayland 支持
-    displayServer = "wayland";     # 使用 Wayland 显示服务器
+    wayland.enable = true;         # 以 Wayland 方式运行 greeter
     package = pkgs.kdePackages.sddm;  # 使用 Qt6 版本的 SDDM（NixOS 26.05）
     theme = "breeze";              # Breeze 主题（与统一主题风格一致）
   };

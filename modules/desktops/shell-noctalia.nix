@@ -12,9 +12,9 @@
     noctalia-shell         # Noctalia-Shell 主程序（v4 legacy，Quickshell 版）
 
     # ===== 辅助工具 =====
-    libappindicator-gtk3   # GTK 托盘图标支持
-    networkmanager-applet  # 网络管理小程序
-    pavucontrol            # 音频控制工具
+    libayatana-appindicator  # GTK 托盘图标支持（libappindicator-gtk3 已从 nixpkgs 移除）
+    networkmanagerapplet     # 网络管理小程序
+    pavucontrol              # 音频控制工具
   ];
 
   # 启用必需的系统服务（依据 Noctalia 官方 NixOS 文档）

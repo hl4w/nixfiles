@@ -233,8 +233,8 @@ nix --version
 ```nix
 services.displayManager.sddm = {
   enable = true;
-  wayland.enable = true;  # Wayland 模式
-  displayServer = "wayland";
+  wayland.enable = true;  # 以 Wayland 方式运行 greeter（26.05 无 displayServer 选项）
+  theme = "breeze";
 };
 ```
 

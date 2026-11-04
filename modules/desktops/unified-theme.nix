@@ -5,33 +5,8 @@
 #       由 Home Manager 模块管理（见 home/common/unified-theme.nix）。
 #       因为 gtk、xdg.iconTheme、wayland.windowManager.* 是 Home Manager 选项，
 #       在 NixOS 系统层不存在。
-{ pkgs, lib, ... }:
+{ pkgs, config, lib, ... }:
 
-let
-  # ==================== 主题模式配置 ====================
-  themeMode = lib.mkDefault "auto";
-  dayStart = lib.mkDefault 6;
-  nightStart = lib.mkDefault 18;
-
-  getThemeMode = pkgs.writeScript "get-theme-mode" ''
-    #!/bin/sh
-    HOUR=$(date +%H)
-    DAY_START=${dayStart}
-    NIGHT_START=${nightStart}
-
-    if [ "${themeMode}" = "dark" ]; then
-        echo "dark"
-    elif [ "${themeMode}" = "light" ]; then
-        echo "light"
-    else
-        if [ $HOUR -ge $DAY_START ] && [ $HOUR -lt $NIGHT_START ]; then
-            echo "light"
-        else
-            echo "dark"
-        fi
-    fi
-  '';
-in
 {
   # ==================== 主题模式选项 ====================
   options.desktop.unified-theme = {
@@ -88,18 +63,10 @@ in
       platformTheme = "gtk3";
     };
 
-    # ==================== SDDM 登录界面主题 ====================
-    # 注意: SDDM 选项路径为 services.displayManager.sddm（驼峰命名）
-    services.displayManager.sddm = lib.mkIf config.services.displayManager.sddm.enable {
-      theme = "breeze";
-      greeterEnvironment = {
-        QT_QPA_PLATFORM = "wayland";
-        QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
-        GTK_THEME = "Adwaita-dark";
-        QT_STYLE_OVERRIDE = "adwaita-dark";
-        XDG_ICON_THEME = "Papirus-Dark";
-      };
-    };
+    # ==================== SDDM 登录界面 ====================
+    # SDDM 的启用与主题（theme = "breeze"）由 modules/desktops/sddm.nix 统一配置。
+    # 注意: services.displayManager.sddm 在 26.05 中只有 enable/package/theme/settings/
+    #       wayland 等选项，不存在 greeterEnvironment、displayServer、themePackages。
 
     # ==================== 系统级 GTK/Qt 配置文件（/etc/skel） ====================
     # 这些是用户首次登录时的骨架默认值（~/.config 还没生成时生效）

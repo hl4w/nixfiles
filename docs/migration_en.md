@@ -233,8 +233,8 @@ This configuration now only supports Wayland/Xwayland:
 ```nix
 services.displayManager.sddm = {
   enable = true;
-  wayland.enable = true;  # Wayland mode
-  displayServer = "wayland";
+  wayland.enable = true;  # run the greeter on Wayland (no displayServer option in 26.05)
+  theme = "breeze";
 };
 ```
 

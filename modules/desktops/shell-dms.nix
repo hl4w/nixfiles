@@ -21,10 +21,10 @@
 
   # DMS 之外仍需要的辅助工具
   environment.systemPackages = with pkgs; [
-    wlr-randr              # Wayland 显示管理工具
-    libappindicator-gtk3   # GTK 托盘图标支持
-    networkmanager-applet  # 网络管理小程序
-    pavucontrol            # 音频控制工具
+    wlr-randr                    # Wayland 显示管理工具
+    libayatana-appindicator      # GTK 托盘图标支持（libappindicator-gtk3 已从 nixpkgs 移除）
+    networkmanagerapplet         # 网络管理小程序
+    pavucontrol                  # 音频控制工具
   ];
 
   # 启用 D-Bus 服务（Shell 通信必需）
