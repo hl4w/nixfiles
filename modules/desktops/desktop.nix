@@ -13,13 +13,13 @@ in
       default = "hyprland";
       description = "选择窗口管理器";
     };
-    
+
     shell = lib.mkOption {
       type = lib.types.enum [ "dms" "noctalia" ];
       default = "dms";
       description = "选择桌面 shell";
     };
-    
+
     enableInputMethod = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -33,29 +33,30 @@ in
     };
   };
 
-  config = lib.mkIf (cfg.windowManager != "") {
-    # 根据窗口管理器选择导入相应模块
-    imports = [
-      ./sddm.nix
-      ./unified-theme.nix           # 系统级主题（Qt/SDDM/环境变量）
-      (lib.mkIf (cfg.windowManager == "hyprland") ./hyprland.nix)
-      (lib.mkIf (cfg.windowManager == "niri") ./niri.nix)
-      (lib.mkIf (cfg.shell == "dms") ./shell-dms.nix)
-      (lib.mkIf (cfg.shell == "noctalia") ./shell-noctalia.nix)
-      (lib.mkIf cfg.enableInputMethod ../input-method/default.nix)
-    ];
+  # imports 是模块级属性，不能写在 config 里（否则会报 `imports` 选项不存在）。
+  # 条件导入通过把每个条目包裹在 lib.mkIf 中实现。
+  imports = [
+    ./sddm.nix
+    ./unified-theme.nix                                    # 系统级主题（Qt/SDDM/环境变量）
+    (lib.mkIf (cfg.windowManager == "hyprland") ./hyprland.nix)
+    (lib.mkIf (cfg.windowManager == "niri") ./niri.nix)
+    (lib.mkIf (cfg.shell == "dms") ./shell-dms.nix)
+    (lib.mkIf (cfg.shell == "noctalia") ./shell-noctalia.nix)
+    (lib.mkIf cfg.enableInputMethod ../input-method/default.nix)
+  ];
 
+  config = {
     # 系统级包配置
-    environment.systemPackages = with pkgs; [
-      # polkit 代理
-      (lib.mkIf (cfg.polkitAgent == "kde") kdePackages.polkit-kde-agent-1)
-      (lib.mkIf (cfg.polkitAgent == "hyprland") hyprpolkitagent)
-      
-      # Qt6 核心主题工具（统一 GTK/Qt 主题）
-      qt6Packages.adwaita-qt        # Qt6 Adwaita 主题
-      adwaita-qt                    # Qt5 Adwaita 主题（兼容性）
-      gnome.adwaita-icon-theme      # Adwaita 图标主题
-      gnome.gnome-themes-extra      # GTK 主题支持
-    ];
+    environment.systemPackages =
+      (with pkgs; [
+        # Qt6 核心主题工具（统一 GTK/Qt 主题）
+        qt6Packages.adwaita-qt        # Qt6 Adwaita 主题
+        adwaita-qt                    # Qt5 Adwaita 主题（兼容性）
+        gnome.adwaita-icon-theme      # Adwaita 图标主题
+        gnome.gnome-themes-extra      # GTK 主题支持
+      ])
+      # polkit 代理：条件性包不能放在 systemPackages 列表里用 mkIf，改用 lib.optional
+      ++ lib.optional (cfg.polkitAgent == "kde") pkgs.kdePackages.polkit-kde-agent-1
+      ++ lib.optional (cfg.polkitAgent == "hyprland") pkgs.hyprpolkitagent;
   };
 }
