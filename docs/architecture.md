@@ -352,7 +352,7 @@ nixConfig = {
   | hyprland | `hyprpolkitagent` | Hyprland 原生代理，更轻量 |
 
 - **Qt6 主题工具**:
-  - `qt6Packages.adwaita-qt`: Qt6 Adwaita 主题
+  - `adwaita-qt`: Qt6 Adwaita 主题
   - `adwaita-qt`: Qt5 Adwaita 主题（兼容性）
   - `gnome.adwaita-icon-theme`: Adwaita 图标主题
   - `gnome.gnome-themes-extra`: GTK 主题支持
@@ -462,7 +462,7 @@ nixConfig = {
 - `qt6Packages.fcitx5-configtool`
 - `qt6Packages.fcitx5-chinese-addons`
 - `kdePackages.polkit-kde-agent-1`
-- `qt6Packages.adwaita-qt`
+- `adwaita-qt`
 - `qt6Packages.qtmultimedia`
 - `qt6Packages.fcitx5-qt`
 

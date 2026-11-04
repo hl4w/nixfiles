@@ -352,7 +352,7 @@ The desktop configuration module `modules/desktops/desktop.nix` supports dynamic
   | hyprland | `hyprpolkitagent` | Hyprland native agent, more lightweight |
 
 - **Qt6 Theme Tools**:
-  - `qt6Packages.adwaita-qt`: Qt6 Adwaita theme
+  - `adwaita-qt`: Qt6 Adwaita theme
   - `adwaita-qt`: Qt5 Adwaita theme (compatibility)
   - `gnome.adwaita-icon-theme`: Adwaita icon theme
   - `gnome.gnome-themes-extra`: GTK theme support
@@ -462,7 +462,7 @@ In NixOS 26.05, some Qt/KDE packages require `kdePackages` or `qt6Packages` pref
 - `qt6Packages.fcitx5-configtool`
 - `qt6Packages.fcitx5-chinese-addons`
 - `kdePackages.polkit-kde-agent-1`
-- `qt6Packages.adwaita-qt`
+- `adwaita-qt`
 - `qt6Packages.qtmultimedia`
 - `qt6Packages.fcitx5-qt`
 

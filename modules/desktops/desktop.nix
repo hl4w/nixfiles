@@ -51,9 +51,8 @@ in
     # 系统级包配置
     environment.systemPackages =
       (with pkgs; [
-        # Qt6 核心主题工具（统一 GTK/Qt 主题）
-        qt6Packages.adwaita-qt        # Qt6 Adwaita 主题
-        adwaita-qt                    # Qt5 Adwaita 主题（兼容性）
+        # Adwaita 主题（qt6Packages 集合中无 adwaita-qt，仅顶层同名包）
+        adwaita-qt                    # Adwaita 主题（跟随 nixpkgs 默认 Qt 版本）
         gnome.adwaita-icon-theme      # Adwaita 图标主题
         gnome.gnome-themes-extra      # GTK 主题支持
       ])
