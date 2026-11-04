@@ -24,12 +24,14 @@ Flakes 提供可重现的构建、更好的依赖管理，以及更清晰的 Nix
 
 ### 如何使用此配置安装 NixOS？
 
-全新机器（从 NixOS ISO 启动）推荐先运行磁盘安装脚本，一次性完成分区、LUKS2 + LVM 加密、格式化、挂载与配置部署：
+全新机器（从 NixOS ISO 启动）推荐运行磁盘安装脚本。`setup-disk.sh` 会在挂载目标磁盘后自动克隆仓库到 `/mnt/etc/nixos`，并以 `-y` 模式调用 `install.sh` 生成主机配置、`nix flake lock` 锁定依赖、`nixos-generate-config --root /mnt` 生成硬件配置，用户只需检查后执行 `nixos-install`：
 
 ```bash
-git clone https://gitee.com/hl4w/nixfiles.git
-cd nixfiles
+# 已 clone 仓库时直接运行（脚本内部会再克隆到 /mnt/etc/nixos，覆盖旧仓库）
 sudo ./scripts/setup-disk.sh <disk> <hostname> <username>
+
+# 脚本完成后，cd 到 /mnt/etc/nixos 执行安装
+cd /mnt/etc/nixos
 sudo nixos-install --flake .#<hostname>
 ```
 
@@ -47,7 +49,10 @@ git clone https://gitee.com/hl4w/nixfiles.git
 # git clone https://github.com/hl4w/nixfiles.git
 cd nixfiles
 
-# 运行安装脚本
+# 首次运行前生成 flake.lock（包含 oh-my-rime 输入法框架）
+nix flake update
+
+# 运行安装脚本（交互模式下依次询问各配置项）
 chmod +x scripts/install.sh
 ./scripts/install.sh
 ```

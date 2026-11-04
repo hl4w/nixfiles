@@ -64,9 +64,9 @@ lsblk -f
 ```
 
 Ensure:
-- Root partition `device` points to the correct disk/partition
-- Swap partition is properly configured
-- Boot partition mount point is correct
+- Root LV (`/dev/vg/root`) `device` points to the correct LVM path
+- Swap LV (`/dev/vg/swap`) is properly configured
+- Boot partition (EFI, `/boot`) mount point is correct
 
 ### Step 5: Migrate User Configuration
 

@@ -24,12 +24,14 @@ Flakes provide reproducible builds, better dependency management, and a cleaner 
 
 ### How do I install NixOS with this configuration?
 
-For a fresh machine (booted from the NixOS ISO), run the disk setup script first. It handles partitioning, LUKS2 + LVM encryption, formatting, mounting and config deployment in one go:
+For a fresh machine (booted from the NixOS ISO), run the disk setup script. `setup-disk.sh` clones the repository to `/mnt/etc/nixos` after mounting the target disk, then invokes `install.sh` with `-y` to generate the host configuration, `nix flake lock` to pin dependencies, and `nixos-generate-config --root /mnt` to write the hardware configuration. Review the generated files and run `nixos-install`:
 
 ```bash
-git clone https://gitee.com/hl4w/nixfiles.git
-cd nixfiles
+# If you already cloned the repo, just run it directly (it clones again to /mnt/etc/nixos anyway)
 sudo ./scripts/setup-disk.sh <disk> <hostname> <username>
+
+# When the script finishes, cd to /mnt/etc/nixos and install
+cd /mnt/etc/nixos
 sudo nixos-install --flake .#<hostname>
 ```
 
@@ -47,7 +49,10 @@ git clone https://gitee.com/hl4w/nixfiles.git
 # git clone https://github.com/hl4w/nixfiles.git
 cd nixfiles
 
-# Run installation script
+# Generate flake.lock before the first run (includes the oh-my-rime input)
+nix flake update
+
+# Run installation script (prompts interactively for each configuration item)
 chmod +x scripts/install.sh
 ./scripts/install.sh
 ```

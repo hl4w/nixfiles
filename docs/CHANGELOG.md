@@ -85,6 +85,7 @@
 - **README 重排**: 特性按「桌面与外观 / 安装与系统 / 中文与办公 / 终端与开发」分组，新增「部署前验证」与「日常管理」小节，统一术语与完整属性路径说明并去除重复段落，中英文版结构保持一致
 - **补充交互选择与 CI 说明**: README 与架构文档说明 `setup-disk.sh` 省略 `-T/-W/-S` 时的交互式选择与 `-y`/非终端回退规则；架构文档新增「持续集成」小节，说明 `build.yml` 的 `nix flake check --no-build`、动态主机发现与完整构建属性路径，并提示提交 `flake.lock`
 - **梳理三种安装路径与脚本调用链**: README 方式一去除冗余的预先 clone 步骤（`setup-disk.sh` 内部会把仓库克隆到 `/mnt/etc/nixos` 并自行调用 `install.sh`），改为「ISO 直接下载 setup-disk.sh 执行 + cd 到 `/mnt/etc/nixos` 执行 `nixos-install`」；方式二补充完整的后续步骤（`nix flake update` 首次运行、`nix flake lock`/`nixos-generate-config --root /` 自动生成、`nixos-rebuild switch --flake .#<hostname>`、`home-manager switch`）；`setup-disk.sh`/`setup-disk_en.sh` 末尾提示明确标注仓库位置 `/mnt/etc/nixos`，避免用户在错误目录下执行 `nixos-install`
+- **docs 全量同步磁盘布局与调用链**: `glossary.md` 逻辑卷条目更新为 `root`/`swap` 并说明 `/home` 位于 `/` 下；`migration.md` 硬件配置检查说明改为「根逻辑卷 `/dev/vg/root` / 交换逻辑卷 `/dev/vg/swap` / EFI 启动分区」；`architecture.md` 与 `faq.md` 初始安装示例补充 setup-disk.sh 内部自动 clone 到 `/mnt/etc/nixos`、调用 install.sh 完成主机配置与硬件生成的完整链路，ISO 场景不再要求预先 clone
 
 ## [v0.0.5] - 2026-06-16
 ### Added

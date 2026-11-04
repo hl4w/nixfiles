@@ -50,7 +50,7 @@
 | 旧系统代 | old generation | `clean.sh -g` | 非当前代的系统快照 | 旧代、历史版本 |
 | 占位符 | placeholder | `youruser`、`Your Name` | 待替换的模板值 | 变量、占位字段 |
 | 磁盘加密 | disk encryption | LUKS2、`cryptsetup` | 本项目使用 LUKS2 容器 | 硬盘加密（混用）、加密盘 |
-| 逻辑卷 | logical volume (LV) | `lvcreate`、`root`/`swap`/`home` | LVM 逻辑卷 | 分区（指 LV 时） |
+| 逻辑卷 | logical volume (LV) | `lvcreate`、`root`/`swap` | LVM 逻辑卷（本项目磁盘只划分 EFI 与数据两个分区，数据分区创建 LVM VG 后划分 root/swap 两个 LV，`/home` 位于 `/` 下） | 分区（指 LV 时） |
 
 ## 书写规范
 

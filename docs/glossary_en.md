@@ -50,7 +50,7 @@ This glossary defines the canonical terminology used throughout HL4W documentati
 | old generation | `clean.sh -g` | Non-current generation snapshot | old version |
 | placeholder | `youruser`, `Your Name` | Template value awaiting replacement | variable, placeholder field |
 | disk encryption | LUKS2, `cryptsetup` | This project uses a LUKS2 container | hard drive encryption, encrypted disk |
-| logical volume (LV) | `lvcreate`, `root`/`swap`/`home` | LVM logical volume | partition (when meaning an LV) |
+| logical volume (LV) | `lvcreate`, `root`/`swap` | LVM logical volume (this project creates only an EFI and a data partition; the data partition becomes an LVM VG split into root and swap LVs, and `/home` lives under `/`) | partition (when meaning an LV) |
 
 ## Style rules
 

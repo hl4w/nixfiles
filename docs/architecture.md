@@ -529,10 +529,14 @@ nixConfig = {
 
 ### 初始安装
 
-全新安装（NixOS ISO 环境，需 root）：
+全新安装（NixOS ISO 环境，需 root）：`setup-disk.sh` 会在挂载目标磁盘后自动把仓库克隆到 `/mnt/etc/nixos`，并以 `-y` 模式调用 `install.sh` 生成主机配置、`nix flake lock` 锁定依赖、`nixos-generate-config --root /mnt` 生成硬件配置。用户只需检查生成的硬件配置后执行 `nixos-install`。
 
 ```bash
+# ISO 环境无需预先 clone；已 clone 过仓库时可直接从仓库根目录运行 setup-disk.sh
 sudo ./scripts/setup-disk.sh <disk> <hostname> <username>
+
+# 脚本完成后，配置仓库已在 /mnt/etc/nixos；cd 进去安装系统
+cd /mnt/etc/nixos
 sudo nixos-install --flake .#<hostname>
 ```
 
@@ -541,10 +545,12 @@ sudo nixos-install --flake .#<hostname>
 已有系统仅生成主机配置：
 
 ```bash
-# 首次构建前生成 flake.lock（包含 oh-my-rime 输入）
+# 克隆仓库并进入
+git clone https://gitee.com/hl4w/nixfiles.git && cd nixfiles
+# 首次运行前生成 flake.lock（包含 oh-my-rime 输入）
 nix flake update
 
-# 使用安装脚本进行初始安装
+# 使用安装脚本生成主机配置
 ./scripts/install.sh
 ```
 

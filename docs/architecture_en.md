@@ -529,10 +529,15 @@ The `secrets/` directory is reserved for agenix-managed secrets (`.age` encrypte
 
 ### Initial Installation
 
-Fresh install (NixOS ISO environment, root required):
+Fresh install (NixOS ISO environment, root required): `setup-disk.sh` clones the repository to `/mnt/etc/nixos` after mounting the target disk, then invokes `install.sh` with `-y` to generate the host configuration, `nix flake lock` to pin dependencies, and `nixos-generate-config --root /mnt` to write the hardware configuration. Review the generated hardware configuration, then run `nixos-install`.
 
 ```bash
+# The ISO environment does not need a pre-cloned repository;
+# if you already cloned it, just run setup-disk.sh from the repo root
 sudo ./scripts/setup-disk.sh <disk> <hostname> <username>
+
+# When the script finishes, the repository is already at /mnt/etc/nixos; cd there to install
+cd /mnt/etc/nixos
 sudo nixos-install --flake .#<hostname>
 ```
 
@@ -541,10 +546,12 @@ sudo nixos-install --flake .#<hostname>
 Existing system, host configuration only:
 
 ```bash
+# Clone the repository and cd into it
+git clone https://gitee.com/hl4w/nixfiles.git && cd nixfiles
 # Generate flake.lock before the first build (includes the oh-my-rime input)
 nix flake update
 
-# Use installation script for initial installation
+# Use installation script for initial host configuration
 ./scripts/install.sh
 ```
 
