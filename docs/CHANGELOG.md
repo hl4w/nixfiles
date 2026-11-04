@@ -14,6 +14,8 @@
   - 新增逻辑卷存在性校验，`pvcreate`/`lvcreate` 增加 `-y` 以支持重复执行
 
 ### Documentation
+- **FAQ 重写**: 新增「重建 flake.lock」「添加自定义字体」「切换 Catppuccin flavor」「DMS Shell / Noctalia Shell 配置」等实用新问题；将之前分散的 5 个 CLI 工具单节（dust、duf、tokei、hyperfine、procs）合并为一张速查表；补充 install.sh 非交互模式参数说明；桌面 Shell 小节明确标注 `desktop.shell` 选项位置与模块名；壁纸颜色不生效新增完整排查清单；故障排除补充更多 NixOS 26.05 特有问题（如 kdePackages/qt6Packages 包名）
+- **shortcuts 文档与实际配置对齐**: Hyprland 快捷键表改为物理键名（`Super + F11` 对应 Hyprland 内部键名 `FULL`）；浮动窗口规则明确 `class` 匹配；新增配置摘要（master 布局、gaps、动画、XWayland）；鼠标绑定表补充侧键透传说明；Niri 补充 workspace-strip 在顶部；整体新增"本文档与配置文件一一对应"声明与 `home-manager switch` 应用提示
 - **梳理三种安装路径与脚本调用链**: README 方式一去除冗余的预先 clone 步骤（`setup-disk.sh` 内部会把仓库克隆到 `/mnt/etc/nixos` 并自行调用 `install.sh`），改为「ISO 直接下载 setup-disk.sh 执行 + cd 到 `/mnt/etc/nixos` 执行 `nixos-install`」；方式二补充完整的后续步骤（`nix flake update` 首次运行、`nix flake lock`/`nixos-generate-config --root /` 自动生成、`nixos-rebuild switch --flake .#<hostname>`、`home-manager switch`）；`setup-disk.sh`/`setup-disk_en.sh` 末尾提示明确标注仓库位置 `/mnt/etc/nixos`，避免用户在错误目录下执行 `nixos-install`
 - **docs 全量同步磁盘布局与调用链**: `glossary.md` 逻辑卷条目更新为 `root`/`swap` 并说明 `/home` 位于 `/` 下；`migration.md` 硬件配置检查说明改为「根逻辑卷 `/dev/vg/root` / 交换逻辑卷 `/dev/vg/swap` / EFI 启动分区」；`architecture.md` 与 `faq.md` 初始安装示例补充 setup-disk.sh 内部自动 clone 到 `/mnt/etc/nixos`、调用 install.sh 完成主机配置与硬件生成的完整链路，ISO 场景不再要求预先 clone
 

@@ -17,8 +17,14 @@ Flakes provide reproducible builds, better dependency management, and a cleaner 
 
 ### What desktop shells are available?
 
-- **DMS Shell**: Lightweight desktop shell
-- **Noctalia Shell**: Modern desktop integration shell
+- **DMS Shell**: Lightweight desktop shell (module: `programs.dms-shell`, configured in `shell-dms.nix`)
+- **Noctalia Shell**: Modern desktop integration shell (configured in `shell-noctalia.nix`)
+
+Both are Wayland shells. Select one in the host configuration via `desktop.shell`:
+
+```nix
+desktop.shell = "dms";     // or "noctalia"
+```
 
 ## Installation
 
@@ -80,6 +86,26 @@ For non-interactive mode pass flags directly, e.g. `./scripts/install.sh -y -U j
 
 See `docs/architecture.md` for detailed instructions, or simply run `./scripts/install.sh`.
 
+### How do I regenerate flake.lock?
+
+`flake.lock` locks all input versions (nixpkgs, home-manager, oh-my-rime, etc.). Regenerate it when:
+
+- You first clone the repo (the repo does not commit `flake.lock`)
+- You modify the `inputs` list in `flake.nix`
+- You want to update an input to its latest version
+
+```bash
+# Update everything
+nix flake update
+
+# Update a specific input only
+nix flake update nixpkgs
+nix flake update home-manager
+
+# Validate afterwards
+nix flake check --no-build
+```
+
 ## Configuration
 
 ### How do I customize my shell?
@@ -96,39 +122,54 @@ Edit `home/common/shell.nix` for shared shell configuration or create host-speci
 | Development packages | `home/common/dev-lsp.nix` | clangd, clang-tools, cmake, ninja, gdb, lldb, go, gopls, python3, pyright, rustc, rust-analyzer, rustfmt, cargo |
 | Office packages | `home/common/apps.nix` | wps-office-cn, nextcloud-client |
 
-### How do I use Yazi file manager?
+### How do I add custom fonts?
 
-Yazi is a fast terminal file manager configured in `home/common/cli.nix`:
+Fonts are managed system-wide in `modules/system/fonts.nix`:
 
-```bash
-# Launch Yazi
-yazi
+```nix
+fonts.packages = with pkgs; [
+  noto-fonts-cjk-sans
+  noto-fonts-cjk-serif
+  noto-fonts-color-emoji
+  source-han-sans-sc
+  source-han-serif-sc
+  wqy_microhei
+  wqy_zenhei
+  nerd-fonts.jetbrains-mono
+  # Add your fonts here:
+  # fira-code
+  # material-design-icons
+];
 
-# Basic operations
-# Arrow keys / hjkl: Navigate
-# Enter: Open file/directory
-# q: Quit
-# : Open command panel
-# Ctrl+G: Open shell (supports zoxide jump)
+# FontConfig fallback order
+fonts.fontconfig.defaultFonts = {
+  monospace = [ "JetBrainsMono Nerd Font" ];
+  sans-serif = [ "Noto Sans CJK SC" ];
+  serif = [ "Noto Serif CJK SC" ];
+};
 ```
 
-### How do I use Zoxide smart navigation?
+Apply with `sudo nixos-rebuild switch --flake .#<hostname>`.
 
-Zoxide is configured in `home/common/cli.nix`:
+### CLI Tools Quick Reference
 
-```bash
-# Jump to directory containing keyword
-z <keyword>
+This project ships with a curated set of modern CLI tools (all configured via `home/common/cli.nix`):
 
-# Interactive selection
-zi
-
-# Jump to previous directory
-z -
-
-# Add directory to database
-z ~/projects/my-project
-```
+| Tool | Purpose | Common Usage |
+|------|---------|-------------|
+| `eza` | ls replacement | `eza -la`, `eza --tree=2` |
+| `bat` | cat with syntax highlighting | `bat file.md`, `bat --paging=never` |
+| `fd` | Fast file finder | `fd pattern`, `fd -e rs` |
+| `rg` | Fast text search | `rg keyword`, `rg -t python` |
+| `fzf` | Fuzzy search | `fzf` (Ctrl+R history, Ctrl+T files) |
+| `yazi` | Terminal file manager | `yazi` (Ctrl+G opens shell + zoxide) |
+| `zoxide` | Smart directory navigation | `z keyword`, `zi` (interactive), `z -` (previous) |
+| `dust` | Disk usage analysis | `dust`, `dust -X` (sort by size) |
+| `duf` | Disk space viewer | `duf`, `duf /dev/nvme0n1` |
+| `tokei` | Code statistics | `tokei`, `tokei --types Rust,Go` |
+| `hyperfine` | Command benchmarking | `hyperfine "ls" "eza"`, `hyperfine --runs 10 cmd` |
+| `procs` | Enhanced ps | `procs`, `procs --tree`, `procs firefox` |
+| `starship` | Cross-shell prompt | Auto-loaded, config in `~/.config/starship.toml` |
 
 ### What is Lix?
 
@@ -136,7 +177,6 @@ Lix is a high-performance alternative implementation of the Nix package manager:
 
 - **Advantages**: Faster than native Nix (performance improvement up to 2-3x for eval and fetch operations)
 - **Compatibility**: Fully compatible with all Nix features (flakes, nix-command, nix-shell, etc.)
-- **Performance**: Rewritten in C++ with better memory efficiency
 - **Configuration**: Auto-configured via overlay in `modules/system/default.nix`
 
 Verify installation:
@@ -145,87 +185,28 @@ nix --version
 # Output: nix (Lix, like Nix) 2.x.x
 ```
 
-### How do I use dust for disk usage analysis?
+### How do I configure Hyprland / Niri?
 
-```bash
-# Check current directory disk usage
-dust
+**Hyprland**: System-level enablement lives in `modules/desktops/hyprland.nix`; keybindings, window rules, gaps, animations and other details live in `home/common/hyprland.nix` using hyprlang syntax (`configType = "hyprlang"`).
 
-# Check specific directory
-dust ~/projects
+**Niri**: System-level enablement lives in `modules/desktops/niri.nix`; keybindings and other details live in `home/common/niri.nix`.
 
-# Show file sizes
-dust -s
+The complete shortcut list is in `docs/shortcuts.md`.
 
-# Sort by size
-dust -X
+### How do I configure DMS Shell / Noctalia Shell?
+
+Both are enabled via official NixOS modules:
+
+**DMS Shell**: `modules/desktops/shell-dms.nix` uses `programs.dms-shell.enable = true`. The module ships its dependencies and the `dms.service` systemd user unit; no manual service or dependency declarations are needed.
+
+**Noctalia Shell**: `modules/desktops/shell-noctalia.nix` uses `programs.noctalia-shell.enable = true`. Ensure `services.upower.enable = true` (required by Noctalia v4).
+
+Select which shell to use in the host configuration:
+
+```nix
+// hosts/<hostname>/configuration.nix
+desktop.shell = "dms";       // or "noctalia"
 ```
-
-### How do I use duf to view disk space?
-
-```bash
-# View all disks
-duf
-
-# View specific device
-duf /dev/nvme0n1p2
-
-# JSON output
-duf --json
-```
-
-### How do I use tokei for code statistics?
-
-```bash
-# Count code in current directory
-tokei
-
-# Exclude directories
-tokei --exclude "node_modules"
-
-# JSON output
-tokei --json
-
-# Only count specific languages
-tokei --types Rust,Go,Python
-```
-
-### How do I use hyperfine for command performance testing?
-
-```bash
-# Compare two commands
-hyperfine "ls -la" "eza -la"
-
-# Multiple runs
-hyperfine --runs 10 "my-command"
-
-# Warmup runs
-hyperfine --warmup 3 "my-command"
-```
-
-### How do I use procs to view processes?
-
-```bash
-# View all processes
-procs
-
-# Search for process
-procs firefox
-
-# Tree view
-procs --tree
-
-# Detailed information
-procs -l
-```
-
-### How do I configure Hyprland?
-
-System-level enablement lives in `modules/desktops/hyprland.nix`; keybindings, window rules and other details live in `home/common/hyprland.nix` using hyprlang syntax (`configType = "hyprlang"`).
-
-### How do I configure Niri?
-
-System-level enablement lives in `modules/desktops/niri.nix`; keybindings and other details live in `home/common/niri.nix`.
 
 ### How do I configure input method (Chinese)?
 
@@ -263,25 +244,22 @@ wp-color -l
 wp-color -c
 ```
 
-Colors are automatically extracted from the wallpaper and applied to:
-- Terminal (alacritty, kitty, foot)
-- Shell prompt (Starship)
-- Neovim/Emacs editors
-- DMS Shell and Noctalia Shell
+Colors are extracted from the wallpaper and applied to terminals (alacritty, kitty, foot), Starship prompt, Neovim and the DMS Shell / Noctalia Shell color config files.
 
-**Auto Watcher**: The system automatically monitors wallpaper changes. When you select a wallpaper via DMS Shell / Noctalia Shell GUI, colors will be updated automatically.
+**Auto Watcher**: The `wallpaper-watcher` systemd user service monitors wallpaper changes in `~/.wallpapers`. Status: `systemctl --user status wallpaper-watcher`.
 
 ### Wallpaper colors not applying?
 
-Ensure:
+Checklist:
 - `pywal` is installed (declared in `modules/desktops/unified-theme.nix`)
-- Wallpaper directory exists: `~/.wallpapers` (automatically created)
+- Wallpaper directory exists: `~/.wallpapers` (auto-created on first login)
 - Colors are loaded in shell: `source ~/.cache/wal/colors.sh`
-- Wallpaper watcher service is running: `systemctl --user status wallpaper-watcher`
+- Watcher service is running: `systemctl --user status wallpaper-watcher`
+- Manual regeneration: run `wal -R`
 
 ### How do I use the day/night theme switching?
 
-The unified theme supports automatic day/night theme switching:
+The unified theme supports automatic day/night switching:
 
 ```bash
 # Auto-switch based on time (light: 6:00-18:00, dark: other times)
@@ -294,24 +272,15 @@ theme-dark
 theme-light
 ```
 
-### How do I configure day/night theme switching?
-
-Add the following to your host configuration (`hosts/<hostname>/configuration.nix`):
+**Switching time configuration** (`hosts/<hostname>/configuration.nix`):
 
 ```nix
 desktop.unified-theme = {
-  themeMode = "auto";    # dark/light/auto
-  dayStart = 6;          # Day start hour
-  nightStart = 18;       # Night start hour
+  themeMode = "auto";    // dark / light / auto
+  dayStart = 6;          // Day start hour
+  nightStart = 18;       // Night start hour
 };
 ```
-
-### Theme switching not working?
-
-Ensure:
-- Both `modules/desktops/unified-theme.nix` (system) and `home/common/unified-theme.nix` (user) are imported
-- Commands are available: `which theme-auto theme-dark theme-light`
-- Theme scripts are generated via `writeScriptBin` in `modules/desktops/unified-theme.nix` and added to `environment.systemPackages`
 
 ### How do I configure Chinese mirrors?
 
@@ -319,10 +288,10 @@ Mirrors are configured in both `flake.nix` (nixConfig) and `modules/system/defau
 
 ```nix
 substituters = [
-  "https://mirrors.ustc.edu.cn/nix-channels/store"  # USTC (recommended)
-  "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"  # Tsinghua
-  "https://mirrors.bfsu.edu.cn/nix-channels/store"  # BFSU
-  "https://cache.nixos.org"  # Official (fallback)
+  "https://mirrors.ustc.edu.cn/nix-channels/store"  // USTC (recommended)
+  "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"  // Tsinghua
+  "https://mirrors.bfsu.edu.cn/nix-channels/store"  // BFSU
+  "https://cache.nixos.org"  // Official (fallback)
 ];
 ```
 
@@ -330,19 +299,37 @@ substituters = [
 
 ### Flake build fails
 
-Check the error message for missing dependencies or syntax errors. Run `nix flake check` to validate the flake.
+Identify the problem with:
+
+```bash
+# Quick evaluation only (no compile)
+nix flake check --no-build
+
+# Full error trace
+nix flake check --no-build 2>&1 | tail -50
+
+# Test a single host build
+nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
+```
 
 ### Home Manager switch fails
 
-Check `home-manager switch --flake .#user@host` output for detailed error messages.
+```bash
+# Detailed output
+home-manager switch --flake .#user@host 2>&1 | tail -30
+
+# Verbose mode
+home-manager switch --flake .#user@host --verbose
+```
 
 ### Hyprland won't start
 
 Ensure:
 - Graphics drivers are properly installed
-- `xdg-desktop-portal-hyprland` is in `environment.systemPackages`
+- `xdg-desktop-portal-hyprland` is in system packages
 - SDDM is running in Wayland mode
-- Logs are in `~/.local/share/hyprland/`
+- Check logs in `~/.local/share/hyprland/`
+- Validate config syntax (Hyprland 0.55+): `hyprctl config -h`
 
 ### Niri won't start
 
@@ -354,9 +341,9 @@ Ensure:
 ### No sound
 
 Check:
-- PipeWire is enabled: `systemctl --user status pipewire`
-- Correct audio device is selected
-- User is in `audio` group
+- PipeWire status: `systemctl --user status pipewire pipewire-pulse`
+- Correct audio device selected: `wpctl status`
+- User is in the `audio` group: `id | grep -o 'audio'`
 
 ### SDDM won't start
 
@@ -371,17 +358,32 @@ Check:
 In NixOS 26.05, some Qt packages require specific prefixes:
 
 ```nix
-# Correct
+// Correct
 qt6Packages.qtwayland
 kdePackages.polkit-kde-agent-1
 qt6Packages.fcitx5-configtool
 qt6Packages.fcitx5-chinese-addons
 
-# Wrong
+// Wrong
 qtwayland
 polkit-kde-agent
 fcitx5-configtool
 fcitx5-chinese-addons
+```
+
+### Fcitx5 won't switch to Chinese input
+
+```bash
+# 1. Verify fcitx5 is running
+fcitx5 -d
+
+# 2. List RIME schemes
+rime_dict_manager list-schemas
+fcitx5-diagnose
+
+# 3. Check environment variables (SDDM launcher should set them)
+echo $GTK_IM_MODULE   // should be fcitx
+echo $QT_IM_MODULE    // should be fcitx
 ```
 
 ### Binary download is slow
@@ -398,13 +400,8 @@ nix show-config | grep substituters
 
 - Enable `powerManagement.cpuFreqGovernor = "performance"` for desktop
 - Use `boot.kernelParams` for hardware-specific optimizations
-- Add `nix.settings.max-jobs` based on CPU cores
-
-### How do I optimize Nix build speed?
-
-- Use Chinese mirrors for faster binary downloads
+- Set `nix.settings.max-jobs` based on CPU cores
 - Enable `nix.settings.auto-optimise-store = true`
-- Increase `nix.settings.max-jobs` for parallel builds
 
 ## Security
 
@@ -426,19 +423,17 @@ UEFI boot with systemd-boot is configured in `modules/boot/default.nix`:
 
 ### How do I update the system?
 
-After installation, if you modify any Nix modules, you can directly update the system using the following commands:
-
 ```bash
-# Update system (use after modifying modules/)
+# Update system config (after modifying modules/)
 sudo nixos-rebuild switch --flake .#<hostname>
 
-# Update Home Manager user configuration (use after modifying home/)
+# Update Home Manager user config (after modifying home/)
 home-manager switch --flake .#<username>@<hostname>
 
-# Update flake inputs (upgrade dependency versions like nixpkgs)
+# Update flake inputs (upgrade nixpkgs and other deps)
 nix flake update
 
-# Or use the update script (one-click flake update and system rebuild)
+# Or use the update script (one-click flake update + system rebuild)
 ./scripts/update.sh
 ```
 
@@ -462,13 +457,13 @@ home-manager switch --flake .#<username>@<hostname>
 ### How do I verify configuration before deployment?
 
 ```bash
-# Check configuration syntax (fast)
-nix flake check
+# Fast syntax check (no compile)
+nix flake check --no-build
 
-# Test build (no deployment)
+# Full test build (no deploy)
 nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 
-# Preview changes
+# Preview what would change
 nixos-rebuild dry-activate --flake .#<hostname>
 ```
 
@@ -481,7 +476,7 @@ sudo nixos-rebuild list-generations
 # Rollback to previous generation
 sudo nixos-rebuild switch --rollback
 
-# Or rollback to specific generation
+# Rollback to a specific generation
 sudo nixos-rebuild switch --generation <number>
 
 # Home Manager rollback

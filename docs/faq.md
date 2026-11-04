@@ -17,8 +17,14 @@ Flakes 提供可重现的构建、更好的依赖管理，以及更清晰的 Nix
 
 ### 有哪些桌面 Shell 可用？
 
-- **DMS Shell**: 轻量级桌面 Shell
-- **Noctalia Shell**: 现代化桌面集成 Shell
+- **DMS Shell**: 轻量级桌面 Shell（模块：`programs.dms-shell`，配置在 `shell-dms.nix`）
+- **Noctalia Shell**: 现代化桌面集成 Shell（模块：`shell-noctalia.nix`）
+
+两者均为 Wayland Shell，在主机配置中通过 `desktop.shell` 选项选择：
+
+```nix
+desktop.shell = "dms";     // 或 "noctalia"
+```
 
 ## 安装
 
@@ -80,6 +86,26 @@ chmod +x scripts/install.sh
 
 请参阅 `docs/architecture.md` 获取详细说明，或直接运行 `./scripts/install.sh`。
 
+### 如何重建 flake.lock？
+
+flake.lock 锁定所有输入的版本（nixpkgs、home-manager、oh-my-rime 等）。以下场景需要重建：
+
+- 首次 clone 仓库（仓库未提交 `flake.lock`）
+- 修改了 flake.nix 的 inputs 列表
+- 想更新某个输入到最新版本
+
+```bash
+# 全部更新
+nix flake update
+
+# 只更新特定输入
+nix flake update nixpkgs
+nix flake update home-manager
+
+# 更新后验证
+nix flake check --no-build
+```
+
 ## 配置
 
 ### 如何自定义 Shell？
@@ -96,39 +122,54 @@ chmod +x scripts/install.sh
 | 开发包 | `home/common/dev-lsp.nix` | clangd, clang-tools, cmake, ninja, gdb, lldb, go, gopls, python3, pyright, rustc, rust-analyzer, rustfmt, cargo |
 | 办公包 | `home/common/apps.nix` | wps-office-cn, nextcloud-client |
 
-### 如何使用 Yazi 文件管理器？
+### 如何添加自定义字体？
 
-Yazi 是一个快速的终端文件管理器，已在 `home/common/cli.nix` 中配置：
+字体配置在 `modules/system/fonts.nix`，系统层统一管理：
 
-```bash
-# 启动 Yazi
-yazi
+```nix
+fonts.packages = with pkgs; [
+  noto-fonts-cjk-sans
+  noto-fonts-cjk-serif
+  noto-fonts-color-emoji
+  source-han-sans-sc
+  source-han-serif-sc
+  wqy_microhei
+  wqy_zenhei
+  nerd-fonts.jetbrains-mono
+  # 添加自定义字体：
+  # fira-code
+  # material-design-icons
+];
 
-# 基本操作
-# 方向键 / hjkl: 导航
-# Enter: 打开文件/目录
-# q: 退出
-# : 打开命令面板
-# Ctrl+G: 打开 shell（支持 zoxide 跳转）
+# FontConfig  fallback 顺序
+fonts.fontconfig.defaultFonts = {
+  monospace = [ "JetBrainsMono Nerd Font" ];
+  sans-serif = [ "Noto Sans CJK SC" ];
+  serif = [ "Noto Serif CJK SC" ];
+};
 ```
 
-### 如何使用 Zoxide 智能导航？
+修改后执行 `sudo nixos-rebuild switch --flake .#<hostname>` 生效。
 
-Zoxide 已在 `home/common/cli.nix` 中配置：
+### CLI 工具速查
 
-```bash
-# 跳转到包含关键字的目录
-z <keyword>
+本项目预装的现代化 CLI 工具（均通过 `home/common/cli.nix` 配置）：
 
-# 交互式选择
-zi
-
-# 跳转到最近使用的目录
-z -
-
-# 添加目录到数据库
-z ~/projects/my-project
-```
+| 工具 | 用途 | 常用命令 |
+|------|------|----------|
+| `eza` | ls 替代品 | `eza -la`、`eza --tree=2` |
+| `bat` | cat 替代品（语法高亮） | `bat file.md`、`bat --paging=never` |
+| `fd` | 快速文件查找 | `fd pattern`、`fd -e rs` |
+| `rg` | 快速内容搜索 | `rg keyword`、`rg -t python` |
+| `fzf` | 模糊搜索 | `fzf`（Ctrl+R 历史搜索、Ctrl+T 文件搜索） |
+| `yazi` | 终端文件管理器 | `yazi`（Ctrl+G 打开 shell + zoxide） |
+| `zoxide` | 智能目录导航 | `z keyword`、`zi`（交互式）、`z -`（上一个） |
+| `dust` | 磁盘使用分析 | `dust`、`dust -X`（按大小排序） |
+| `duf` | 磁盘空间查看 | `duf`、`duf /dev/nvme0n1` |
+| `tokei` | 代码统计 | `tokei`、`tokei --types Rust,Go` |
+| `hyperfine` | 命令性能测试 | `hyperfine "ls" "eza"`、`hyperfine --runs 10 cmd` |
+| `procs` | 增强版 ps | `procs`、`procs --tree`、`procs firefox` |
+| `starship` | 跨 Shell 提示符 | 自动加载，配置在 `~/.config/starship.toml` |
 
 ### 什么是 Lix？
 
@@ -136,7 +177,6 @@ Lix 是 Nix 包管理器的高性能替代实现：
 
 - **优势**: 比原生 Nix 更快（特别是 eval 和 fetch 操作，性能提升可达 2-3 倍）
 - **兼容性**: 完全兼容 Nix 所有功能（flakes、nix-command、nix-shell 等）
-- **性能**: 使用 C++ 重写，内存效率更高
 - **配置**: 在 `modules/system/default.nix` 中通过 overlay 自动配置
 
 验证安装：
@@ -145,87 +185,28 @@ nix --version
 # 输出: nix (Lix, like Nix) 2.x.x
 ```
 
-### 如何使用 dust 分析磁盘使用？
+### 如何配置 Hyprland / Niri？
 
-```bash
-# 查看当前目录磁盘使用
-dust
+**Hyprland**：系统级启用位于 `modules/desktops/hyprland.nix`；按键绑定、窗口规则、gaps、动画等详细配置位于 `home/common/hyprland.nix`，使用 hyprlang 语法（`configType = "hyprlang"`）。
 
-# 查看指定目录
-dust ~/projects
+**Niri**：系统级启用位于 `modules/desktops/niri.nix`；按键绑定等详细配置位于 `home/common/niri.nix`。
 
-# 显示文件大小
-dust -s
+快捷键完整列表见 `docs/shortcuts.md`。
 
-# 按大小排序
-dust -X
+### 如何配置 DMS Shell / Noctalia Shell？
+
+两者都通过 NixOS 官方模块启用：
+
+**DMS Shell**：`modules/desktops/shell-dms.nix` 使用 `programs.dms-shell.enable = true`，模块自带 `dms.service` systemd 用户单元，无需手动声明依赖或服务。
+
+**Noctalia Shell**：`modules/desktops/shell-noctalia.nix` 使用 `programs.noctalia-shell.enable = true`，需额外确保 `services.upower.enable = true`（Noctalia v4 依赖）。
+
+选择哪个 Shell 在主机配置中设置：
+
+```nix
+# hosts/<hostname>/configuration.nix
+desktop.shell = "dms";       // 或 "noctalia"
 ```
-
-### 如何使用 duf 查看磁盘空间？
-
-```bash
-# 查看所有磁盘
-duf
-
-# 查看指定设备
-duf /dev/nvme0n1p2
-
-# JSON 输出
-duf --json
-```
-
-### 如何使用 tokei 统计代码？
-
-```bash
-# 统计当前目录代码
-tokei
-
-# 排除目录
-tokei --exclude "node_modules"
-
-# 输出 JSON 格式
-tokei --json
-
-# 只统计特定语言
-tokei --types Rust,Go,Python
-```
-
-### 如何使用 hyperfine 测试命令性能？
-
-```bash
-# 比较两个命令
-hyperfine "ls -la" "eza -la"
-
-# 多次运行
-hyperfine --runs 10 "my-command"
-
-# 预热运行
-hyperfine --warmup 3 "my-command"
-```
-
-### 如何使用 procs 查看进程？
-
-```bash
-# 查看所有进程
-procs
-
-# 搜索进程
-procs firefox
-
-# 树形视图
-procs --tree
-
-# 详细信息
-procs -l
-```
-
-### 如何配置 Hyprland？
-
-系统级启用位于 `modules/desktops/hyprland.nix`；按键绑定、窗口规则等详细配置位于 `home/common/hyprland.nix`，使用 hyprlang 语法（`configType = "hyprlang"`）。
-
-### 如何配置 Niri？
-
-系统级启用位于 `modules/desktops/niri.nix`；按键绑定等详细配置位于 `home/common/niri.nix`。
 
 ### 如何配置输入法（中文）？
 
@@ -263,21 +244,18 @@ wp-color -l
 wp-color -c
 ```
 
-颜色会自动从壁纸提取并应用到：
-- 终端（alacritty、kitty、foot）
-- Shell 提示符（Starship）
-- Neovim/Emacs 编辑器
-- DMS Shell 和 Noctalia Shell
+颜色会自动从壁纸提取并应用到终端（alacritty、kitty、foot）、Starship 提示符、Neovim 以及 DMS Shell / Noctalia Shell 的配色文件。
 
-**自动监听器**：系统会自动监控壁纸变化。当您通过 DMS Shell / Noctalia Shell GUI 选择壁纸时，颜色会自动更新。
+**自动监听器**：壁纸变化时自动取色（`home/common/wallpaper-watcher.nix` systemd 用户服务），可通过 `systemctl --user status wallpaper-watcher` 查看状态。
 
 ### 壁纸颜色不生效？
 
 确保：
 - `pywal` 已安装（包含在 `modules/desktops/unified-theme.nix` 中）
-- 壁纸目录存在：`~/.wallpapers`（自动创建）
+- 壁纸目录存在：`~/.wallpapers`（首次登录自动创建）
 - 颜色已在 Shell 中加载：`source ~/.cache/wal/colors.sh`
 - 壁纸监听器服务正在运行：`systemctl --user status wallpaper-watcher`
+- 运行 `wal -R` 手动重新生成模板
 
 ### 如何使用日夜主题切换？
 
@@ -294,24 +272,15 @@ theme-dark
 theme-light
 ```
 
-### 如何配置日夜主题切换？
-
-在主机配置中添加以下内容（`hosts/<hostname>/configuration.nix`）：
+**切换时间配置**（`hosts/<hostname>/configuration.nix`）：
 
 ```nix
 desktop.unified-theme = {
-  themeMode = "auto";    # dark/light/auto
-  dayStart = 6;          # 白天开始时间
-  nightStart = 18;       # 夜晚开始时间
+  themeMode = "auto";    // dark / light / auto
+  dayStart = 6;          // 白天开始时间（小时）
+  nightStart = 18;       // 夜晚开始时间（小时）
 };
 ```
-
-### 主题切换不工作？
-
-确保：
-- 系统层 `modules/desktops/unified-theme.nix` 与用户层 `home/common/unified-theme.nix` 均已导入
-- 命令可用：`which theme-auto theme-dark theme-light`
-- 主题脚本由 `modules/desktops/unified-theme.nix` 通过 `writeScriptBin` 生成并加入 `environment.systemPackages`
 
 ### 如何配置中国镜像？
 
@@ -319,10 +288,10 @@ desktop.unified-theme = {
 
 ```nix
 substituters = [
-  "https://mirrors.ustc.edu.cn/nix-channels/store"  # 中科大（推荐）
-  "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"  # 清华
-  "https://mirrors.bfsu.edu.cn/nix-channels/store"  # 北外
-  "https://cache.nixos.org"  # 官方（备用）
+  "https://mirrors.ustc.edu.cn/nix-channels/store"  // 中科大（推荐）
+  "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"  // 清华
+  "https://mirrors.bfsu.edu.cn/nix-channels/store"  // 北外
+  "https://cache.nixos.org"  // 官方（备用）
 ];
 ```
 
@@ -330,19 +299,37 @@ substituters = [
 
 ### Flake 构建失败
 
-检查错误消息以查找缺失的依赖或语法错误。运行 `nix flake check` 验证 flake。
+检查错误消息以查找缺失的依赖或语法错误。运行以下命令定位问题：
+
+```bash
+# 快速求值检查（不编译）
+nix flake check --no-build
+
+# 查看完整错误栈
+nix flake check --no-build 2>&1 | tail -50
+
+# 测试构建单个主机
+nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
+```
 
 ### Home Manager 切换失败
 
-检查 `home-manager switch --flake .#user@host` 输出获取详细错误消息。
+```bash
+# 查看详细错误
+home-manager switch --flake .#user@host 2>&1 | tail -30
+
+# 启用 verbose 模式
+home-manager switch --flake .#user@host --verbose
+```
 
 ### Hyprland 无法启动
 
 确保：
 - 图形驱动已正确安装
-- `xdg-desktop-portal-hyprland` 在 `environment.systemPackages` 中
+- `xdg-desktop-portal-hyprland` 在系统包中
 - SDDM 以 Wayland 模式运行
-- 日志位于 `~/.local/share/hyprland/`
+- 查看日志：`~/.local/share/hyprland/`
+- 验证配置语法：`hyprctl config -h`（Hyprland 0.55+）
 
 ### Niri 无法启动
 
@@ -354,9 +341,9 @@ substituters = [
 ### 没有声音
 
 检查：
-- PipeWire 是否已启用：`systemctl --user status pipewire`
-- 选择了正确的音频设备
-- 用户在 `audio` 组中
+- PipeWire 状态：`systemctl --user status pipewire pipewire-pulse`
+- 选择了正确的音频设备：`wpctl status`
+- 用户在 `audio` 组中：`id | grep -o 'audio'`
 
 ### SDDM 无法启动
 
@@ -371,22 +358,37 @@ substituters = [
 在 NixOS 26.05 中，一些 Qt 包需要特定前缀：
 
 ```nix
-# 正确
+// 正确
 qt6Packages.qtwayland
 kdePackages.polkit-kde-agent-1
 qt6Packages.fcitx5-configtool
 qt6Packages.fcitx5-chinese-addons
 
-# 错误
+// 错误
 qtwayland
 polkit-kde-agent
 fcitx5-configtool
 fcitx5-chinese-addons
 ```
 
+### Fcitx5 无法切换到中文
+
+```bash
+# 1. 验证 fcitx5 正在运行
+fcitx5 -d
+
+# 2. 查看 RIME 方案
+rime_dict_manager list-schemas
+fcitx5-diagnose
+
+# 3. 确认环境变量（SDDM 启动器应自动设置）
+echo $GTK_IM_MODULE   // 应为 fcitx
+echo $QT_IM_MODULE    // 应为 fcitx
+```
+
 ### 二进制下载速度慢
 
-确保在 `flake.nix` 和 `modules/system/default.nix` 中配置了中国镜像。使用以下命令检查：
+确保在 `flake.nix` 和 `modules/system/default.nix` 中配置了中国镜像。检查：
 
 ```bash
 nix show-config | grep substituters
@@ -396,15 +398,10 @@ nix show-config | grep substituters
 
 ### 如何优化性能？
 
-- 为桌面启用 `powerManagement.cpuFreqGovernor = "performance"`
+- 桌面启用 `powerManagement.cpuFreqGovernor = "performance"`
 - 使用 `boot.kernelParams` 进行硬件特定优化
-- 根据 CPU 核心数添加 `nix.settings.max-jobs`
-
-### 如何优化 Nix 构建速度？
-
-- 使用中国镜像加快二进制下载
+- 根据 CPU 核心数设置 `nix.settings.max-jobs`
 - 启用 `nix.settings.auto-optimise-store = true`
-- 增加 `nix.settings.max-jobs` 进行并行构建
 
 ## 安全
 
@@ -426,19 +423,17 @@ UEFI 启动与 systemd-boot 在 `modules/boot/default.nix` 中配置：
 
 ### 如何更新系统？
 
-安装完成后，如果修改了任何 Nix 模块，可以直接使用以下命令更新系统：
-
 ```bash
-# 更新系统（修改 modules/ 后使用）
+# 更新系统配置（修改 modules/ 后使用）
 sudo nixos-rebuild switch --flake .#<hostname>
 
 # 更新 Home Manager 用户配置（修改 home/ 后使用）
 home-manager switch --flake .#<username>@<hostname>
 
-# 更新 flake 输入（升级依赖版本如 nixpkgs）
+# 更新 flake 输入（升级 nixpkgs 等依赖版本）
 nix flake update
 
-# 或使用更新脚本（一键完成 flake update 和系统重建）
+# 一键完成 flake update + 系统重建
 ./scripts/update.sh
 ```
 
@@ -462,13 +457,13 @@ home-manager switch --flake .#<username>@<hostname>
 ### 如何在部署前验证配置？
 
 ```bash
-# 检查配置语法（快速）
-nix flake check
+# 检查配置语法（快速，不编译）
+nix flake check --no-build
 
-# 测试构建（不部署）
+# 完整测试构建（不部署）
 nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 
-# 预览差异
+# 预览将发生哪些变更
 nixos-rebuild dry-activate --flake .#<hostname>
 ```
 
@@ -481,7 +476,7 @@ sudo nixos-rebuild list-generations
 # 回滚到上一个系统代
 sudo nixos-rebuild switch --rollback
 
-# 或指定回滚到特定系统代
+# 指定回滚到某个系统代
 sudo nixos-rebuild switch --generation <number>
 
 # Home Manager 回滚
@@ -497,6 +492,6 @@ nix-collect-garbage -d
 # 清理系统代
 sudo nix-collect-garbage -d
 
-# 或使用清理脚本（-a 全部、-s 仅 Nix store、-g 仅旧系统代）
+# 使用清理脚本（-a 全部、-s 仅 Nix store、-g 仅旧系统代）
 ./scripts/clean.sh -a
 ```
