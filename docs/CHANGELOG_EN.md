@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Installation guide website**: New `hl4w-install/` directory with two standalone bilingual HTML pages (`index.html` / `index_en.html`). Technical-installation-guide style with sticky sidebar TOC, three-option tabs, step cards, flag tables, collapsible FAQ, scroll-spy highlight and mobile-responsive layout
 
 ### Changed
+- **flake.nix full audit and comment enhancement**: Fully audited against the NixOS 26.05 and Home Manager release-26.05 official specs (fetched HM's flake.nix source to confirm the `nixosModules.home-manager` path); verified all inputs align (`nixos-26.05` + `release-26.05`), the oh-my-rime source-input chain is complete (flake inputs → extraSpecialArgs → home/common/input.nix), and the cache-config variables in specialArgs are actually consumed by modules/system/default.nix; added comments for the USERNAME placeholder format constraint, the double inputs injection via extraSpecialArgs / specialArgs, and the empty nixosConfigurations default
 - **Removed GitHub Actions CI**: Deleted `.github/workflows/build.yml` (remote CI is not needed at this stage); synced — removed the "Continuous Integration" section from `architecture.md` / `architecture_en.md`, and dropped the CI mentions from the README directory tree and documentation index
 
 ### Documentation

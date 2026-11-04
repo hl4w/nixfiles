@@ -50,7 +50,9 @@
   # Flake 输出配置
   outputs = { self, nixpkgs, home-manager, ... }@inputs: let
     inherit substituters trusted-public-keys;
-    USERNAME = "youruser";  # 默认用户名（安装时会替换）
+    # 默认用户名占位符：install.sh 会用精确字符串匹配 `"youruser"` 替换
+    # 注意：用户名必须是合法 Nix attr（仅字母、数字、下划线），不能含 `.` `-`
+    USERNAME = "youruser";
     
     # 主机配置生成函数
     # 参数: name - 主机名称（对应 hosts/{name}/configuration.nix）
@@ -59,23 +61,28 @@
       modules = [
         # 导入主机特定配置
         ./hosts/${name}/configuration.nix
-        # 导入 Home Manager 模块
+        # 导入 Home Manager 作为 NixOS 模块
+        # release-26.05: nixosModules.home-manager = ./nixos
         home-manager.nixosModules.home-manager
-        # Home Manager 用户配置
+        # Home Manager 用户配置 + 向 HM 模块注入 flake inputs
+        # - home-manager.users.<name> 声明 HM 管理的用户
+        # - home-manager.extraSpecialArgs 把 inputs 传给每个 HM 模块
+        #   （home/common/*.nix 才能解构到 { inputs } 来消费 oh-my-rime 等源码输入）
         {
           home-manager.users.${USERNAME} = import ./home/hosts/${name}.nix;
           home-manager.extraSpecialArgs = { inherit inputs; };
         }
       ];
+      # 向 NixOS 模块注入参数：inputs + 缓存镜像配置
       specialArgs = {
         inherit inputs;
-        # 传递缓存配置给系统模块
         nixSubstituters = substituters;
         nixTrustedPublicKeys = trusted-public-keys;
       };
     };
   in {
-    # NixOS 配置输出（由安装脚本动态生成）
+    # NixOS 配置输出（由 install.sh 动态追加条目）
+    # 例如: "my-host" = mkHost "my-host";
     nixosConfigurations = {
     };
   };

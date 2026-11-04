@@ -18,6 +18,7 @@
 - **安装指南网站**: 新增 `hl4w-install/` 目录，包含中英双语独立 HTML 页面（`index.html` / `index_en.html`）。技术安装指南风格，带粘性侧边导航、三方式切换标签、步骤卡片、参数表、FAQ 折叠卡片、TOC 高亮与移动端自适应
 
 ### Changed
+- **flake.nix 完整审计与注释增强**: 对照 NixOS 26.05 与 Home Manager release-26.05 官方规范完整审计 flake.nix（fetch HM 源码确认 `nixosModules.home-manager` 路径正确）；确认所有 inputs 版本对齐、oh-my-rime 源码输入消费链完整（flake inputs → extraSpecialArgs → home/common/input.nix）、specialArgs 的缓存配置变量被 modules/system/default.nix 实际消费；补充 USERNAME 占位符格式约束、extraSpecialArgs / specialArgs 双重 inputs 传递说明、空 nixosConfigurations 默认值与 mkHost 追加格式注释
 - **移除 GitHub Actions CI**: 删除 `.github/workflows/build.yml`（仓库当前不需要远端构建）；同步删除 architecture.md / architecture_en.md 的「持续集成」小节、README 目录树与文档索引中的 CI 提及
 
 ### Documentation
