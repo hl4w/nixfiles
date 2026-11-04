@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [v0.0.6] - 2026-11-04
 ### Fixed
-- **flake.nix `let` syntax error**: The top-level attrset had a `let ... in` block inserted inside it (Nix forbids this), causing `nix flake check` to fail with `syntax error, unexpected 'let', expecting 'inherit'`. Fixed by letting `let ... in` wrap the whole attrset. Added a top-of-file comment explaining the Nix syntax rule
+- **flake.nix top-level `let` plus flake evaluator rejecting top-level `let`**: Two consecutive failed attempts. First, a `let ... in { ... }` was placed *inside* the attrset between properties — Nix reported `syntax error, unexpected 'let', expecting 'inherit'`. Second, moving `let ... in` to the outermost level still got rejected by the flake evaluator, which requires the flake.nix **top-level expression to be a plain attrset**. Final fix: top-level is now plain `{ ... }`, `nixConfig` inlines substituters / trusted-public-keys directly, and the two arrays are re-declared in the `outputs` inner `let` for `specialArgs` consumption. A file-top comment documents this flake evaluator constraint
 - **Wrong Nix option path**: The SDDM config in `modules/desktops/unified-theme.nix` used `services.sddm` (does not exist in NixOS 26.05). Changed to `services.displayManager.sddm`, and fixed `config.services.sddm.enable` → `config.services.displayManager.sddm.enable`. This mistake would make Nix evaluation fail immediately
 - **Unified disk layout on LVM**:
   - `setup-disk.sh` / `setup-disk_en.sh` create only an EFI and a data partition (the data partition is a LUKS2 container when encryption is enabled); `/` and `/home` are no longer separate partitions, `/` and swap are LVM logical volumes and `/home` lives under `/`

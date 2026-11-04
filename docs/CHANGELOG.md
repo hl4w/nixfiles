@@ -8,7 +8,7 @@
 
 ## [v0.0.6] - 2026-11-04
 ### Fixed
-- **flake.nix let 语法错误**: 顶层 attrset 内部写了 `let ... in`（Nix 禁止），导致 `nix flake check` 报 `syntax error, unexpected 'let', expecting 'inherit'`；改为让 `let ... in` 包裹整个顶层 attrset。同时为 substituters / trusted-public-keys 定义块补充注释说明 Nix 语法规则
+- **flake.nix 顶层 let 语法 + flake evaluator 拒绝 let 包裹顶层 attrset**: 连续两次尝试失败。第一次把 `let ... in { ... }` 写在 attrset 内部作为属性之间的语句，Nix 报 `syntax error, unexpected 'let', expecting 'inherit'`；第二次虽然把 `let ... in` 移到了最顶层，但 flake evaluator 仍然拒绝（它要求 flake.nix **顶层表达式必须是纯 attrset**）。最终修复：顶层回到纯 `{ ... }`，`nixConfig` 直接内联 substituters / trusted-public-keys，`outputs` 的 inner let 里重新定义这两个数组给 specialArgs 消费。文件顶部注明这个 flake evaluator 约束
 - **Nix 选项路径错误**: `modules/desktops/unified-theme.nix` 的 SDDM 配置用了 `services.sddm`（NixOS 26.05 中不存在），改为 `services.displayManager.sddm`；同时修正 `config.services.sddm.enable` → `config.services.displayManager.sddm.enable`。此错误会导致 Nix 求值直接失败
 - **统一磁盘布局为 LVM**:
   - `setup-disk.sh` / `setup-disk_en.sh` 磁盘只划分 EFI 与数据两个分区（启用加密时数据分区为 LUKS2 容器），不再为 `/` 与 `/home` 单独分区；`/` 与 swap 统一为 LVM 逻辑卷，`/home` 位于 `/` 下
