@@ -98,14 +98,9 @@
     LC_MESSAGES = "zh_CN.UTF-8";      # 消息语言
   };
 
-  # 限制启动项数量为最近 3 个
-  systemd = {
-    tmpfiles.rules = [
-      # 清理旧的系统配置（保留最近 3 个版本）
-      "d /boot/loader/entries - - - - 3"
-    ];
-  };
-
-  # 限制 systemd-boot 配置数量
+  # systemd-boot 自动限制配置数量
+  # 保留最近 3 个系统版本的引导条目，由 systemd-boot 自身管理
+  # 不要用 tmpfiles 干预 /boot/loader/entries：age 字段默认为秒，
+  # 每次开机都会删掉系统刚写入的所有引导条目，轻则菜单空、重则无法引导
   boot.loader.systemd-boot.configurationLimit = 3;
 }

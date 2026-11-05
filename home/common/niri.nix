@@ -35,10 +35,6 @@
       workspace-strip = {
         position = "top";
       };
-
-      xwayland = {
-        enable = true;
-      };
     };
   };
 }

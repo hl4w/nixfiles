@@ -8,6 +8,8 @@
 
 ## [v0.0.6] - 2026-11-05
 ### Fixed
+- **`home/common/niri.nix` 多余的 `settings.xwayland` 键**: Niri 的 XWayland 支持内建，不需要也不存在 `xwayland` 配置节，整个块已删除
+- **`modules/system/default.nix` 中 `/boot/loader/entries` 的 tmpfiles 规则有破坏性**: `tmpfiles.rules = [ "d /boot/loader/entries - - - - 3" ]` 的 age 字段无单位时按秒解析，**每次开机都会删掉系统刚写入的所有引导条目**，轻则引导菜单空、重则无法引导。已删除该 tmpfiles 规则，保留 `boot.loader.systemd-boot.configurationLimit = 3` 让 systemd-boot 自身管理版本数量
 - **`wayland.windowManager.hyprland.keybinds` / `binds` 不存在**: Home Manager 的 hyprland 模块没有 `keybinds`、`binds` 选项，报 `The option 'home-manager.users.<user>.wayland.windowManager.hyprland.binds' does not exist`。快捷键与鼠标绑定统一改为 `settings.bind` / `settings.bindm` 列表（Hyprland 原生 `bind` / `bindm` 指令，键位与动作不变）；同时删除 `settings.xwayland.enable`（XWayland 由系统级 `programs.hyprland.xwayland.enable` 控制），`windowrulev2` 条目去掉多余的 `rule = ` 前缀
 - **`programs.zsh.prompt` 不存在**: Home Manager 的 zsh 模块没有 `prompt` 选项，报 `The option 'home-manager.users.<user>.programs.zsh.prompt' does not exist`。已删除该行，提示符统一由 `programs.starship.enable` + `enableZshIntegration` 接管
 - **`home/common/shell.nix` 别名键名语法错误**: 报 `syntax error, unexpected '.', expecting identifier or 'or' or '${' or '"'`。`cd..`、`..`、`...` 不是合法的 Nix 标识符（`.` 非标识符字符，`...` 是函数参数的省略号记号），改为字符串属性名 `"cd.."` / `".."` / `"..."`；系统级 `environment.shellAliases` 键名经核对无需改动
