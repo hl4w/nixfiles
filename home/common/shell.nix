@@ -33,7 +33,8 @@
       enable = true;
       theme = "robbyrussell";
     };
-    prompt = "starship";
+    # 提示符由下面的 programs.starship 接管（enableZshIntegration），
+    # Home Manager 的 zsh 模块没有 prompt 选项
     initExtra = ''
       export PATH="$HOME/.local/bin:$PATH"
       export EDITOR="nvim"
