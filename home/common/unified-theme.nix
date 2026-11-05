@@ -6,12 +6,12 @@
 # - gtk、xdg.iconTheme、wayland.windowManager.* 是 Home Manager 选项
 # - NixOS 系统级主题（Qt、SDDM、环境变量）在 modules/desktops/unified-theme.nix
 # - HM 26.05+: gtk.gtk4.theme 不再默认镜像 gtk.theme，需显式设置
+# - 不要在模块 function 顶层表达式里引用 config：会触发 NixOS/HM 的模块循环
+#   依赖（desktop.nix 的子模块就是反例）。把条件化逻辑内联到 option 值内部。
 { pkgs, config, lib, ... }:
 
-# GTK / XDG 无条件生效；Hyprland / Niri 主题只有对应 HM 模块加载且启用时才写入。
-# 这样既避免「属性 niri 不存在」（READ 侧），也避免「unmatched definition」（WRITE 侧）。
 {
-  # ==================== GTK 主题配置 ====================
+  # ==================== GTK 主题配置（无条件生效） ====================
   gtk = {
     enable = true;
     theme = {
@@ -40,55 +40,58 @@
     };
   };
 
-  # ==================== XDG 图标主题 ====================
+  # ==================== XDG 图标主题（无条件生效） ====================
   xdg.iconTheme = {
     enable = true;
     name = "Papirus-Dark";
   };
-}
 
-// lib.optionalAttrs (config.wayland.windowManager ? hyprland && config.wayland.windowManager.hyprland.enable) {
-  # ==================== Hyprland 主题配色 ====================
-  wayland.windowManager.hyprland.settings = lib.mkMerge [
-    {
-      general = {
-        col.active_border = "rgba(34, 197, 94)";
-        col.inactive_border = "rgba(71, 85, 105)";
-      };
-    }
-    {
-      decoration = lib.mkMerge [
-        ((config.wayland.windowManager.hyprland.settings or {}).decoration or {})
-        {
-          rounding = 12;
-          blur = true;
-          blur_size = 3;
-          blur_passes = 2;
-          blur_new_windows = true;
-          shadow = true;
-          shadow_range = 4;
-          shadow_render_power = 3;
-        }
-      ];
-    }
-  ];
-}
+  # ==================== Hyprland 主题配色（仅 Hyprland 启用时写入） ====================
+  # 条件化逻辑内联到 option 值内部，不在模块顶层表达式引用 config
+  wayland.windowManager.hyprland.settings =
+    let existingSettings = config.wayland.windowManager.hyprland.settings or {};
+        existingDecoration = existingSettings.decoration or {};
+    in lib.mkIf (config.wayland.windowManager.hyprland.enable or false) (lib.mkMerge [
+      {
+        general = {
+          col.active_border = "rgba(34, 197, 94)";
+          col.inactive_border = "rgba(71, 85, 105)";
+        };
+      }
+      {
+        decoration = lib.mkMerge [
+          existingDecoration
+          {
+            rounding = 12;
+            blur = true;
+            blur_size = 3;
+            blur_passes = 2;
+            blur_new_windows = true;
+            shadow = true;
+            shadow_range = 4;
+            shadow_render_power = 3;
+          }
+        ];
+      }
+    ]);
 
-// lib.optionalAttrs (config.wayland.windowManager ? niri && config.wayland.windowManager.niri.enable) {
-  # ==================== Niri 主题配色 ====================
-  wayland.windowManager.niri.settings = lib.mkMerge [
-    {
-      border-color = "rgba(34, 197, 94)";
-      inactive-border-color = "rgba(71, 85, 105)";
-    }
-    {
-      workspace-strip = lib.mkMerge [
-        ((config.wayland.windowManager.niri.settings or {}).workspace-strip or {})
-        {
-          show-workspace-numbers = true;
-          show-window-titles = true;
-        }
-      ];
-    }
-  ];
+  # ==================== Niri 主题配色（仅 Niri 启用时写入） ====================
+  wayland.windowManager.niri.settings =
+    let existingSettings = config.wayland.windowManager.niri.settings or {};
+        existingStrip = existingSettings."workspace-strip" or {};
+    in lib.mkIf (config.wayland.windowManager.niri.enable or false) (lib.mkMerge [
+      {
+        border-color = "rgba(34, 197, 94)";
+        inactive-border-color = "rgba(71, 85, 105)";
+      }
+      {
+        "workspace-strip" = lib.mkMerge [
+          existingStrip
+          {
+            show-workspace-numbers = true;
+            show-window-titles = true;
+          }
+        ];
+      }
+    ]);
 }
