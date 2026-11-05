@@ -6,12 +6,20 @@
 # - gtk、xdg.iconTheme、wayland.windowManager.* 是 Home Manager 选项
 # - NixOS 系统级主题（Qt、SDDM、环境变量）在 modules/desktops/unified-theme.nix
 # - HM 26.05+: gtk.gtk4.theme 不再默认镜像 gtk.theme，需显式设置
-# - 不要在模块 function 顶层表达式里引用 config：会触发 NixOS/HM 的模块循环
-#   依赖（desktop.nix 的子模块就是反例）。把条件化逻辑内联到 option 值内部。
+#
+# 关键设计：
+# - GTK/XDG 块无条件生效（不依赖 WM 模块是否加载）
+# - Hyprland/Niri 主题块用两层条件：
+#   1) 顶层属性存在性：config.wayland.windowManager ? <wm>
+#      （检查 HM 模块是否已加载，避免 unmatched definition）
+#   2) 值内部 enable 检查：lib.mkIf (config.wayland.windowManager.<wm>.enable or false)
+# - ? 操作符只检查 attrset key 存在性，不强制展开 config thunk 的值，
+#   所以不会触发 desktop.nix 子模块那种 imports→config thunk→merge→imports 的循环
 { pkgs, config, lib, ... }:
 
+# 基础块：GTK/XDG（永远写入）
 {
-  # ==================== GTK 主题配置（无条件生效） ====================
+  # ==================== GTK 主题配置 ====================
   gtk = {
     enable = true;
     theme = {
@@ -40,14 +48,15 @@
     };
   };
 
-  # ==================== XDG 图标主题（无条件生效） ====================
+  # ==================== XDG 图标主题 ====================
   xdg.iconTheme = {
     enable = true;
     name = "Papirus-Dark";
   };
+}
 
-  # ==================== Hyprland 主题配色（仅 Hyprland 启用时写入） ====================
-  # 条件化逻辑内联到 option 值内部，不在模块顶层表达式引用 config
+// lib.optionalAttrs (config.wayland.windowManager ? hyprland) {
+  # ==================== Hyprland 主题配色（仅 Hyprland HM 模块已加载时才追加） ====================
   wayland.windowManager.hyprland.settings =
     let existingSettings = config.wayland.windowManager.hyprland.settings or {};
         existingDecoration = existingSettings.decoration or {};
@@ -74,8 +83,10 @@
         ];
       }
     ]);
+}
 
-  # ==================== Niri 主题配色（仅 Niri 启用时写入） ====================
+// lib.optionalAttrs (config.wayland.windowManager ? niri) {
+  # ==================== Niri 主题配色（仅 Niri HM 模块已加载时才追加） ====================
   wayland.windowManager.niri.settings =
     let existingSettings = config.wayland.windowManager.niri.settings or {};
         existingStrip = existingSettings."workspace-strip" or {};
