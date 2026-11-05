@@ -11,6 +11,8 @@
 # 参考: https://wiki.nixos.org/wiki/Hyprland
 { pkgs, lib, config, ... }:
 
+lib.mkIf (config.desktop.windowManager == "hyprland")
+
 {
   # NixOS 原生 Hyprland 模块（系统级：安装包、桌面会话条目、安全包装等）
   programs.hyprland = {

@@ -2,7 +2,9 @@
 # 现代化桌面集成 Shell，提供完整的桌面体验
 # 命名说明: nixos-26.05 中 noctalia-shell(v4 legacy) 与 noctalia(v5) 同时存在，
 #           上游 v5 不是改名替换，而是全新实现（配置文件不迁移）
-{ pkgs, ... }:
+{ pkgs, lib, config, ... }:
+
+lib.mkIf (config.desktop.shell == "noctalia")
 
 {
   environment.systemPackages = with pkgs; [

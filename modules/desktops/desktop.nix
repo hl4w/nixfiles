@@ -33,19 +33,18 @@ in
     };
   };
 
-  # imports 是模块级属性，不能写在 config 里（否则会报 `imports` 选项不存在）。
-  # 条件导入用 lib.optional（返回列表，可与其他导入项拼接），
-  # 不能用 lib.mkIf 包裹裸路径——那会被模块系统当作"path 类型的选项定义"而报错。
-  imports =
-    [
-      ./sddm.nix
-      ./unified-theme.nix              # 系统级主题（Qt/SDDM/环境变量）
-    ]
-    ++ lib.optional (cfg.windowManager == "hyprland") ./hyprland.nix
-    ++ lib.optional (cfg.windowManager == "niri") ./niri.nix
-    ++ lib.optional (cfg.shell == "dms") ./shell-dms.nix
-    ++ lib.optional (cfg.shell == "noctalia") ./shell-noctalia.nix
-    ++ lib.optional cfg.enableInputMethod ../input-method/default.nix;
+  # imports 必须与 config 无关：imports 在选项合并之前求值，
+  # 引用 cfg 会导致 infinite recursion（正是 NixOS 报错提示的场景）。
+  # 因此这里无条件导入所有桌面模块，把条件逻辑下放到各模块内部的 lib.mkIf。
+  imports = [
+    ./sddm.nix
+    ./unified-theme.nix              # 系统级主题（Qt/SDDM/环境变量）
+    ./hyprland.nix                   # 内部按 windowManager == "hyprland" 生效
+    ./niri.nix                       # 内部按 windowManager == "niri" 生效
+    ./shell-dms.nix                  # 内部按 shell == "dms" 生效
+    ./shell-noctalia.nix             # 内部按 shell == "noctalia" 生效
+    ../input-method/default.nix      # 内部按 enableInputMethod 生效
+  ];
 
   config = {
     # 系统级包配置

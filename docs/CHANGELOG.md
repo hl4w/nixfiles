@@ -6,6 +6,11 @@
 
 > 约定：版本号不变时，每次提交均以**当日日期**开一个新的小节，当日所有改动聚合在该节下，便于按日期追踪未发布版本的变更。
 
+## [v0.0.6] - 2026-11-05
+### Fixed
+- **核实 `qt6Packages` 包名（对照 nixos-26.05 官方源码）**: 逐一核对代码中的 `qt6Packages.*` 引用。`qt6-packages.nix` 作用域文件与 `qt6` 核心模块合集中均无 `adwaita-qt`（它只是 by-name 顶层包），因此删除 `modules/desktops/desktop.nix` 的 `qt6Packages.adwaita-qt`，保留已有的 `adwaita-qt`；`qt6Packages.fcitx5-qt`、`qt6Packages.fcitx5-chinese-addons`、`qt6Packages.fcitx5-configtool` 确认存在于该作用域内，保持原样未改动
+- **`infinite recursion encountered`（imports 依赖 config）**: `modules/desktops/desktop.nix` 之前用 `lib.optional (cfg.windowManager == ...)` 做条件导入。`imports` 在选项合并之前求值，引用 `config` 会形成循环。改为无条件导入全部桌面模块，条件逻辑下移到各模块自身的 `lib.mkIf`：`hyprland.nix` / `niri.nix` 按 `desktop.windowManager`，`shell-dms.nix` / `shell-noctalia.nix` 按 `desktop.shell`，`input-method/default.nix` 按 `desktop.enableInputMethod`
+
 ## [v0.0.6] - 2026-11-04
 ### Fixed
 - **flake.nix 顶层 let 语法 + flake evaluator 拒绝 let 包裹顶层 attrset**: 连续两次尝试失败。第一次把 `let ... in { ... }` 写在 attrset 内部作为属性之间的语句，Nix 报 `syntax error, unexpected 'let', expecting 'inherit'`；第二次虽然把 `let ... in` 移到了最顶层，但 flake evaluator 仍然拒绝（它要求 flake.nix **顶层表达式必须是纯 attrset**）。最终修复：顶层回到纯 `{ ... }`，`nixConfig` 直接内联 substituters / trusted-public-keys，`outputs` 的 inner let 里重新定义这两个数组给 specialArgs 消费。文件顶部注明这个 flake evaluator 约束
@@ -14,10 +19,9 @@
 - **未启用 flakes 环境下安装失败**: 报 `experimental Nix feature 'nix-command' is disabled`。`install.sh` / `install_en.sh` / `update.sh` / `update_en.sh` 内所有 nix 调用统一走 `NIX=(nix --extra-experimental-features "nix-command flakes")`，不再依赖目标环境的 `nix.conf`；`setup-disk.sh` / `setup-disk_en.sh` 的安装指引补充 `sudo NIX_CONFIG='experimental-features = nix-command flakes' nixos-install --flake .#<host>` 写法；FAQ 新增该报错的三类处理方式
 - **`imports` 中的 `lib.mkIf` + 裸路径导致 path 类型定义错误**: 报 `trying to define a value of type 'path' rather than an attribute set for the option ''`。`imports` 元素里的 `(lib.mkIf cond ./x.nix)` 会把路径当作模块定义下发，模块系统无法处理。改为 `imports = [ ... ] ++ lib.optional cond ./x.nix`（`imports` 支持路径项与列表拼接，但不支持嵌套列表）
 - **flake `nixConfig` 下发 `auto-optimise-store` 的警告**: 该设置为 restricted setting，客户端会被忽略并输出 `ignoring the client-specified setting 'auto-optimise-store'`。已从 `nixConfig` 移除，统一由 `modules/system/default.nix` 的系统级 `nix.settings` 设置
-- **核实 `qt6Packages` 包名（对照 nixos-26.05 官方源码）**: 逐一核对代码中的 `qt6Packages.*` 引用。`qt6-packages.nix` 作用域文件与 `qt6` 核心模块合集中均无 `adwaita-qt`（它只是 by-name 顶层包），因此删除 `modules/desktops/desktop.nix` 的 `qt6Packages.adwaita-qt`，保留已有的 `adwaita-qt`；`qt6Packages.fcitx5-qt`、`qt6Packages.fcitx5-chinese-addons`、`qt6Packages.fcitx5-configtool` 确认存在于该作用域内，保持原样未改动
 - **`undefined variable 'config'`**: `modules/desktops/unified-theme.nix` 与 `home/common/unified-theme.nix` 使用了 `config` 但函数参数只声明了 `{ pkgs, lib, ... }`，现补上 `config`；同时删除 `modules/desktops/unified-theme.nix` 顶部未被引用的 `let` 块（`getThemeMode` 脚本与 `lib.mkDefault` 变量）
 - **SDDM 不存在选项与过时包名**: 报 `The option 'services.displayManager.sddm.greeterEnvironment' does not exist` 等价问题。26.05 的 `services.displayManager.sddm` 仅有 `enable`/`package`/`theme`/`settings`/`wayland`/`autoLogin` 等 11 个选项，`displayServer` 与 `greeterEnvironment` 均不存在：`sddm.nix` 删除 `displayServer`（由 `wayland.enable` 决定），`unified-theme.nix` 删除整个 greeter 环境变量块。另修正包名：`libappindicator-gtk3`（已从 nixpkgs 移除）→ `libayatana-appindicator`，`networkmanager-applet` → `networkmanagerapplet`（DMS / Noctalia 两个模块）
-- **`imports` 被写在 `config` 内导致求值失败**: 报 `The option 'imports' does not exist`，定义来自 `modules/desktops/desktop.nix`。`imports` 是模块级属性而非选项，不能出现在 `config` 块中。现将其提升到顶层，并用 `lib.mkIf` 包裹每个条件导入项；同时把 `environment.systemPackages` 中用 `lib.mkIf` 包裹的 polkit 代理包改为 `lib.optional`（列表元素不能是 `mkIf` 生成的属性集，否则会在包类型校验阶段失败）
+- **`imports` 被写在 `config` 内导致求值失败**: 报 `The option 'imports' does not exist`，定义来自 `modules/desktops/desktop.nix`。`imports` 是模块级属性而非选项，不能出现在 `config` 块中。现将其提升到顶层，条件逻辑不再放在 `imports` 中（见下一条）；同时把 `environment.systemPackages` 中用 `lib.mkIf` 包裹的 polkit 代理包改为 `lib.optional`（列表元素不能是 `mkIf` 生成的属性集，否则会在包类型校验阶段失败）
 - **`i18n.locales` 选项已移除**: 报 `The option 'i18n.locales' does not exist`。NixOS 24.11 起该选项被移除，`modules/system/default.nix` 改用 `i18n.extraLocales = [ "zh_CN.UTF-8" "en_US.UTF-8" ]`（值为 locale 名，不再包含 ` UTF-8` 编码段）
 - **`boot.efi` 选项不存在导致求值失败**: 报 `The option 'boot.efi' does not exist`。`modules/boot/default.nix` 误用了 `boot.efi`（NixOS 无此选项）以及 `boot.loader.systemd-boot.efiSysMountPoint`（该选项实际位于 `boot.loader.efi`），现改为 `boot.loader.efi.canTouchEfiVariables` 与 `boot.loader.efi.efiSysMountPoint = "/boot"`，并删除无效的 `boot.efi.enable`
 - **新建主机配置未被 Git 跟踪**: 报 `Path 'hosts/<host>/configuration.nix' in the repository "... " is not tracked by Git`。Nix 对 git 仓库中的 flake 只读取已跟踪文件，`install.sh` / `install_en.sh` 新增 `git_track()`，在生成主机配置、`flake.lock`、硬件配置后自动 `git add`，并在 `nix flake check` 前兜底；README 方式三与 FAQ 补充手动 `git add` 步骤

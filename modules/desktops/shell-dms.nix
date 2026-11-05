@@ -1,7 +1,9 @@
 # DMS-Shell 配置模块（DankMaterialShell）
 # NixOS 26.05 官方模块为 programs.dms-shell（nixos/modules/programs/wayland/dms-shell.nix）
 # 注意：上游 2.0 已更名为 Dux Shell（包名 dux-shell），但 nixos-26.05 分支仍只提供 dms-shell
-{ pkgs, ... }:
+{ pkgs, lib, config, ... }:
+
+lib.mkIf (config.desktop.shell == "dms")
 
 {
   programs.dms-shell = {

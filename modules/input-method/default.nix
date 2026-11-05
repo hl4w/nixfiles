@@ -1,6 +1,8 @@
 # 系统级输入法配置 - NixOS 26.05 标准配置（仅 Wayland）
 # 参考: https://wiki.nixos.org/wiki/Fcitx5
-{ pkgs, lib, ... }:
+{ pkgs, lib, config, ... }:
+
+lib.mkIf config.desktop.enableInputMethod
 
 {
   # 核心输入法配置 - NixOS 会自动设置环境变量
