@@ -8,6 +8,7 @@
 
 ## [v0.0.6] - 2026-11-05
 ### Fixed
+- **`home/common/shell.nix` 别名键名语法错误**: 报 `syntax error, unexpected '.', expecting identifier or 'or' or '${' or '"'`。`cd..`、`..`、`...` 不是合法的 Nix 标识符（`.` 非标识符字符，`...` 是函数参数的省略号记号），改为字符串属性名 `"cd.."` / `".."` / `"..."`；系统级 `environment.shellAliases` 键名经核对无需改动
 - **核实 `qt6Packages` 包名（对照 nixos-26.05 官方源码）**: 逐一核对代码中的 `qt6Packages.*` 引用。`qt6-packages.nix` 作用域文件与 `qt6` 核心模块合集中均无 `adwaita-qt`（它只是 by-name 顶层包），因此删除 `modules/desktops/desktop.nix` 的 `qt6Packages.adwaita-qt`，保留已有的 `adwaita-qt`；`qt6Packages.fcitx5-qt`、`qt6Packages.fcitx5-chinese-addons`、`qt6Packages.fcitx5-configtool` 确认存在于该作用域内，保持原样未改动
 - **`infinite recursion encountered`（imports 依赖 config）**: `modules/desktops/desktop.nix` 之前用 `lib.optional (cfg.windowManager == ...)` 做条件导入。`imports` 在选项合并之前求值，引用 `config` 会形成循环。改为无条件导入全部桌面模块，条件逻辑下移到各模块自身的 `lib.mkIf`：`hyprland.nix` / `niri.nix` 按 `desktop.windowManager`，`shell-dms.nix` / `shell-noctalia.nix` 按 `desktop.shell`，`input-method/default.nix` 按 `desktop.enableInputMethod`
 
