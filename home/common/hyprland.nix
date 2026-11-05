@@ -57,59 +57,55 @@
         disable_splash_rendering = true;
       };
 
-      xwayland = {
-        enable = true;
-      };
-
       windowrulev2 = [
-        "rule = float,class:^(foot)$"
-        "rule = float,class:^(kitty)$"
-        "rule = float,class:^(alacritty)$"
-        "rule = float,class:^(rofi)$"
-        "rule = float,class:^(nemo)$"
+        "float,class:^(foot)$"
+        "float,class:^(kitty)$"
+        "float,class:^(alacritty)$"
+        "float,class:^(rofi)$"
+        "float,class:^(nemo)$"
       ];
-    };
 
-    # 键盘快捷键
-    keybinds = {
-      "SUPER,Q" = "killactive";
-      "SUPER,E" = "exec nemo";
-      "SUPER,R" = "exec rofi -show drun";
-      "SUPER,RETURN" = "exec foot";
-      "SUPER,C" = "exec codium";
-      "SUPER,B" = "exec firefox";
-      "SUPER,P" = "exec rofi -show powermenu";
-      "SUPER,H" = "movefocus left";
-      "SUPER,J" = "movefocus down";
-      "SUPER,K" = "movefocus up";
-      "SUPER,L" = "movefocus right";
-      "SUPER,S,H" = "resizeactive -10 0";
-      "SUPER,S,J" = "resizeactive 0 10";
-      "SUPER,S,K" = "resizeactive 0 -10";
-      "SUPER,S,L" = "resizeactive 10 0";
-      "SUPER,1" = "workspace 1";
-      "SUPER,2" = "workspace 2";
-      "SUPER,3" = "workspace 3";
-      "SUPER,4" = "workspace 4";
-      "SUPER,5" = "workspace 5";
-      "SUPER,S,1" = "movetoworkspace 1";
-      "SUPER,S,2" = "movetoworkspace 2";
-      "SUPER,S,3" = "movetoworkspace 3";
-      "SUPER,S,4" = "movetoworkspace 4";
-      "SUPER,S,5" = "movetoworkspace 5";
-      "SUPER,F" = "togglefloating";
-      "SUPER,FULL" = "fullscreen";
-      "SUPER,S,F" = "swapnext";
-      "ALT,SHIFT,F" = "fakefullscreen";
-    };
+      # 键盘与鼠标绑定
+      # Home Manager 的 hyprland 模块没有 keybinds / binds 选项，
+      # 统一写入 settings.bind / settings.bindm（Hyprland 原生命令）
+      bind = [
+        "SUPER, Q, killactive"
+        "SUPER, E, exec, nemo"
+        "SUPER, R, exec, rofi -show drun"
+        "SUPER, RETURN, exec, foot"
+        "SUPER, C, exec, codium"
+        "SUPER, B, exec, firefox"
+        "SUPER, P, exec, rofi -show powermenu"
+        "SUPER, H, movefocus, l"
+        "SUPER, J, movefocus, d"
+        "SUPER, K, movefocus, u"
+        "SUPER, L, movefocus, r"
+        "SUPER, S, H, resizeactive, -10, 0"
+        "SUPER, S, J, resizeactive, 0, 10"
+        "SUPER, S, K, resizeactive, 0, -10"
+        "SUPER, S, L, resizeactive, 10, 0"
+        "SUPER, 1, workspace, 1"
+        "SUPER, 2, workspace, 2"
+        "SUPER, 3, workspace, 3"
+        "SUPER, 4, workspace, 4"
+        "SUPER, 5, workspace, 5"
+        "SUPER, S, 1, movetoworkspace, 1"
+        "SUPER, S, 2, movetoworkspace, 2"
+        "SUPER, S, 3, movetoworkspace, 3"
+        "SUPER, S, 4, movetoworkspace, 4"
+        "SUPER, S, 5, movetoworkspace, 5"
+        "SUPER, F, togglefloating"
+        "SUPER, FULL, fullscreen"
+        "SUPER, S, F, swapnext"
+        "ALT, SHIFT, F, fakefullscreen"
+      ];
 
-    # 鼠标绑定
-    binds = {
-      "mouse,1" = "movewindow";
-      "mouse,2" = "resizewindow";
-      "mouse,3" = "togglefloating";
-      "mouse,8" = "pass";
-      "mouse,9" = "pass";
+      # 鼠标绑定（bindm：左键拖动窗口、右键调整大小、中键切换浮动）
+      bindm = [
+        "SUPER, mouse:272, movewindow"
+        "SUPER, mouse:273, resizewindow"
+        "SUPER, mouse:274, togglefloating"
+      ];
     };
   };
 }

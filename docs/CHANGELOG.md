@@ -8,6 +8,7 @@
 
 ## [v0.0.6] - 2026-11-05
 ### Fixed
+- **`wayland.windowManager.hyprland.keybinds` / `binds` 不存在**: Home Manager 的 hyprland 模块没有 `keybinds`、`binds` 选项，报 `The option 'home-manager.users.<user>.wayland.windowManager.hyprland.binds' does not exist`。快捷键与鼠标绑定统一改为 `settings.bind` / `settings.bindm` 列表（Hyprland 原生 `bind` / `bindm` 指令，键位与动作不变）；同时删除 `settings.xwayland.enable`（XWayland 由系统级 `programs.hyprland.xwayland.enable` 控制），`windowrulev2` 条目去掉多余的 `rule = ` 前缀
 - **`programs.zsh.prompt` 不存在**: Home Manager 的 zsh 模块没有 `prompt` 选项，报 `The option 'home-manager.users.<user>.programs.zsh.prompt' does not exist`。已删除该行，提示符统一由 `programs.starship.enable` + `enableZshIntegration` 接管
 - **`home/common/shell.nix` 别名键名语法错误**: 报 `syntax error, unexpected '.', expecting identifier or 'or' or '${' or '"'`。`cd..`、`..`、`...` 不是合法的 Nix 标识符（`.` 非标识符字符，`...` 是函数参数的省略号记号），改为字符串属性名 `"cd.."` / `".."` / `"..."`；系统级 `environment.shellAliases` 键名经核对无需改动
 - **核实 `qt6Packages` 包名（对照 nixos-26.05 官方源码）**: 逐一核对代码中的 `qt6Packages.*` 引用。`qt6-packages.nix` 作用域文件与 `qt6` 核心模块合集中均无 `adwaita-qt`（它只是 by-name 顶层包），因此删除 `modules/desktops/desktop.nix` 的 `qt6Packages.adwaita-qt`，保留已有的 `adwaita-qt`；`qt6Packages.fcitx5-qt`、`qt6Packages.fcitx5-chinese-addons`、`qt6Packages.fcitx5-configtool` 确认存在于该作用域内，保持原样未改动
