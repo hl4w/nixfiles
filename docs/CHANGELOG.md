@@ -20,6 +20,16 @@
 - **`programs.zsh.prompt` 不存在**: Home Manager 的 zsh 模块没有 `prompt` 选项，报 `The option 'home-manager.users.<user>.programs.zsh.prompt' does not exist`。已删除该行，提示符统一由 `programs.starship.enable` + `enableZshIntegration` 接管
 - **`home/common/shell.nix` 别名键名语法错误**: 报 `syntax error, unexpected '.', expecting identifier or 'or' or '${' or '"'`。`cd..`、`..`、`...` 不是合法的 Nix 标识符（`.` 非标识符字符，`...` 是函数参数的省略号记号），改为字符串属性名 `"cd.."` / `".."` / `"..."`；系统级 `environment.shellAliases` 键名经核对无需改动
 - **核实 `qt6Packages` 包名（对照 nixos-26.05 官方源码）**: 逐一核对代码中的 `qt6Packages.*` 引用。`qt6-packages.nix` 作用域文件与 `qt6` 核心模块合集中均无 `adwaita-qt`（它只是 by-name 顶层包），因此删除 `modules/desktops/desktop.nix` 的 `qt6Packages.adwaita-qt`，保留已有的 `adwaita-qt`；`qt6Packages.fcitx5-qt`、`qt6Packages.fcitx5-chinese-addons`、`qt6Packages.fcitx5-configtool` 确认存在于该作用域内，保持原样未改动
+- **`home/common/unified-theme.nix` 模块返回值顶层表达式引用 config 导致 infinite recursion（最终根因修复）**:
+  - 之前用 `? hyprland`（只查 key 不展开值）+ `option 值内部 lib.mkIf` 两层防护，以为已经安全——**实测仍触发循环**
+  - **根因重新定位**：NixOS modules 框架在构建 config thunk 时，需要先拿到**所有模块的返回值表达式**（attrset 字面量）才能开始合并；`unified-theme.nix` 的返回值是 `{ gtk = ... } // optionalAttrs (config.wayland.windowManager ? hyprland) { settings = ... }`——框架拿到这个表达式后要对 `//` 求值，右侧的 `optionalAttrs` 需要求值 `config.wayland.windowManager ? hyprland`，而 config thunk 还没构建完（框架正在收集返回值！）→ **循环**
+  - 关键认知：**在模块 function 的返回值顶层表达式里（不在 `config = { ... }` 块内），任何对 config 的引用——哪怕是 `? xxx` 这种看似惰性的 attrset key 检查——都可能触发循环**
+  - **最终方案：拆文件 + 主机 imports 层面决定**：
+    1. `home/common/theme-gtk.nix`（纯 GTK/XDG，不引用 config，无条件导入）
+    2. `home/common/theme-hyprland.nix`（Hyprland 配色，config 块内部 `lib.mkIf`，由 desktop.nix 显式导入——此时 hyprland HM 模块已在 imports 里，option 一定存在）
+    3. `home/common/theme-niri.nix`（Niri 配色，同上，由 laptop.nix 显式导入）
+    4. 删除 `home/common/unified-theme.nix`
+    5. 更新 `install.sh` / `install_en.sh` 对应输出
 
 ## [v0.0.6] - 2026-11-04
 ### Fixed

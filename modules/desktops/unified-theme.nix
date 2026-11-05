@@ -2,7 +2,8 @@
 # 提供 Qt、SDDM、环境变量、壁纸目录等系统级主题配置
 #
 # 注意: GTK 主题、XDG 图标主题、Hyprland/Niri 窗口配色等用户级配置
-#       由 Home Manager 模块管理（见 home/common/unified-theme.nix）。
+#       由 Home Manager 模块管理（见 home/common/theme-gtk.nix、
+#       theme-hyprland.nix、theme-niri.nix）。
 #       因为 gtk、xdg.iconTheme、wayland.windowManager.* 是 Home Manager 选项，
 #       在 NixOS 系统层不存在。
 { pkgs, config, lib, ... }:

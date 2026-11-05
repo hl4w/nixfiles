@@ -20,6 +20,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **`programs.zsh.prompt` does not exist**: the Home Manager zsh module has no `prompt` option (`The option 'home-manager.users.<user>.programs.zsh.prompt' does not exist`). The line was removed; the prompt is handled solely by `programs.starship.enable` with `enableZshIntegration`
 - **Invalid alias key names in `home/common/shell.nix`**: `cd..`, `..`, `...` are not valid Nix identifiers (`.` is not an identifier character, `...` is the function parameter ellipsis token); changed to string attribute names `"cd.."` / `".."` / `"..."`
 - **Verified `qt6Packages` attribute names against nixos-26.05 sources**: checked every `qt6Packages.*` reference in the codebase against `qt6-packages.nix` and the qt6 core scope. `adwaita-qt` exists only as a top-level attribute (`pkgs/by-name/ad/adwaita-qt`), not inside `qt6Packages`; removed `qt6Packages.adwaita-qt` from `modules/desktops/desktop.nix` while keeping the correct top-level `adwaita-qt`. `qt6Packages.fcitx5-qt`, `qt6Packages.fcitx5-chinese-addons`, `qt6Packages.fcitx5-configtool` all exist in the scope and were left unchanged
+- **`home/common/unified-theme.nix` module's return-value top-level expression referenced `config`, causing infinite recursion (final root-cause fix)**:
+  - Previously used a two-layer guard (`? hyprland` which only checks attrset key presence without forcing config value evaluation, plus `lib.mkIf` inside the option value), and assumed this was safe — **still triggered recursion in practice**
+  - **Root cause re-located**: the NixOS modules framework builds the config thunk by first collecting **every module's return-value expression** (the attrset literal), then merging them. `unified-theme.nix` returned `{ gtk = ... } // optionalAttrs (config.wayland.windowManager ? hyprland) { settings = ... }`. The framework evaluates `//` → `optionalAttrs` needs to evaluate `config.wayland.windowManager ? hyprland` → the config thunk isn't built yet (the framework is *in the process of collecting return values!*) → **CYCLE**
+  - **Key insight**: **any reference to `config` inside a module function's top-level return-value expression (not inside `config = { ... }` block) — even the seemingly lazy `? xxx` attrset key check — can trigger recursion**
+  - **Final fix: split files + host-level imports decide**:
+    1. `home/common/theme-gtk.nix` (pure GTK/XDG, no config reference, unconditionally imported)
+    2. `home/common/theme-hyprland.nix` (Hyprland colors, `lib.mkIf` inside the config block, explicitly imported by desktop.nix — where hyprland HM module is already in imports so the option always exists)
+    3. `home/common/theme-niri.nix` (Niri colors, same pattern, imported by laptop.nix)
+    4. Deleted `home/common/unified-theme.nix`
+    5. Updated `install.sh` / `install_en.sh` to output the new file paths
 
 ## [v0.0.6] - 2026-11-04
 ### Fixed

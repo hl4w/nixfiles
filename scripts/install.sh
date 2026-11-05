@@ -536,15 +536,17 @@ EOF
 if [ "$HOST_TYPE_NAME" != "server" ]; then
     echo "    ../common/input.nix" >> "home/hosts/$HOSTNAME.nix"
     echo "    ../common/apps.nix" >> "home/hosts/$HOSTNAME.nix"
-    # 导入用户级主题（GTK/XDG 图标/WM 配色）
-    echo "    ../common/unified-theme.nix" >> "home/hosts/$HOSTNAME.nix"
-    # 根据选择的窗口管理器导入对应配置
+    # 导入用户级主题基础块（GTK/XDG 图标，无条件）
+    echo "    ../common/theme-gtk.nix" >> "home/hosts/$HOSTNAME.nix"
+    # 根据选择的窗口管理器导入对应配置 + WM 主题配色
     case $WINDOW_MANAGER in
         hyprland)
             echo "    ../common/hyprland.nix" >> "home/hosts/$HOSTNAME.nix"
+            echo "    ../common/theme-hyprland.nix" >> "home/hosts/$HOSTNAME.nix"
             ;;
         niri)
             echo "    ../common/niri.nix" >> "home/hosts/$HOSTNAME.nix"
+            echo "    ../common/theme-niri.nix" >> "home/hosts/$HOSTNAME.nix"
             ;;
     esac
 fi

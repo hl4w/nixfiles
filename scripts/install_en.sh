@@ -536,15 +536,17 @@ EOF
 if [ "$HOST_TYPE_NAME" != "server" ]; then
     echo "    ../common/input.nix" >> "home/hosts/$HOSTNAME.nix"
     echo "    ../common/apps.nix" >> "home/hosts/$HOSTNAME.nix"
-    # Import user-level theme (GTK/XDG icons/WM colors)
-    echo "    ../common/unified-theme.nix" >> "home/hosts/$HOSTNAME.nix"
-    # Import WM-specific configuration based on selection
+    # Import user-level theme base block (GTK/XDG icons, unconditional)
+    echo "    ../common/theme-gtk.nix" >> "home/hosts/$HOSTNAME.nix"
+    # Import WM-specific configuration + WM theme colors based on selection
     case $WINDOW_MANAGER in
         hyprland)
             echo "    ../common/hyprland.nix" >> "home/hosts/$HOSTNAME.nix"
+            echo "    ../common/theme-hyprland.nix" >> "home/hosts/$HOSTNAME.nix"
             ;;
         niri)
             echo "    ../common/niri.nix" >> "home/hosts/$HOSTNAME.nix"
+            echo "    ../common/theme-niri.nix" >> "home/hosts/$HOSTNAME.nix"
             ;;
     esac
 fi
