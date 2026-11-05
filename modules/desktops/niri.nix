@@ -5,18 +5,18 @@
 #       wayland.windowManager.niri 模块管理（见 home/common/niri.nix）。
 { pkgs, lib, config, ... }:
 
-lib.mkIf (config.desktop.windowManager == "niri")
-
 {
-  # NixOS 原生 Niri 模块（系统级：安装包、桌面会话条目等）
-  programs.niri = {
-    enable = true;
-    package = pkgs.niri;
-  };
+  config = lib.mkIf (config.desktop.windowManager == "niri") {
+    # NixOS 原生 Niri 模块（系统级：安装包、桌面会话条目等）
+    programs.niri = {
+      enable = true;
+      package = pkgs.niri;
+    };
 
-  # Niri 相关系统包
-  environment.systemPackages = with pkgs; [
-    xdg-desktop-portal-wlr  # Wayland 桌面门户
-    xwayland                # Xwayland 兼容层
-  ];
+    # Niri 相关系统包
+    environment.systemPackages = with pkgs; [
+      xdg-desktop-portal-wlr  # Wayland 桌面门户
+      xwayland                # Xwayland 兼容层
+    ];
+  };
 }
