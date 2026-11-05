@@ -8,6 +8,8 @@
 # - HM 26.05+: gtk.gtk4.theme 不再默认镜像 gtk.theme，需显式设置
 { pkgs, config, lib, ... }:
 
+# GTK / XDG 无条件生效；Hyprland / Niri 主题只有对应 HM 模块加载且启用时才写入。
+# 这样既避免「属性 niri 不存在」（READ 侧），也避免「unmatched definition」（WRITE 侧）。
 {
   # ==================== GTK 主题配置 ====================
   gtk = {
@@ -43,9 +45,11 @@
     enable = true;
     name = "Papirus-Dark";
   };
+}
 
+// lib.optionalAttrs (config.wayland.windowManager ? hyprland && config.wayland.windowManager.hyprland.enable) {
   # ==================== Hyprland 主题配色 ====================
-  wayland.windowManager.hyprland.settings = lib.mkIf config.wayland.windowManager.hyprland.enable (lib.mkMerge [
+  wayland.windowManager.hyprland.settings = lib.mkMerge [
     {
       general = {
         col.active_border = "rgba(34, 197, 94)";
@@ -54,7 +58,7 @@
     }
     {
       decoration = lib.mkMerge [
-        (config.wayland.windowManager.hyprland.settings.decoration or {})
+        ((config.wayland.windowManager.hyprland.settings or {}).decoration or {})
         {
           rounding = 12;
           blur = true;
@@ -67,22 +71,24 @@
         }
       ];
     }
-  ]);
+  ];
+}
 
+// lib.optionalAttrs (config.wayland.windowManager ? niri && config.wayland.windowManager.niri.enable) {
   # ==================== Niri 主题配色 ====================
-  wayland.windowManager.niri.settings = lib.mkIf config.wayland.windowManager.niri.enable (lib.mkMerge [
+  wayland.windowManager.niri.settings = lib.mkMerge [
     {
       border-color = "rgba(34, 197, 94)";
       inactive-border-color = "rgba(71, 85, 105)";
     }
     {
       workspace-strip = lib.mkMerge [
-        config.wayland.windowManager.niri.settings.workspace-strip or {}
+        ((config.wayland.windowManager.niri.settings or {}).workspace-strip or {})
         {
           show-workspace-numbers = true;
           show-window-titles = true;
         }
       ];
     }
-  ]);
+  ];
 }
