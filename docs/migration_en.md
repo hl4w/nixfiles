@@ -302,7 +302,7 @@ wp-color -a
 
 If you were using manual theme switching, migrate to the new unified theme system:
 
-1. The system-level theme is imported automatically by `modules/desktops/desktop.nix` via `unified-theme.nix`, so no manual import is needed; the user-level theme requires importing `home/common/unified-theme.nix` (already included by `home/hosts/*.nix`)
+1. The system-level theme is imported automatically by `modules/desktops/desktop.nix` via `unified-theme.nix`, so no manual import is needed; the user-level theme has been split into three files: `theme-gtk.nix` (GTK/icons, imported unconditionally by all hosts), `theme-hyprland.nix` (Hyprland colors, desktop only), `theme-niri.nix` (Niri colors, laptop only), imported on demand by `home/hosts/*.nix`
 
 2. Configure theme mode in your host configuration:
 ```nix

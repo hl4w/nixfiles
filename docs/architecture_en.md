@@ -60,7 +60,9 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 │   │   ├── git.nix       # Git configuration
 │   │   ├── hyprland.nix  # Hyprland detailed config (wayland.windowManager.hyprland)
 │   │   ├── niri.nix      # Niri detailed config (wayland.windowManager.niri)
-│   │   ├── unified-theme.nix # User-level theme (GTK/XDG icons/WM colors)
+│   │   ├── theme-gtk.nix   # User-level theme (GTK/icons, unconditionally imported)
+│   │   ├── theme-hyprland.nix  # Hyprland window colors (desktop host)
+│   │   ├── theme-niri.nix  # Niri window colors (laptop host)
 │   │   └── wallpaper-watcher.nix  # Wallpaper watcher user service
 │   └── hosts/            # Host-specific user configurations (user-level)
 │       ├── desktop/       # Desktop user configuration
@@ -157,7 +159,9 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 | `git.nix` | Git global configuration |
 | `hyprland.nix` | Hyprland detailed config (wayland.windowManager.hyprland: settings/keybinds/binds) |
 | `niri.nix` | Niri detailed config (wayland.windowManager.niri: settings) |
-| `unified-theme.nix` | User-level theme (GTK/XDG icons/Hyprland-Niri color merging) |
+| `theme-gtk.nix` | User-level theme (GTK/icons, unconditionally imported) |
+| `theme-hyprland.nix` | Hyprland window colors (desktop host; imports order guarantees the option exists) |
+| `theme-niri.nix` | Niri window colors (laptop host) |
 | `wallpaper-watcher.nix` | Wallpaper change watcher user service (auto-update colors) |
 
 ### Documentation (`docs/`)

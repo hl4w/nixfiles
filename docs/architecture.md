@@ -60,7 +60,9 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 │   │   ├── git.nix       # Git 配置
 │   │   ├── hyprland.nix  # Hyprland 详细配置（wayland.windowManager.hyprland）
 │   │   ├── niri.nix      # Niri 详细配置（wayland.windowManager.niri）
-│   │   ├── unified-theme.nix # 用户级主题（GTK/XDG 图标/WM 配色）
+│   │   ├── theme-gtk.nix   # 用户级主题（GTK/图标，无条件导入）
+│   │   ├── theme-hyprland.nix  # Hyprland 窗口配色（desktop 主机导入）
+│   │   ├── theme-niri.nix  # Niri 窗口配色（laptop 主机导入）
 │   │   └── wallpaper-watcher.nix  # 壁纸监听器用户服务
 │   └── hosts/            # 主机特定用户配置（用户级）
 │       ├── desktop/       # 桌面用户配置
@@ -157,7 +159,9 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 | `git.nix` | Git 全局配置 |
 | `hyprland.nix` | Hyprland 详细配置（wayland.windowManager.hyprland：settings/keybinds/binds） |
 | `niri.nix` | Niri 详细配置（wayland.windowManager.niri：settings） |
-| `unified-theme.nix` | 用户级主题（GTK/XDG 图标/Hyprland-Niri 配色合并） |
+| `theme-gtk.nix` | 用户级主题（GTK/图标，无条件导入） |
+| `theme-hyprland.nix` | Hyprland 窗口配色（desktop 主机导入，由 imports 顺序保证 option 存在） |
+| `theme-niri.nix` | Niri 窗口配色（laptop 主机导入） |
 | `wallpaper-watcher.nix` | 壁纸变化监听器用户服务（自动更新配色） |
 
 ### 文档 (`docs/`)
