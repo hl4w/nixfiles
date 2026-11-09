@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
+- **Undefined variable `lspconfig` in Neovim plugin list (`home/common/editor.nix`)**: There is no package called `lspconfig` in `pkgs.vimPlugins` — the correct name is `nvim-lspconfig` (already present at the end of the same list). Removed the duplicate/non-existent entry
 - **`networking.useDHCP` conflict with networkmanager in `modules/services/network.nix`**: In NixOS 26.05, `networking.networkmanager.enable = true` automatically sets `networking.useDHCP` to `false` (NetworkManager manages DHCP itself), so our manual `useDHCP = true` caused a conflicting-definitions error. Removed the redundant line
 - **Non-existent `xdg.iconTheme` option in `home/common/theme-gtk.nix`**: Home Manager release-26.05's `xdg` module (`modules/misc/xdg.nix`) only exposes base directories (`cacheHome`/`configHome`/`dataHome`/`binHome`/`stateHome`) and session-variables-related options — **there has never been an `iconTheme`** under `xdg`. Icon themes are set exclusively through `gtk.iconTheme` (already configured to Papirus-Dark). This bogus option was copied verbatim from the old `unified-theme.nix` and had been masked by the infinite recursion that prevented option validation from running. The whole `xdg.iconTheme` block was deleted
 

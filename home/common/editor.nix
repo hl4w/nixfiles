@@ -13,7 +13,6 @@
       cmp-nvim-lsp
       cmp-buffer
       cmp-path
-      lspconfig
       nvim-treesitter
       gruvbox-nvim
       lualine-nvim
