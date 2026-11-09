@@ -46,7 +46,7 @@
       THEME_NIGHT_START = "${toString startNight}";
 
       # XDG 基础环境变量（非主题相关，保留）
-      QT_QPA_PLATFORMTHEME = "gtk3";
+      # QT_QPA_PLATFORMTHEME 由下面的 qt.platformTheme = "gnome" 自动设置，不手动覆盖
       QT_QPA_FONTDIR = "${pkgs.noto-fonts}/share/fonts";
       # XDG_DATA_DIRS 用列表而非字符串——NixOS 26.05 的 display-manager 模块
       # 也定义了它为列表，列表形式会自动合并；字符串会因重复定义冲突
