@@ -8,6 +8,7 @@
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
+- **`modules/services/network.nix` 中 `networking.useDHCP` 与 networkmanager 冲突**: NixOS 26.05 的 `networking.networkmanager.enable = true` 会自动把 `networking.useDHCP` 设为 `false`（NetworkManager 自己管理 DHCP），我们手动设了 `useDHCP = true` 就导致冲突定义。删除那行即可
 - **`home/common/theme-gtk.nix` 中 `xdg.iconTheme` 选项不存在**: Home Manager release-26.05 的 `xdg` 模块（`modules/misc/xdg.nix`）只有 base directories（`cacheHome`/`configHome`/`dataHome`/`binHome`/`stateHome`）和 session variables 相关选项，**从来没有 `iconTheme`**。图标主题统一由 `gtk.iconTheme` 设置（已配置为 Papirus-Dark）。这个错误选项从 `unified-theme.nix` 原样搬过来，之前一直被 infinite recursion 掩盖没暴露。现删除整个 `xdg.iconTheme` 块
 
 ## [v0.0.6] - 2026-11-05
