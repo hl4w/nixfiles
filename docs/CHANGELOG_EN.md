@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
+- **Desktop host build passes (`nixos-rebuild build` succeeds)**: After ~20 fixes (infinite recursion, 26.05 option/package renames, integer interpolation, env-var conflicts, etc.), the `nixosConfigurations.nixos` (desktop host) flake build succeeds for the first time. Next stage: debug laptop and server hosts one by one
 - **Manual `QT_QPA_PLATFORMTHEME` conflicts with `qt.platformTheme = "gnome"`** (`modules/desktops/unified-theme.nix`): Once the NixOS `qt` module is enabled, it automatically sets `environment.variables.QT_QPA_PLATFORMTHEME` to the `platformTheme` value (`"gnome"`). Our manual `"gtk3"` produced conflicting definitions. Removed the manual line and let the qt module own it
 - **`liberation-fonts` renamed** (`modules/system/fonts.nix`): In nixos-26.05 the Liberation fonts package is `liberation_ttf` (with underscore); the old `liberation-fonts` no longer exists
 - **`XDG_DATA_DIRS` string vs list type mismatch + duplicate definition** (`modules/system/fonts.nix` / `modules/desktops/unified-theme.nix`): NixOS 26.05's display-manager module defines `XDG_DATA_DIRS` as a **list**, while our two modules used a **colon-separated string**. This caused (1) `either (listOf str) str` type-check failure and (2) "defined multiple times while expected to be unique" because strings don't merge. Changed both to lists so all three modules' `XDG_DATA_DIRS` concatenate automatically
