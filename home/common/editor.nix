@@ -21,8 +21,6 @@
       comment-nvim
       gitsigns-nvim
       nvim-lspconfig
-      nixvim
-      nix-syntax-vim
     ];
     extraConfig = ''
       set number

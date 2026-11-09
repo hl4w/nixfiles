@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
+- **Non-existent `nixvim` and `nix-syntax-vim` in Neovim plugin list (`home/common/editor.nix`)**: Neither is present in nixos-26.05's `pkgs.vimPlugins`. Removed both
 - **Non-existent `autopairs-nvim` in Neovim plugin list (`home/common/editor.nix`)**: nixos-26.05's `pkgs.vimPlugins` does not include `windwp/nvim-autopairs` (neovim 0.10+ has built-in pairing; can be replaced later). Removed the entry
 - **Undefined variable `lspconfig` in Neovim plugin list (`home/common/editor.nix`)**: There is no package called `lspconfig` in `pkgs.vimPlugins` — the correct name is `nvim-lspconfig` (already present later in the same list). Removed the duplicate/non-existent entry
 - **`networking.useDHCP` conflict with networkmanager in `modules/services/network.nix`**: In NixOS 26.05, `networking.networkmanager.enable = true` automatically sets `networking.useDHCP` to `false` (NetworkManager manages DHCP itself), so our manual `useDHCP = true` caused a conflicting-definitions error. Removed the redundant line
