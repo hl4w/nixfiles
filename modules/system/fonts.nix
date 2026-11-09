@@ -14,7 +14,7 @@
     noto-fonts-cjk-serif        # Noto CJK 衬线字体（中日韩）
     noto-fonts-color-emoji      # Noto 彩色 Emoji 字体（已替换 noto-fonts-emoji）
     cantarell-fonts             # Cantarell 字体（GNOME 默认）
-    liberation-fonts            # Liberation 字体（替代微软字体）
+    liberation_ttf            # Liberation 字体（替代微软字体，26.05 改名 liberation_ttf）
     
     # 中文字体（支持 WPS Office CN）
     wqy_microhei                # 文泉驿微米黑
