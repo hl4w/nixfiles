@@ -8,7 +8,13 @@
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
-- **移除多余的 `services.dbus.enable = true`**（`shell-dms.nix` / `shell-noctalia.nix`）: NixOS 26.05 桌面环境模块会自动拉取 dbus，显式设置可能与 qt/dbus 模块的 `environment.etc."dbus-1".source` 合并产生 `cannot coerce an integer to a string: 6` 类型错误。待验证
+- **`QT_QPA_PLATFORMTHEME` 手动设置与 `qt.platformTheme = "gnome"` 冲突**（`modules/desktops/unified-theme.nix`）: NixOS 的 `qt` 模块启用后会自动把 `environment.variables.QT_QPA_PLATFORMTHEME` 设为 `platformTheme` 的值（`"gnome"`），我们手动设了 `"gtk3"` 就产生冲突定义。删除手动那行，让 qt 模块统一管理
+- **`liberation-fonts` 包名已改**（`modules/system/fonts.nix`）: nixos-26.05 里 Liberation 字体包名是 `liberation_ttf`（带下划线），原名 `liberation-fonts` 不存在
+- **`XDG_DATA_DIRS` 字符串与列表形式冲突 + 重复定义**（`modules/system/fonts.nix` / `modules/desktops/unified-theme.nix`）: NixOS 26.05 的 display-manager 模块把 `XDG_DATA_DIRS` 定义为**列表**，而我们两个模块用的是**冒号分隔字符串**。导致 (1) `either (listOf str) str` 类型检查失败；(2) 字符串定义不支持合并 → "defined multiple times while expected to be unique"。改为列表后，三个模块的 `XDG_DATA_DIRS` 自动拼接
+- **`theme-switch` 脚本里整数选项插值未 `toString`**（`modules/desktops/unified-theme.nix`）: `writeScriptBin` 的脚本字符串里 `${startDay}`（int 6）/ `${startNight}`（int 18）直接插值——Nix 不允许 `"${整数}"`，报 `cannot coerce an integer to a string: 6`。trace 挂在 `environment.etc.dbus-1.source` 是因为 dbus 模块的 `serviceDirectories` 会强制求值整个 `environment.systemPackages`，而 `theme-switch` 就在里面。修复：用 `${toString startDay}`。**续坑**：修复注释时在 `''...''` 字符串内写了 `# ... ${startDay} ...`，Nix 对 indented string 里**所有** `${...}` 都插值（包括注释行），又炸了一次。最终用 `''${` 转义注释里的字面量
+- **Home Manager 独立 nixpkgs 实例也需 allowUnfree**（`flake.nix`）: 系统级 `nixpkgs.config.allowUnfree = true` 只作用于 NixOS 主配置，HM 有独立的 nixpkgs 实例。在 `mkHost` 里加 `home-manager.sharedModules = [ { nixpkgs.config.allowUnfree = true; } ]` 让 HM 也允许 Steam/Discord 等非自由包
+- **`qt.platformTheme = "gtk3"` 枚举值已移除**（`modules/desktops/unified-theme.nix`）: nixos-26.05 只接受 `"gnome"`/`"gtk2"`/`"kde"`/`"lxqt"`/`"qt5ct"`，`"gtk3"` 已删（Qt 6 原生支持 GTK 3 集成）。改为 `"gnome"`，语义等价
+- **移除多余的 `services.dbus.enable = true`**（`shell-dms.nix` / `shell-noctalia.nix`）: NixOS 26.05 桌面环境模块会自动拉取 dbus，显式设置属于冗余。注：最初误以为这是 `cannot coerce an integer to a string: 6` 的根因，实际真因是 `theme-switch` 的整数插值（见上），但移除冗余显式启用本身也是对的
 - **`environment.etc."skel/.wallpapers".recursive` 已移除（26.05）**: `modules/desktops/unified-theme.nix` 里 `environment.etc.submodule` 默认对目录 source 做递归复制，`.recursive = true` 选项在 26.05 被移除。删掉
 - **`home/common/git.nix` 的 git 选项重命名（HM 26.05）**: `userName`/`userEmail`/`extraConfig` 已合并进 `settings.submodule`。改为 `settings.user.name`/`settings.user.email`/`settings.{其余}`
 - **`home/common/shell.nix` 的 `programs.zsh.initExtra` 已废弃（HM 26.05）**: 改为 `programs.zsh.initContent`。**注意**：Bash 没改，还是 `initExtra`
