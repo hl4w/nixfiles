@@ -14,7 +14,6 @@
     vlc
     gimp
     inkscape
-    wps-office-cn
     keepassxc
     nextcloud-client          # Nextcloud 客户端
     vscodium                  # VSCodium 编辑器（开源版 VS Code）

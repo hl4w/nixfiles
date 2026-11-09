@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
+- **`wps-office-cn` is not a top-level package (`home/common/apps.nix`)**: Removed (NixOS official repos don't include WPS Office)
 - **`nemo-extensions` is not a top-level package (`home/common/apps.nix`)**: Removed. If needed later, can be configured through the Cinnamon/Nemo module
 - **`kdenlive` is not a top-level package (`home/hosts/desktop/default.nix`)**: nixos-26.05 does not expose kdenlive at the top level. Removed it (can be added via `pkgs.kdePackages.kdenlive` or explicit Qt version if needed)
 - **`clangd` is not a standalone top-level package (`home/common/dev-lsp.nix`)**: `clangd` is a binary inside `clang-tools`, which is already in the list. Removed the duplicate/non-existent entry

@@ -8,6 +8,7 @@
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
+- **`home/common/apps.nix` 中 `wps-office-cn` 不在顶层**: 删掉（NixOS 官方仓库不包含 WPS Office）
 - **`home/common/apps.nix` 中 `nemo-extensions` 不在顶层**: 删掉，需要时可通过 Cinnamon/Nemo 模块配置
 - **`home/hosts/desktop/default.nix` 中 `kdenlive` 不在顶层**: nixos-26.05 里 kdenlive 不在顶层 pkgs。删掉（需要时可通过 `pkgs.kdePackages.kdenlive` 或指定 Qt 版本）
 - **`home/common/dev-lsp.nix` 中 `clangd` 不是独立顶层包**: `clangd` 是 `clang-tools` 包里的二进制，`clang-tools` 已在列表里。删掉重复/不存在的 `clangd`
