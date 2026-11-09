@@ -8,6 +8,7 @@
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
+- **`home/common/apps.nix` 中 `nemo-extensions` 不在顶层**: 删掉，需要时可通过 Cinnamon/Nemo 模块配置
 - **`home/hosts/desktop/default.nix` 中 `kdenlive` 不在顶层**: nixos-26.05 里 kdenlive 不在顶层 pkgs。删掉（需要时可通过 `pkgs.kdePackages.kdenlive` 或指定 Qt 版本）
 - **`home/common/dev-lsp.nix` 中 `clangd` 不是独立顶层包**: `clangd` 是 `clang-tools` 包里的二进制，`clang-tools` 已在列表里。删掉重复/不存在的 `clangd`
 - **`theme-hyprland.nix` / `theme-niri.nix` 里 config 引用又触发 infinite recursion**: 拆文件时注释写了「放在 config 块内部」但实际根本没包进 `config = { ... }`，而是直接写在模块返回值顶层表达式里，还引用了 `config.wayland.windowManager.hyprland.settings or {}` 来做手动 merge。两个教训：
