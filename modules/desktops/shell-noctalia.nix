@@ -19,7 +19,8 @@
     ];
 
     # 启用必需的系统服务（依据 Noctalia 官方 NixOS 文档）
-    services.dbus.enable = true;                   # D-Bus 通信
+    # 注意: 不再显式设置 services.dbus.enable = true —— 26.05 里桌面环境模块
+    # 会自动拉取 dbus，显式设置反而可能产生 type mismatch
     powerManagement.enable = true;                 # 电源管理（挂起/休眠钩子）
     services.blueman.enable = true;                # 蓝牙图形管理
     services.power-profiles-daemon.enable = true;  # 电源配置服务

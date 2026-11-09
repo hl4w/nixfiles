@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
+- **Removed redundant `services.dbus.enable = true`** in shell-dms.nix and shell-noctalia.nix: NixOS 26.05 desktop modules pull in dbus automatically. Explicit enable may conflict with qt/dbus module merge producing `cannot coerce an integer to a string: 6` on `environment.etc."dbus-1".source`. TBD
 - **`environment.etc.submodule` removed `.recursive` option in 26.05**: Defaults to recursive copy for directory sources. Removed `recursive = true` in `modules/desktops/unified-theme.nix`
 - **Git HM options renamed in 26.05**: `programs.git.userName`, `.userEmail`, `.extraConfig` merged into `settings.submodule`. Rewrote as `settings.user.name`, `settings.user.email`, `settings.*`
 - **`programs.zsh.initExtra` → `initContent` in 26.05 (zsh only)**: Bash still uses `initExtra`. Fixed in `home/common/shell.nix`

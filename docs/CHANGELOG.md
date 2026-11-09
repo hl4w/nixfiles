@@ -8,6 +8,7 @@
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
+- **移除多余的 `services.dbus.enable = true`**（`shell-dms.nix` / `shell-noctalia.nix`）: NixOS 26.05 桌面环境模块会自动拉取 dbus，显式设置可能与 qt/dbus 模块的 `environment.etc."dbus-1".source` 合并产生 `cannot coerce an integer to a string: 6` 类型错误。待验证
 - **`environment.etc."skel/.wallpapers".recursive` 已移除（26.05）**: `modules/desktops/unified-theme.nix` 里 `environment.etc.submodule` 默认对目录 source 做递归复制，`.recursive = true` 选项在 26.05 被移除。删掉
 - **`home/common/git.nix` 的 git 选项重命名（HM 26.05）**: `userName`/`userEmail`/`extraConfig` 已合并进 `settings.submodule`。改为 `settings.user.name`/`settings.user.email`/`settings.{其余}`
 - **`home/common/shell.nix` 的 `programs.zsh.initExtra` 已废弃（HM 26.05）**: 改为 `programs.zsh.initContent`。**注意**：Bash 没改，还是 `initExtra`

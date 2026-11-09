@@ -28,7 +28,8 @@
       pavucontrol                  # 音频控制工具
     ];
 
-    # 启用 D-Bus 服务（Shell 通信必需）
-    services.dbus.enable = true;
+    # D-Bus 服务（shell 内部会自动拉取，或由 NixOS 默认启用，
+    # 不需要显式 services.dbus.enable = true —— 26.05 里显式设置
+    # 反而可能导致与 qt/dbus 模块的环境合并产生 type mismatch）
   };
 }
