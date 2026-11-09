@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - **`environment.etc.submodule` removed `.recursive` option in 26.05**: Defaults to recursive copy for directory sources. Removed `recursive = true` in `modules/desktops/unified-theme.nix`
 - **Git HM options renamed in 26.05**: `programs.git.userName`, `.userEmail`, `.extraConfig` merged into `settings.submodule`. Rewrote as `settings.user.name`, `settings.user.email`, `settings.*`
-- **`programs.zsh.initExtra` → `initContent` in 26.05**: Same for Bash. Updated both in `home/common/shell.nix`
+- **`programs.zsh.initExtra` → `initContent` in 26.05 (zsh only)**: Bash still uses `initExtra`. Fixed in `home/common/shell.nix`
 - **Unfree packages like `steam` refused to evaluate**: Added `nixpkgs.config.allowUnfree = true` to `modules/system/default.nix` so Steam, Discord, and other non-free packages can be evaluated. Another item masked by the original infinite recursion
 - **`wps-office-cn` is not a top-level package (`home/common/apps.nix`)**: Removed (NixOS official repos don't include WPS Office)
 - **`nemo-extensions` is not a top-level package (`home/common/apps.nix`)**: Removed. If needed later, can be configured through the Cinnamon/Nemo module

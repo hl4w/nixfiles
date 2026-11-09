@@ -8,8 +8,7 @@
   # Bash 配置
   programs.bash = {
     enable = true;
-    # Home Manager 26.05: initExtra 已改名 initContent
-    initContent = ''
+    initExtra = ''
       export PATH="$HOME/.local/bin:$PATH"
       export EDITOR="nvim"
       export VISUAL="nvim"
@@ -35,7 +34,7 @@
     };
     # 提示符由下面的 programs.starship 接管（enableZshIntegration），
     # Home Manager 的 zsh 模块没有 prompt 选项
-    # Home Manager 26.05: initExtra 已改名 initContent
+    # Home Manager 26.05: zsh.initExtra 已废弃，改用 initContent
     initContent = ''
       export PATH="$HOME/.local/bin:$PATH"
       export EDITOR="nvim"
