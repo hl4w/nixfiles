@@ -59,10 +59,9 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 │   │   ├── dev-lsp.nix   # LSP servers (including C/C++)
 │   │   ├── git.nix       # Git configuration
 │   │   ├── hyprland.nix  # Hyprland detailed config (wayland.windowManager.hyprland)
-│   │   ├── niri.nix      # Niri detailed config (wayland.windowManager.niri)
+│   │   ├── niri.nix      # Niri config (KDL format with colors; HM 26.05 has no niri module, uses xdg.configFile)
 │   │   ├── theme-gtk.nix   # User-level theme (GTK/icons, unconditionally imported)
 │   │   ├── theme-hyprland.nix  # Hyprland window colors (desktop host)
-│   │   ├── theme-niri.nix  # Niri window colors (laptop host)
 │   │   └── wallpaper-watcher.nix  # Wallpaper watcher user service
 │   └── hosts/            # Host-specific user configurations (user-level)
 │       ├── desktop/       # Desktop user configuration
@@ -158,10 +157,9 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 | `dev-lsp.nix` | Development tools and LSP servers (C/C++: clangd/clang-tools/cmake/ninja/gdb/lldb; Go: go/gopls; Python: python3/pyright; Rust: rustc/rust-analyzer/rustfmt/cargo) |
 | `git.nix` | Git global configuration |
 | `hyprland.nix` | Hyprland detailed config (wayland.windowManager.hyprland: settings/keybinds/binds) |
-| `niri.nix` | Niri detailed config (wayland.windowManager.niri: settings) |
+| `niri.nix` | Niri config (KDL format with colors; HM 26.05 has no wayland.windowManager.niri module, generated via xdg.configFile; laptop host) |
 | `theme-gtk.nix` | User-level theme (GTK/icons, unconditionally imported) |
 | `theme-hyprland.nix` | Hyprland window colors (desktop host; imports order guarantees the option exists) |
-| `theme-niri.nix` | Niri window colors (laptop host) |
 | `wallpaper-watcher.nix` | Wallpaper change watcher user service (auto-update colors) |
 
 ### Documentation (`docs/`)

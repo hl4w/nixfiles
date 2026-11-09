@@ -302,7 +302,7 @@ wp-color -a
 
 如果您之前使用手动主题切换，请迁移到新的统一主题系统：
 
-1. 系统层主题由 `modules/desktops/desktop.nix` 自动导入 `unified-theme.nix`，无需手动添加；用户级主题已拆分为三个文件：`theme-gtk.nix`（GTK/图标，所有主机无条件导入）、`theme-hyprland.nix`（Hyprland 配色，仅 desktop 导入）、`theme-niri.nix`（Niri 配色，仅 laptop 导入），由 `home/hosts/*.nix` 按需导入
+1. 系统层主题由 `modules/desktops/desktop.nix` 自动导入 `unified-theme.nix`，无需手动添加；用户级主题已拆分：`theme-gtk.nix`（GTK/图标，所有主机无条件导入）、`theme-hyprland.nix`（Hyprland 配色，仅 desktop 导入）；Niri 配色合并进 `niri.nix`（KDL 格式，因 HM 26.05 无 `wayland.windowManager.niri` 模块，用 `xdg.configFile` 生成 `~/.config/niri/config.kdl`），由 `home/hosts/laptop.nix` 导入
 
 2. 在主机配置中配置主题模式：
 ```nix

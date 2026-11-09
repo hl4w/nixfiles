@@ -8,6 +8,7 @@
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
+- **`wayland.windowManager.niri` 在 HM release-26.05 中不存在**: 查 `modules/services/window-managers/` 目录确认有 `hyprland.nix` 但无 `niri.nix`。`home/common/niri.nix` 和 `theme-niri.nix` 改用 `xdg.configFile."niri/config.kdl".text` 直接生成 KDL 格式配置（niri 原生配置格式）；配色合并进 `niri.nix`（KDL 是单一文件，不能多模块 merge），删除 `theme-niri.nix`；更新 `laptop.nix` imports
 - **desktop 主机构建已通过（`nixos-rebuild build` 成功）**: 经过约 20 处修复（infinite recursion、26.05 选项/包名变更、整数插值、环境变量冲突等），`nixosConfigurations.nixos`（desktop 主机）的 flake 构建首次成功。下一阶段开始逐主机调试 laptop 与 server
 - **`QT_QPA_PLATFORMTHEME` 手动设置与 `qt.platformTheme = "gnome"` 冲突**（`modules/desktops/unified-theme.nix`）: NixOS 的 `qt` 模块启用后会自动把 `environment.variables.QT_QPA_PLATFORMTHEME` 设为 `platformTheme` 的值（`"gnome"`），我们手动设了 `"gtk3"` 就产生冲突定义。删除手动那行，让 qt 模块统一管理
 - **`liberation-fonts` 包名已改**（`modules/system/fonts.nix`）: nixos-26.05 里 Liberation 字体包名是 `liberation_ttf`（带下划线），原名 `liberation-fonts` 不存在

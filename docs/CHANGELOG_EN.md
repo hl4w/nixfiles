@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
+- **`wayland.windowManager.niri` does not exist in HM release-26.05**: Verified the `modules/services/window-managers/` directory has `hyprland.nix` but no `niri.nix`. Rewrote `home/common/niri.nix` and `theme-niri.nix` to use `xdg.configFile."niri/config.kdl".text` to generate the KDL-format config directly (niri's native format); merged colors into `niri.nix` (KDL is a single file, can't be multi-module merged), deleted `theme-niri.nix`; updated `laptop.nix` imports
 - **Desktop host build passes (`nixos-rebuild build` succeeds)**: After ~20 fixes (infinite recursion, 26.05 option/package renames, integer interpolation, env-var conflicts, etc.), the `nixosConfigurations.nixos` (desktop host) flake build succeeds for the first time. Next stage: debug laptop and server hosts one by one
 - **Manual `QT_QPA_PLATFORMTHEME` conflicts with `qt.platformTheme = "gnome"`** (`modules/desktops/unified-theme.nix`): Once the NixOS `qt` module is enabled, it automatically sets `environment.variables.QT_QPA_PLATFORMTHEME` to the `platformTheme` value (`"gnome"`). Our manual `"gtk3"` produced conflicting definitions. Removed the manual line and let the qt module own it
 - **`liberation-fonts` renamed** (`modules/system/fonts.nix`): In nixos-26.05 the Liberation fonts package is `liberation_ttf` (with underscore); the old `liberation-fonts` no longer exists
