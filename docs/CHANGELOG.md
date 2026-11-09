@@ -8,7 +8,9 @@
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
-- **`qt.platformTheme = "gtk3"` 在 nixos-26.05 中不再合法**: 有效值只剩 `"gnome"` / `"gtk2"` / `"kde"` / `"lxqt"` / `"qt5ct"`。Qt 6 原生支持 GTK 3 集成，所以 `"gtk3"` 被移除了。改为 `"gnome"`（语义等价，跟随 GNOME Adwaita 主题）
+- **`theme-hyprland.nix` / `theme-niri.nix` 里 config 引用又触发 infinite recursion**: 拆文件时注释写了「放在 config 块内部」但实际根本没包进 `config = { ... }`，而是直接写在模块返回值顶层表达式里，还引用了 `config.wayland.windowManager.hyprland.settings or {}` 来做手动 merge。两个教训：
+  1) **attrset 自动合并替代手动 merge**：HM 模块框架会自动合并同名 attrset，不需要先读 config 再用 `lib.mkMerge` 手动拼接。hyprland.nix 写了 `settings = { general = {...}; decoration = {}; }`，theme-hyprland.nix 写 `settings = { general = { col.* = ... }; decoration = { rounding = 12; ... }; }`，框架自动 merge 两个 general 和两个 decoration
+  2) **彻底不引用 config**：既然 option 存在由 imports 顺序保证，配置合并由框架自动处理，主题文件完全不需要 config 参数。重写为纯 attrset，0 个 config 引用
 - **`pkgs.gnome.gnome-themes-extra` / `pkgs.gnome.adwaita-icon-theme` 已搬到顶层**: nixos-26.05 的 gnome scope 里这两个包已经不存在，直接用顶层 `pkgs.gnome-themes-extra` / `pkgs.adwaita-icon-theme`。涉及 `home/common/theme-gtk.nix`、`modules/desktops/desktop.nix`、`modules/desktops/unified-theme.nix` 共 3 个文件
 - **`home/common/editor.nix` Neovim 插件列表里 `nixvim` 和 `nix-syntax-vim` 不存在**: 两个都不在 nixos-26.05 的 `pkgs.vimPlugins` 里。已删除
 - **`home/common/editor.nix` Neovim 插件列表里 `autopairs-nvim` 不存在**: nixos-26.05 分支的 `pkgs.vimPlugins` 里根本没有 `windwp/nvim-autopairs`（neovim 0.10+ 有内置配对，可后续按需替代），直接删掉

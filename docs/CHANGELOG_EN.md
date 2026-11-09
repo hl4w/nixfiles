@@ -8,7 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
-- **`qt.platformTheme = "gtk3"` no longer valid in nixos-26.05**: Valid values are now only `"gnome"` / `"gtk2"` / `"kde"` / `"lxqt"` / `"qt5ct"`. Qt 6 has native GTK 3 integration so the `"gtk3"` value was dropped. Changed to `"gnome"` (semantically equivalent, follows the GNOME Adwaita theme)
+- **Infinite recursion again in theme-hyprland.nix / theme-niri.nix due to config references**: When splitting files, the comment said "inside the config block" but the code was NOT wrapped in `config = { ... }` — the `let ... in lib.mkIf (config.xxx)` expression sat directly in the module's top-level return value, and even worse, tried to manually `lib.mkMerge` with `config.wayland.windowManager.hyprland.settings or {}`. Two lessons:
+  1) **Attrset auto-merge replaces manual merge**: HM modules automatically merge attrs with the same path. hyprland.nix writes `settings = { general = {...}; decoration = {}; }`, theme-hyprland.nix writes `settings = { general = { col.* = ... }; decoration = { rounding = 12; ... }; }` — the framework recurses-merges both `general` and both `decoration` for free
+  2) **Don't reference config at all**: imports order guarantees the option exists, framework handles merge. Rewrote both files as pure attrsets with zero config references
 - **`pkgs.gnome.gnome-themes-extra` / `pkgs.gnome.adwaita-icon-theme` moved to top-level**: In nixos-26.05 both packages are no longer under the gnome scope; use `pkgs.gnome-themes-extra` / `pkgs.adwaita-icon-theme` directly. Affects `home/common/theme-gtk.nix`, `modules/desktops/desktop.nix`, `modules/desktops/unified-theme.nix` (3 files)
 - **Non-existent `nixvim` and `nix-syntax-vim` in Neovim plugin list (`home/common/editor.nix`)**: Neither is present in nixos-26.05's `pkgs.vimPlugins`. Removed both
 - **Non-existent `autopairs-nvim` in Neovim plugin list (`home/common/editor.nix`)**: nixos-26.05's `pkgs.vimPlugins` does not include `windwp/nvim-autopairs` (neovim 0.10+ has built-in pairing; can be replaced later). Removed the entry
