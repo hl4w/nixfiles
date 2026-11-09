@@ -75,10 +75,8 @@
     # 这些是用户首次登录时的骨架默认值（~/.config 还没生成时生效）
     # Home Manager 配置安装后会覆盖这些系统级默认值
     environment.etc = {
-      "skel/.wallpapers" = {
-        source = ./../../wallpapers;
-        recursive = true;
-      };
+      # environment.etc.submodule 默认对目录 source 做递归复制，不需要 recursive = true（26.05 已移除此选项）
+      "skel/.wallpapers".source = ./../../wallpapers;
 
       "gtk-3.0/settings.ini".text = ''
         [Settings]
