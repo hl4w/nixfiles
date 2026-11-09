@@ -6,6 +6,10 @@
 
 > 约定：版本号不变时，每次提交均以**当日日期**开一个新的小节，当日所有改动聚合在该节下，便于按日期追踪未发布版本的变更。
 
+## [v0.0.6] - 2026-11-09
+### Fixed
+- **`home/common/theme-gtk.nix` 中 `xdg.iconTheme` 选项不存在**: Home Manager release-26.05 的 `xdg` 模块（`modules/misc/xdg.nix`）只有 base directories（`cacheHome`/`configHome`/`dataHome`/`binHome`/`stateHome`）和 session variables 相关选项，**从来没有 `iconTheme`**。图标主题统一由 `gtk.iconTheme` 设置（已配置为 Papirus-Dark）。这个错误选项从 `unified-theme.nix` 原样搬过来，之前一直被 infinite recursion 掩盖没暴露。现删除整个 `xdg.iconTheme` 块
+
 ## [v0.0.6] - 2026-11-05
 ### Fixed
 - **`modules/desktops/*.nix` 与 `modules/input-method/default.nix` 中 `lib.mkIf` 放在模块顶层导致 infinite recursion**: 模块顶层的 `lib.mkIf config.desktop.windowManager / shell / enableInputMethod` 被 desktop.nix 的 `imports` 列表求值时触发循环依赖：求值 module function → 解析 mkIf 的 config 条件 → config 是惰性 thunk → 需要合并所有模块 config 才能解析 → 又回到这里。NixOS 报错提示的正是这种模式（*"reference `config` in `imports`"*）。修复：把 `lib.mkIf` 全部挪进 `config = lib.mkIf ... { ... }` 块内部，模块顶层只返回纯 `{ config = ... }` 结构，NixOS modules 框架会在合并 config 之后才求值 mkIf 条件，此时 config 值已确定。涉及 `hyprland.nix`、`niri.nix`、`shell-dms.nix`、`shell-noctalia.nix`、`input-method/default.nix` 共 5 个文件

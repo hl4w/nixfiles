@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 > Convention: when the version number stays the same, each commit opens a new section with the current date. All changes made on the same day are grouped under that section, so commits can be traced back to their day even before the next release is cut.
 
+## [v0.0.6] - 2026-11-09
+### Fixed
+- **Non-existent `xdg.iconTheme` option in `home/common/theme-gtk.nix`**: Home Manager release-26.05's `xdg` module (`modules/misc/xdg.nix`) only exposes base directories (`cacheHome`/`configHome`/`dataHome`/`binHome`/`stateHome`) and session-variables-related options — **there has never been an `iconTheme`** under `xdg`. Icon themes are set exclusively through `gtk.iconTheme` (already configured to Papirus-Dark). This bogus option was copied verbatim from the old `unified-theme.nix` and had been masked by the infinite recursion that prevented option validation from running. The whole `xdg.iconTheme` block was deleted
+
 ## [v0.0.6] - 2026-11-05
 ### Fixed
 - **`lib.mkIf` at module top level in `modules/desktops/*.nix` and `modules/input-method/default.nix` caused infinite recursion**: desktop.nix's unconditional `imports` list evaluated these module expressions. Each used `lib.mkIf config.desktop.windowManager / shell / enableInputMethod` at module top level, which forced evaluation of the `config` lazy thunk before any config values were merged → evaluating all module configs → back to the same module evaluation → CYCLE. This is exactly the pattern NixOS's error message warns about: *"you probably reference `config` in `imports`"*. Fix: move every `lib.mkIf` inside a `config = lib.mkIf ... { ... }` block so the module top level only returns a pure `{ config = ... }` attrset, and mkIf conditions are evaluated only after the module system has merged all config values. Affects `hyprland.nix`, `niri.nix`, `shell-dms.nix`, `shell-noctalia.nix`, `input-method/default.nix` (5 files)
