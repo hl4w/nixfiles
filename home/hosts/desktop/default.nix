@@ -11,6 +11,5 @@
     # 内容创作
     obs-studio
     blender
-    kdenlive
   ];
 }
