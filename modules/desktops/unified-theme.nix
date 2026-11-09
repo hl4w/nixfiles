@@ -131,8 +131,10 @@
 
         if [ -z "$MODE" ]; then
             HOUR=$(date +%H)
-            DAY_START=${startDay}
-            NIGHT_START=${startNight}
+            # Nix 字符串插值不接受整数，必须显式 toString
+            # （直接写 ${startDay} 会报 "cannot coerce an integer to a string: 6"）
+            DAY_START=${toString startDay}
+            NIGHT_START=${toString startNight}
 
             if [ "${currentThemeMode}" = "dark" ]; then
                 MODE="dark"
