@@ -8,6 +8,7 @@
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
+- **Home Manager 独立 nixpkgs 实例也需 allowUnfree**: 系统级 `nixpkgs.config.allowUnfree = true` 只作用于 NixOS 主配置，HM 有独立的 nixpkgs 实例。在 `flake.nix` 的 mkHost 里加 `home-manager.sharedModules = [ { nixpkgs.config.allowUnfree = true; } ]` 让 HM 也允许 Steam/Discord 等非自由包
 - **`steam` 等 unfree 包被拒绝求值**: 加 `nixpkgs.config.allowUnfree = true` 到 `modules/system/default.nix`，允许 Steam、Discord 等非自由软件。之前无限递归导致从没走到包求值阶段，所以一直没暴露
 - **`home/common/apps.nix` 中 `wps-office-cn` 不在顶层**: 删掉（NixOS 官方仓库不包含 WPS Office）
 - **`home/common/apps.nix` 中 `nemo-extensions` 不在顶层**: 删掉，需要时可通过 Cinnamon/Nemo 模块配置

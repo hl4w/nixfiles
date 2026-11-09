@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
+- **Home Manager needs its own allowUnfree config**: System-level `nixpkgs.config.allowUnfree = true` only applies to the NixOS config; HM has a separate nixpkgs instance. Added `home-manager.sharedModules = [ { nixpkgs.config.allowUnfree = true; } ]` in flake.nix's mkHost so HM also allows Steam/Discord non-free packages
 - **Unfree packages like `steam` refused to evaluate**: Added `nixpkgs.config.allowUnfree = true` to `modules/system/default.nix` so Steam, Discord, and other non-free packages can be evaluated. Another item masked by the original infinite recursion
 - **`wps-office-cn` is not a top-level package (`home/common/apps.nix`)**: Removed (NixOS official repos don't include WPS Office)
 - **`nemo-extensions` is not a top-level package (`home/common/apps.nix`)**: Removed. If needed later, can be configured through the Cinnamon/Nemo module

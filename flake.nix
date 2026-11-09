@@ -95,6 +95,12 @@
 
         # ③ Home Manager 用户绑定 + 注入 flake inputs 给 HM 模块
         {
+          # 允许 unfree 包（steam、discord 等）——HM 有独立的 nixpkgs 实例，
+          # 系统级 modules/system/default.nix 的 allowUnfree 不会自动传递过来
+          home-manager.sharedModules = [
+            { nixpkgs.config.allowUnfree = true; }
+          ];
+
           # 用占位符用户名声明 HM 管理的用户
           # install.sh 替换 flake.nix USERNAME 后，这里会自动匹配
           home-manager.users.${USERNAME} = import ./home/hosts/${name}.nix;
