@@ -8,6 +8,7 @@
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
+- **`qt.platformTheme = "gtk3"` 在 nixos-26.05 中不再合法**: 有效值只剩 `"gnome"` / `"gtk2"` / `"kde"` / `"lxqt"` / `"qt5ct"`。Qt 6 原生支持 GTK 3 集成，所以 `"gtk3"` 被移除了。改为 `"gnome"`（语义等价，跟随 GNOME Adwaita 主题）
 - **`pkgs.gnome.gnome-themes-extra` / `pkgs.gnome.adwaita-icon-theme` 已搬到顶层**: nixos-26.05 的 gnome scope 里这两个包已经不存在，直接用顶层 `pkgs.gnome-themes-extra` / `pkgs.adwaita-icon-theme`。涉及 `home/common/theme-gtk.nix`、`modules/desktops/desktop.nix`、`modules/desktops/unified-theme.nix` 共 3 个文件
 - **`home/common/editor.nix` Neovim 插件列表里 `nixvim` 和 `nix-syntax-vim` 不存在**: 两个都不在 nixos-26.05 的 `pkgs.vimPlugins` 里。已删除
 - **`home/common/editor.nix` Neovim 插件列表里 `autopairs-nvim` 不存在**: nixos-26.05 分支的 `pkgs.vimPlugins` 里根本没有 `windwp/nvim-autopairs`（neovim 0.10+ 有内置配对，可后续按需替代），直接删掉

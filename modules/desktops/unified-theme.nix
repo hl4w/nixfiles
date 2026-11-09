@@ -61,7 +61,9 @@
     qt = {
       enable = true;
       style = "adwaita-dark";
-      platformTheme = "gtk3";
+      # nixos-26.05: platformTheme 只接受 "gnome" / "gtk2" / "kde" / "lxqt" / "qt5ct"
+      # "gtk3" 不再是有效值，Qt 6 原生支持 GTK 3 集成
+      platformTheme = "gnome";
     };
 
     # ==================== SDDM 登录界面 ====================
