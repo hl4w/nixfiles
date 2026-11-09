@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
+- **`pkgs.gnome.gnome-themes-extra` / `pkgs.gnome.adwaita-icon-theme` moved to top-level**: In nixos-26.05 both packages are no longer under the gnome scope; use `pkgs.gnome-themes-extra` / `pkgs.adwaita-icon-theme` directly. Affects `home/common/theme-gtk.nix`, `modules/desktops/desktop.nix`, `modules/desktops/unified-theme.nix` (3 files)
 - **Non-existent `nixvim` and `nix-syntax-vim` in Neovim plugin list (`home/common/editor.nix`)**: Neither is present in nixos-26.05's `pkgs.vimPlugins`. Removed both
 - **Non-existent `autopairs-nvim` in Neovim plugin list (`home/common/editor.nix`)**: nixos-26.05's `pkgs.vimPlugins` does not include `windwp/nvim-autopairs` (neovim 0.10+ has built-in pairing; can be replaced later). Removed the entry
 - **Undefined variable `lspconfig` in Neovim plugin list (`home/common/editor.nix`)**: There is no package called `lspconfig` in `pkgs.vimPlugins` — the correct name is `nvim-lspconfig` (already present later in the same list). Removed the duplicate/non-existent entry

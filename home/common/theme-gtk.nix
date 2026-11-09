@@ -21,7 +21,7 @@
     enable = true;
     theme = {
       name = "Adwaita-dark";
-      package = pkgs.gnome.gnome-themes-extra;
+      package = pkgs.gnome-themes-extra;
     };
     iconTheme = {
       name = "Papirus-Dark";
@@ -41,7 +41,7 @@
     # HM 26.05+: gtk4.theme 不再默认镜像 gtk.theme，必须显式设置
     gtk4.theme = {
       name = "Adwaita-dark";
-      package = pkgs.gnome.gnome-themes-extra;
+      package = pkgs.gnome-themes-extra;
     };
   };
 }

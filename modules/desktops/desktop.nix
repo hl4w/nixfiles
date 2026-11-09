@@ -52,8 +52,8 @@ in
       (with pkgs; [
         # Adwaita 主题（qt6Packages 集合中无 adwaita-qt，仅顶层同名包）
         adwaita-qt                    # Adwaita 主题（跟随 nixpkgs 默认 Qt 版本）
-        gnome.adwaita-icon-theme      # Adwaita 图标主题
-        gnome.gnome-themes-extra      # GTK 主题支持
+        adwaita-icon-theme            # Adwaita 图标主题（已从 gnome scope 搬到顶层）
+        gnome-themes-extra            # GTK 主题支持（已从 gnome scope 搬到顶层）
       ])
       # polkit 代理：条件性包不能放在 systemPackages 列表里用 mkIf，改用 lib.optional
       ++ lib.optional (cfg.polkitAgent == "kde") pkgs.kdePackages.polkit-kde-agent-1

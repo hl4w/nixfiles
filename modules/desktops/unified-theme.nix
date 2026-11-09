@@ -48,7 +48,7 @@
       # XDG 基础环境变量（非主题相关，保留）
       QT_QPA_PLATFORMTHEME = "gtk3";
       QT_QPA_FONTDIR = "${pkgs.noto-fonts}/share/fonts";
-      XDG_DATA_DIRS = "${pkgs.papirus-icon-theme}/share:${pkgs.gnome.adwaita-icon-theme}/share:${pkgs.kdePackages.breeze-icons}/share:/usr/share";
+      XDG_DATA_DIRS = "${pkgs.papirus-icon-theme}/share:${pkgs.adwaita-icon-theme}/share:${pkgs.kdePackages.breeze-icons}/share:/usr/share";
 
       XDG_CURRENT_DESKTOP = (if currentDesktopManager == "hyprland" then "Hyprland" else "Niri");
       XDG_SESSION_DESKTOP = (if currentDesktopManager == "hyprland" then "Hyprland" else "Niri");
