@@ -80,10 +80,13 @@
   time.timeZone = "Asia/Shanghai";    # 时区：上海
   i18n = {
     defaultLocale = "zh_CN.UTF-8";    # 默认语言：中文
-    # NixOS 24.11+ 已移除 i18n.locales，改用 extraLocales（仅 locale 名，不含编码段）
+    # NixOS 24.11+ 已移除 i18n.locales，改用 extraLocales
+    # 注意: 每个条目必须是 "locale/charmap" 格式（如 "en_US.UTF-8/UTF-8"），
+    #       裸写 "en_US.UTF-8" 会导致 glibc-locales 构建失败：
+    #       "Error: unsupported locales detected: en_US.UTF-8 ..."
     extraLocales = [                  # 额外构建的语言环境
-      "zh_CN.UTF-8"
-      "en_US.UTF-8"
+      "zh_CN.UTF-8/UTF-8"
+      "en_US.UTF-8/UTF-8"
     ];
   };
   
