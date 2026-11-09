@@ -8,6 +8,7 @@
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
+- **`home/common/dev-lsp.nix` 中 `clangd` 不是独立顶层包**: `clangd` 是 `clang-tools` 包里的二进制，`clang-tools` 已在列表里。删掉重复/不存在的 `clangd`
 - **`theme-hyprland.nix` / `theme-niri.nix` 里 config 引用又触发 infinite recursion**: 拆文件时注释写了「放在 config 块内部」但实际根本没包进 `config = { ... }`，而是直接写在模块返回值顶层表达式里，还引用了 `config.wayland.windowManager.hyprland.settings or {}` 来做手动 merge。两个教训：
   1) **attrset 自动合并替代手动 merge**：HM 模块框架会自动合并同名 attrset，不需要先读 config 再用 `lib.mkMerge` 手动拼接。hyprland.nix 写了 `settings = { general = {...}; decoration = {}; }`，theme-hyprland.nix 写 `settings = { general = { col.* = ... }; decoration = { rounding = 12; ... }; }`，框架自动 merge 两个 general 和两个 decoration
   2) **彻底不引用 config**：既然 option 存在由 imports 顺序保证，配置合并由框架自动处理，主题文件完全不需要 config 参数。重写为纯 attrset，0 个 config 引用

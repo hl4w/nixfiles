@@ -3,8 +3,7 @@
 {
   home.packages = with pkgs; [
     # C/C++ 开发工具和 LSP
-    clang-tools
-    clangd
+    clang-tools          # 包含 clangd、clang、clang-tidy 等
     llvm
     cmake
     ninja
