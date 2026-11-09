@@ -138,10 +138,17 @@
   };
 
   # 字体相关环境变量（针对 WPS Office CN 优化）
+  # 注意: XDG_DATA_DIRS 用列表而非字符串——NixOS 26.05 的 display-manager 模块
+  #       也定义了它为列表，列表形式会自动合并；字符串会因重复定义冲突
   environment.sessionVariables = {
     WPS_FONT_ROOT = "${pkgs.wqy_zenhei}/share/fonts";  # WPS Office 字体路径
     FONTCONFIG_PATH = "/etc/fonts/conf.d";             # FontConfig 配置路径
     # noto-fonts-cjk 已拆分为 noto-fonts-cjk-sans 和 noto-fonts-cjk-serif
-    XDG_DATA_DIRS = "${pkgs.noto-fonts-cjk-sans}/share:${pkgs.noto-fonts-cjk-serif}/share:${pkgs.source-han-sans}/share:/usr/share";
+    XDG_DATA_DIRS = [
+      "${pkgs.noto-fonts-cjk-sans}/share"
+      "${pkgs.noto-fonts-cjk-serif}/share"
+      "${pkgs.source-han-sans}/share"
+      "/usr/share"
+    ];
   };
 }

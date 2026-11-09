@@ -48,7 +48,14 @@
       # XDG 基础环境变量（非主题相关，保留）
       QT_QPA_PLATFORMTHEME = "gtk3";
       QT_QPA_FONTDIR = "${pkgs.noto-fonts}/share/fonts";
-      XDG_DATA_DIRS = "${pkgs.papirus-icon-theme}/share:${pkgs.adwaita-icon-theme}/share:${pkgs.kdePackages.breeze-icons}/share:/usr/share";
+      # XDG_DATA_DIRS 用列表而非字符串——NixOS 26.05 的 display-manager 模块
+      # 也定义了它为列表，列表形式会自动合并；字符串会因重复定义冲突
+      XDG_DATA_DIRS = [
+        "${pkgs.papirus-icon-theme}/share"
+        "${pkgs.adwaita-icon-theme}/share"
+        "${pkgs.kdePackages.breeze-icons}/share"
+        "/usr/share"
+      ];
 
       XDG_CURRENT_DESKTOP = (if currentDesktopManager == "hyprland" then "Hyprland" else "Niri");
       XDG_SESSION_DESKTOP = (if currentDesktopManager == "hyprland" then "Hyprland" else "Niri");
