@@ -19,7 +19,6 @@
       bufferline-nvim
       which-key-nvim
       comment-nvim
-      autopairs-nvim
       gitsigns-nvim
       nvim-lspconfig
       nixvim

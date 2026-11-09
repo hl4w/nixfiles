@@ -8,6 +8,7 @@
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
+- **`home/common/editor.nix` Neovim 插件列表里 `autopairs-nvim` 不存在**: nixos-26.05 分支的 `pkgs.vimPlugins` 里根本没有 `windwp/nvim-autopairs`（neovim 0.10+ 有内置配对，可后续按需替代），直接删掉
 - **`home/common/editor.nix` Neovim 插件列表里 `lspconfig` 未定义**: `pkgs.vimPlugins` 里没有叫 `lspconfig` 的包，正确名字是 `nvim-lspconfig`（插件列表末尾已存在）。删掉重复/不存在的 `lspconfig`
 - **`modules/services/network.nix` 中 `networking.useDHCP` 与 networkmanager 冲突**: NixOS 26.05 的 `networking.networkmanager.enable = true` 会自动把 `networking.useDHCP` 设为 `false`（NetworkManager 自己管理 DHCP），我们手动设了 `useDHCP = true` 就导致冲突定义。删除那行即可
 - **`home/common/theme-gtk.nix` 中 `xdg.iconTheme` 选项不存在**: Home Manager release-26.05 的 `xdg` 模块（`modules/misc/xdg.nix`）只有 base directories（`cacheHome`/`configHome`/`dataHome`/`binHome`/`stateHome`）和 session variables 相关选项，**从来没有 `iconTheme`**。图标主题统一由 `gtk.iconTheme` 设置（已配置为 Papirus-Dark）。这个错误选项从 `unified-theme.nix` 原样搬过来，之前一直被 infinite recursion 掩盖没暴露。现删除整个 `xdg.iconTheme` 块
