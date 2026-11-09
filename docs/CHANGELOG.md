@@ -8,6 +8,7 @@
 
 ## [v0.0.6] - 2026-11-09
 ### Fixed
+- **`steam` 等 unfree 包被拒绝求值**: 加 `nixpkgs.config.allowUnfree = true` 到 `modules/system/default.nix`，允许 Steam、Discord 等非自由软件。之前无限递归导致从没走到包求值阶段，所以一直没暴露
 - **`home/common/apps.nix` 中 `wps-office-cn` 不在顶层**: 删掉（NixOS 官方仓库不包含 WPS Office）
 - **`home/common/apps.nix` 中 `nemo-extensions` 不在顶层**: 删掉，需要时可通过 Cinnamon/Nemo 模块配置
 - **`home/hosts/desktop/default.nix` 中 `kdenlive` 不在顶层**: nixos-26.05 里 kdenlive 不在顶层 pkgs。删掉（需要时可通过 `pkgs.kdePackages.kdenlive` 或指定 Qt 版本）

@@ -66,6 +66,9 @@
     })
   ];
 
+  # 允许 unfree 包（steam、discord 等非自由软件）
+  nixpkgs.config.allowUnfree = true;
+
   # 系统环境变量和别名
   environment.shellAliases = {
     ls = "eza --icons";       # 使用 eza 替代 ls
