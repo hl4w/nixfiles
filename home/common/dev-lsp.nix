@@ -2,6 +2,10 @@
 
 {
   home.packages = with pkgs; [
+    # Nix 开发工具和 LSP（editor.nix 中 vim.lsp.enable('nil_ls') 依赖）
+    nil
+    nixpkgs-fmt
+
     # C/C++ 开发工具和 LSP
     clang-tools          # 包含 clangd、clang、clang-tidy 等
     llvm

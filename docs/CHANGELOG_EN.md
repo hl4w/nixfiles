@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [v0.0.6] - 2026-11-11
 ### Fixed
+- **nvim-lspconfig deprecation warning: `require('lspconfig')` framework is deprecated** (`home/common/editor.nix`): The framework will be removed in nvim-lspconfig v3.0.0. All 5 servers' (nil_ls / clangd / gopls / pyright / rust_analyzer) `require('lspconfig').X.setup({...})` migrated to Neovim 0.11+'s built-in API: servers with custom settings use `vim.lsp.config('name', {...})` (default cmd/root_dir still provided by the nvim-lspconfig plugin on runtimepath), then a single `vim.lsp.enable({...})` activates them all. omnifunc is set automatically by Neovim on LspAttach, so the duplicated on_attach boilerplate (5×3 lines) was deleted
+- **Missing Nix LSP binaries** (`home/common/dev-lsp.nix`): The `nil_ls` config existed for a while but `nil` / `nixpkgs-fmt` were never added to `home.packages` — installed now (the other server binaries clang-tools/gopls/pyright/rust-analyzer were already listed)
 - **Neovim startup error `module 'nvim-treesitter.configs' not found`** (`home/common/editor.nix`): nixpkgs 26.05's `nvim-treesitter` tracks the upstream rewritten `main` branch, where the legacy `require('nvim-treesitter.configs').setup({ ensure_installed = ..., highlight = ... })` module was removed entirely. Since parsers are already installed by Nix via `withPlugins` (making `ensure_installed` unnecessary), highlighting now uses Neovim 0.12's built-in API: a FileType autocmd calling `pcall(vim.treesitter.start)`, silently skipping filetypes without a parser
 
 ## [v0.0.6] - 2026-11-10

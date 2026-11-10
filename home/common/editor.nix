@@ -71,10 +71,12 @@
         end,
       })
 
-      require('lspconfig').nil_ls.setup({
-        on_attach = function(client, bufnr)
-          vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-        end,
+      -- nvim-lspconfig 的 require('lspconfig').x.setup() 框架已废弃
+      -- （将在 v3.0.0 移除），改用 Neovim 0.11+ 内置的
+      -- vim.lsp.config / vim.lsp.enable。server 的默认 cmd/root_dir
+      -- 仍由 runtimepath 上的 nvim-lspconfig 插件提供。
+      -- 注：omnifunc 由 Neovim 在 LspAttach 时自动设置，on_attach 样板已删除。
+      vim.lsp.config('nil_ls', {
         settings = {
           ['nil'] = {
             formatting = {
@@ -87,16 +89,7 @@
         },
       })
 
-      require('lspconfig').clangd.setup({
-        on_attach = function(client, bufnr)
-          vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-        end,
-      })
-
-      require('lspconfig').gopls.setup({
-        on_attach = function(client, bufnr)
-          vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-        end,
+      vim.lsp.config('gopls', {
         settings = {
           gopls = {
             analyses = {
@@ -108,16 +101,7 @@
         },
       })
 
-      require('lspconfig').pyright.setup({
-        on_attach = function(client, bufnr)
-          vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-        end,
-      })
-
-      require('lspconfig').rust_analyzer.setup({
-        on_attach = function(client, bufnr)
-          vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-        end,
+      vim.lsp.config('rust_analyzer', {
         settings = {
           ['rust-analyzer'] = {
             cargo = {
@@ -129,6 +113,9 @@
           },
         },
       })
+
+      -- clangd / pyright 无自定义 settings，仅需启用
+      vim.lsp.enable({ 'nil_ls', 'clangd', 'gopls', 'pyright', 'rust_analyzer' })
 
       vim.api.nvim_create_autocmd('FileType', {
         pattern = 'nix',

@@ -8,6 +8,8 @@
 
 ## [v0.0.6] - 2026-11-11
 ### Fixed
+- **nvim-lspconfig 弃用警告: `require('lspconfig')` framework is deprecated**（`home/common/editor.nix`）: 该框架将在 nvim-lspconfig v3.0.0 移除。5 个 server（nil_ls / clangd / gopls / pyright / rust_analyzer）的 `require('lspconfig').X.setup({...})` 迁移到 Neovim 0.11+ 内置 API：有自定义 settings 的用 `vim.lsp.config('name', {...})`（默认 cmd/root_dir 仍由 runtimepath 上的 nvim-lspconfig 插件提供），最后统一 `vim.lsp.enable({...})` 启用。omnifunc 由 Neovim 在 LspAttach 时自动设置，重复的 on_attach 样板（5×3 行）整体删除
+- **Nix LSP 二进制缺失**（`home/common/dev-lsp.nix`）: `nil_ls` 配置早已存在但 `nil` / `nixpkgs-fmt` 从未装进 `home.packages`，补装（其余 server 二进制 clang-tools/gopls/pyright/rust-analyzer 已在列表中）
 - **Neovim 启动报 `module 'nvim-treesitter.configs' not found`**（`home/common/editor.nix`）: nixpkgs 26.05 的 `nvim-treesitter` 跟踪上游重写的 `main` 分支，旧的 `require('nvim-treesitter.configs').setup({ ensure_installed = ..., highlight = ... })` 模块已整体移除。由于解析器已由 Nix 的 `withPlugins` 随包安装（无需 `ensure_installed`），高亮改用 Neovim 0.12 内置 API：FileType autocmd 里 `pcall(vim.treesitter.start)`，无解析器的文件类型静默跳过
 
 ## [v0.0.6] - 2026-11-10
