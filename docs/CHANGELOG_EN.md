@@ -10,6 +10,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - **`pywal.service` systemd user service** (`home/common/pywal.nix`): Generates a color scheme from the current wallpaper at login. Type `oneshot` with `RemainAfterExit=true`; tries `wal -R` to restore the previous scheme, falling back to `wal -i` from the current wallpaper. `wallpaper-watcher.service` depends on it via `Requires`/`After` so a color cache exists before the wallpaper watcher starts.
 
+### Changed
+- **Hyprland configuration migrated to the official 0.55 Lua format** (`home/common/hyprland.nix` / `home/common/theme-hyprland.nix`): Since Hyprland 0.55 the official config format is Lua — if `$XDG_CONFIG_HOME/hypr/hyprland.lua` exists, the sibling `hyprland.conf` is ignored entirely (hyprlang is only kept for 1-2 release cycles). Home Manager release-26.05's hyprland module natively supports `configType = "lua"` (writes `hyprland.lua` plus a `.luarc.json` pointing at the package's stubs), so `configType` changed from `"hyprlang"` to `"lua"` and the settings were rewritten per the official mapping rules:
+  - Section config `general` / `input` / `misc` / `animations` collapse into a single `hl.config({ ... })` (`settings.config`); `decoration` and `general.col` are appended as nested tables by `theme-hyprland.nix`, relying on Home Manager's deep attrset merging
+  - `bezier` → `hl.curve("overshoot", { type = "bezier", points = {{0.4, 1}, {0.2, 1}} })`; `animation = [ ... ]` → one `hl.animation({ leaf = ..., speed = ..., bezier = ... })` per entry
+  - `windowrulev2` → `hl.window_rule({ name = ..., match.class = ..., float = true })`
+  - `bind` → `hl.bind(key, dispatch)`: modifiers are now joined with `" + "`, and dispatchers use `hl.dsp.*` (`window.close` / `exec_cmd` / `window.move` / `window.resize` / `window.float` / `window.fullscreen` / `window.swap` / `focus`)
+  - `bindm` is folded into `hl.bind` in 0.55, so mouse binds pass a third argument `{ mouse = true; }` (`window.drag()` / `window.resize()`)
+  - The previously invalid `"SUPER, FULL, fullscreen"` (`FULL` is not a valid keysym) became `SUPER + SHIFT + RETURN` for fullscreen toggling
+  - The 10 workspace 1-5 switch/move binds are now generated via `lib.concatMap`
+
 ### Fixed
 - **Starship `git_status` used the non-existent `unstaged` key** (`home/common/shell.nix` + 4 wallpaper scripts): Interactive shells printed `[WARN] - (starship::config): Error in 'GitStatus' at 'unstaged': Unknown key (Did you mean 'modified'?)`. Starship's `git_status` module has no `unstaged` key; unstaged working-tree changes map to `modified`. Fixed `programs.starship.settings.git_status` in `shell.nix` and the generated starship templates in `scripts/wallpaper-color{,_en}.sh` and `scripts/wallpaper-watcher{,_en}.sh`; also removed the equally invalid `unmerged` key (Starship uses `conflicted` for conflicts)
 - **`wallpaper-watcher.service` failed to start: `Unit pywal.service not found`** (`home/common/pywal.nix` + `home/common/wallpaper-watcher.nix`): `Requires = [ "pywal.service" ]` referenced a non-existent unit. The correct fix is to **define** `pywal.service` rather than remove the dependency. New `pywal.nix` defines the service and `wallpaper-watcher.nix` keeps its `After`/`Requires` dependency

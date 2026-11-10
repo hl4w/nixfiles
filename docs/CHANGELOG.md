@@ -10,6 +10,16 @@
 ### Added
 - **`pywal.service` systemd 用户服务**（`home/common/pywal.nix`）: 登录时自动从当前壁纸生成配色。oneshot 类型 + `RemainAfterExit=true`，优先 `wal -R` 恢复上次配色，失败则 `wal -i` 从当前壁纸提取。供 `wallpaper-watcher.service` 通过 `Requires`/`After` 依赖，确保壁纸监听启动前已有配色缓存
 
+### Changed
+- **Hyprland 配置迁移到 0.55 官方 Lua 格式**（`home/common/hyprland.nix` / `home/common/theme-hyprland.nix`）: Hyprland 0.55 起官方配置格式为 Lua，`$XDG_CONFIG_HOME/hypr/hyprland.lua` 存在时会直接忽略同目录的 `hyprland.conf`（hyprlang 只保留 1-2 个 release 的兼容期）。Home Manager release-26.05 的 hyprland 模块原生支持 `configType = "lua"`（生成 `hyprland.lua` 与指向包内 stubs 的 `.luarc.json`），因此把 `configType` 由 `"hyprlang"` 改为 `"lua"`，并按官方 settings 映射规则重写：
+  - 节配置 `general` / `input` / `misc` / `animations` 收敛为单次 `hl.config({ ... })`（`settings.config`）；`decoration` 与 `general.col` 由 `theme-hyprland.nix` 以嵌套表追加，依赖 HM 的深层 attrset 自动合并
+  - `bezier` → `hl.curve("overshoot", { type = "bezier", points = {{0.4, 1}, {0.2, 1}} })`；`animation = [ ... ]` → 每条一次 `hl.animation({ leaf = ..., speed = ..., bezier = ... })`
+  - `windowrulev2` → `hl.window_rule({ name = ..., match.class = ..., float = true })`
+  - `bind` → `hl.bind(key, dispatch)`：键位语法改为修饰键之间用 `" + "` 连接，dispatcher 改为 `hl.dsp.*`（`window.close` / `exec_cmd` / `window.move` / `window.resize` / `window.float` / `window.fullscreen` / `window.swap` / `focus`）
+  - `bindm` 在 0.55 中已并入 `hl.bind`，鼠标绑定改为传第三参数 `{ mouse = true; }`（`window.drag()` / `window.resize()`）
+  - 原先非法的 `"SUPER, FULL, fullscreen"`（`FULL` 不是合法 keysym）改为 `SUPER + SHIFT + RETURN` 切换全屏
+  - 工作区 1-5 的切换/移动共 10 条绑定改由 `lib.concatMap` 批量生成
+
 ### Fixed
 - **Starship `git_status` 使用不存在的 `unstaged` 键**（`home/common/shell.nix` + 4 个壁纸脚本）: 交互式 shell 报 `[WARN] - (starship::config): Error in 'GitStatus' at 'unstaged': Unknown key (Did you mean 'modified'?)`。Starship 的 `git_status` 模块没有 `unstaged` 键，工作区未暂存改动对应的是 `modified`。修复 `shell.nix` 的 `programs.starship.settings.git_status`，并同步 `scripts/wallpaper-color{,_en}.sh`、`scripts/wallpaper-watcher{,_en}.sh` 中生成的 starship 配置模板；顺带移除同处无效的 `unmerged` 键（Starship 用 `conflicted` 表示冲突）
 - **`wallpaper-watcher.service` 启动失败: `Unit pywal.service not found`**（`home/common/pywal.nix` + `home/common/wallpaper-watcher.nix`）: 之前 `Requires = [ "pywal.service" ]` 引用了不存在的 unit。正确做法是**定义** `pywal.service` 而非删除依赖。修复：新增 `pywal.nix` 定义该服务，恢复 `wallpaper-watcher.nix` 的 `After`/`Requires` 依赖
