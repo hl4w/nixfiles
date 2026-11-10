@@ -69,7 +69,8 @@
       };
       git_status = {
         staged = "[✓]($color2)";
-        unstaged = "[✗]($color1)";
+        # Starship 的 git_status 没有 unstaged 键，工作区改动用 modified
+        modified = "[✗]($color1)";
       };
       directory = {
         style = "bold $color6";

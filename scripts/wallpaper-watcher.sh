@@ -132,7 +132,7 @@ style = "bold $color4"
 
 [git_status]
 staged = "[✓]($color2)"
-unstaged = "[✗]($color1)"
+modified = "[✗]($color1)"
 
 [directory]
 style = "bold $color6"

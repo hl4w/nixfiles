@@ -183,8 +183,7 @@ conflicted = "⚔"
 deleted = "✗"
 renamed = "➜"
 staged = "[✓]($color2)"
-unmerged = "═"
-unstaged = "[✗]($color1)"
+modified = "[✗]($color1)"
 untracked = "?"
 
 [directory]
