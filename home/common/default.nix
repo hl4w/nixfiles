@@ -12,6 +12,7 @@
     ./cli.nix
     ./git.nix
     ./dev-lsp.nix
+    ./pywal.nix
     ./wallpaper-watcher.nix
   ];
 }

@@ -7,7 +7,11 @@
 > 约定：版本号不变时，每次提交均以**当日日期**开一个新的小节，当日所有改动聚合在该节下，便于按日期追踪未发布版本的变更。
 
 ## [v0.0.6] - 2026-11-10
+### Added
+- **`pywal.service` systemd 用户服务**（`home/common/pywal.nix`）: 登录时自动从当前壁纸生成配色。oneshot 类型 + `RemainAfterExit=true`，优先 `wal -R` 恢复上次配色，失败则 `wal -i` 从当前壁纸提取。供 `wallpaper-watcher.service` 通过 `Requires`/`After` 依赖，确保壁纸监听启动前已有配色缓存
+
 ### Fixed
+- **`wallpaper-watcher.service` 启动失败: `Unit pywal.service not found`**（`home/common/pywal.nix` + `home/common/wallpaper-watcher.nix`）: 之前 `Requires = [ "pywal.service" ]` 引用了不存在的 unit。正确做法是**定义** `pywal.service` 而非删除依赖。修复：新增 `pywal.nix` 定义该服务，恢复 `wallpaper-watcher.nix` 的 `After`/`Requires` 依赖
 - **Hyprland 方向 dispatcher 参数需全名（`left/down/up/right`）**（`home/common/hyprland.nix`）: 构建通过后首次进 Hyprland 报 `Invalid dispatcher, requested "h"/"j"/"k"/"l"/"1" does not exist`。Hyprland 0.55+ 把 `movefocus` 的方向参数从缩写 `l/d/u/r` 改为全名 `left/down/up/right`。修复 4 行：`"SUPER, H, movefocus, l"` → `"SUPER, H, movefocus, left"` 等
 - **`qutebrowser` 被标记 insecure 导致求值失败**（`home/common/apps.nix`）: 报 `Refusing to evaluate package 'qutebrowser-3.7.0' ... because it is marked as insecure`（上游理由：*Still accepts eMudhra TLS certs*）。`qutebrowser` 位于 `home/common/apps.nix`，走 Home Manager 的独立 nixpkgs 实例，因此放行规则就近声明在该 HM 模块内（不写进 `flake.nix`，也不写系统级）。修复：新增 `nixpkgs.config.permittedInsecurePackages = [ "qutebrowser-3.7.0" ]`。该列表按 `<name>-<version>` 精确匹配，qutebrowser 升级后版本号变化需同步更新
 - **移除 Neovim 补全插件链**（`home/common/editor.nix`）: `nvim-cmp` / `cmp-nvim-lsp` / `cmp-buffer` / `cmp-path` 需从 `github.com` 拉源码，而 `cache.nixos.org` 与国内镜像均缺少 `vimplugin-cmp-nvim-lsp-0-unstable-2025-11-13` 等新版本的二进制缓存，Nix 回退到源码下载后 curl 超时（重试 4 次各 21 秒），连带 `neovim` → `home-manager-path` → `home-manager-generation` → `etc` → `nixos-system` 全链失败。LSP 能力保留（`nvim-lspconfig` 仍在，补全靠 Neovim 0.12 内置 `vim.lsp.omnifunc`）
