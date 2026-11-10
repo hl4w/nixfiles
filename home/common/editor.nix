@@ -9,10 +9,14 @@
     plugins = with pkgs.vimPlugins; [
       nvim-tree-lua
       telescope-nvim
-      nvim-cmp
-      cmp-nvim-lsp
-      cmp-buffer
-      cmp-path
+      #
+      # 补全链已移除：nvim-cmp / cmp-nvim-lsp / cmp-buffer / cmp-path
+      # 原因：这些插件需从 github.com 拉取源码（cache.nixos.org 与国内镜像
+      # 均缺少对应 unstable 版本的二进制缓存），而 github 在国内网络不可达，
+      # 导致构建时 curl 超时并连带 home-manager-generation 全链失败。
+      # LSP 本身仍可用（nvim-lspconfig 保留），补全依靠 Neovim 0.12 内置
+      # 的 vim.lsp.omnifunc（见下方 extraConfig）。
+      #
       nvim-treesitter
       gruvbox-nvim
       lualine-nvim
