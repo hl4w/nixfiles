@@ -97,18 +97,8 @@
         {
           # 允许 unfree 包（steam、discord 等）——HM 有独立的 nixpkgs 实例，
           # 系统级 modules/system/default.nix 的 allowUnfree 不会自动传递过来
-          #
-          # permittedInsecurePackages: qutebrowser 在上游被标记 insecure
-          # （"Still accepts eMudhra TLS certs"），需显式放行才能求值。
-          # 注意：此列表按 "<name>-<version>" 精确匹配，qutebrowser 升级后
-          # 版本号变化会导致再次报错，届时按报错提示更新此处版本号即可。
           home-manager.sharedModules = [
-            {
-              nixpkgs.config.allowUnfree = true;
-              nixpkgs.config.permittedInsecurePackages = [
-                "qutebrowser-3.7.0"
-              ];
-            }
+            { nixpkgs.config.allowUnfree = true; }
           ];
 
           # 用占位符用户名声明 HM 管理的用户
