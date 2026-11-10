@@ -12,8 +12,7 @@
   systemd.user.services.wallpaper-watcher = {
     Unit = {
       Description = "Wallpaper change watcher";
-      After = [ "graphical-session.target" "pywal.service" ];
-      Requires = [ "pywal.service" ];
+      After = [ "graphical-session.target" ];
     };
     Service = {
       Type = "simple";
