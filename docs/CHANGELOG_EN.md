@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 > Convention: when the version number stays the same, each commit opens a new section with the current date. All changes made on the same day are grouped under that section, so commits can be traced back to their day even before the next release is cut.
 
+## [v0.0.6] - 2026-11-11
+### Fixed
+- **Neovim startup error `module 'nvim-treesitter.configs' not found`** (`home/common/editor.nix`): nixpkgs 26.05's `nvim-treesitter` tracks the upstream rewritten `main` branch, where the legacy `require('nvim-treesitter.configs').setup({ ensure_installed = ..., highlight = ... })` module was removed entirely. Since parsers are already installed by Nix via `withPlugins` (making `ensure_installed` unnecessary), highlighting now uses Neovim 0.12's built-in API: a FileType autocmd calling `pcall(vim.treesitter.start)`, silently skipping filetypes without a parser
+
 ## [v0.0.6] - 2026-11-10
 ### Fixed
 - **Neovim startup error `E492: Not an editor command: require('nvim-treesitter.configs')`** (`home/common/editor.nix`): `programs.neovim.extraConfig` content is written to a Vimscript file (`init.vim`, loaded from `init.lua` via `:source`), but `require(...)` Lua code was mixed in directly — Vimscript doesn't know a `require` command. Fix: Vimscript settings stay in `extraConfig`; all Lua code (treesitter, LSP, autocmd) moved into `programs.neovim.extraLuaConfig`, whose content lands in `init.lua`'s Lua context. Also switched `nvim-treesitter` to `nvim-treesitter.withPlugins` (18 parsers installed via the nixpkgs binary cache) so `ensure_installed` won't try to download/compile parsers from github at first launch (unreachable from CN networks — same rationale as the nvim-cmp removal)

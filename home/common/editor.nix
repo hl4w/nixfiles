@@ -60,31 +60,15 @@
     '';
     # extraConfig 是 Vimscript，Lua 代码必须放在 extraLuaConfig
     extraLuaConfig = ''
-      require('nvim-treesitter.configs').setup({
-        ensure_installed = {
-          'nix',
-          'lua',
-          'python',
-          'javascript',
-          'typescript',
-          'tsx',
-          'json',
-          'yaml',
-          'toml',
-          'markdown',
-          'bash',
-          'rust',
-          'go',
-          'html',
-          'css'
-        },
-        highlight = {
-          enable = true,
-          additional_vim_regex_highlighting = false,
-        },
-        indent = {
-          enable = true,
-        },
+      -- nixpkgs 26.05 的 nvim-treesitter 跟踪上游重写的 main 分支，
+      -- 旧的 require('nvim-treesitter.configs').setup() 模块已被移除。
+      -- 解析器由 Nix 的 withPlugins 随包安装（见上方 plugins 列表），
+      -- 高亮用 Neovim 0.12 内置的 vim.treesitter 启用：
+      vim.api.nvim_create_autocmd('FileType', {
+        callback = function()
+          -- 无对应解析器的文件类型静默跳过
+          pcall(vim.treesitter.start)
+        end,
       })
 
       require('lspconfig').nil_ls.setup({

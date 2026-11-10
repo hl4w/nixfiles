@@ -6,6 +6,10 @@
 
 > 约定：版本号不变时，每次提交均以**当日日期**开一个新的小节，当日所有改动聚合在该节下，便于按日期追踪未发布版本的变更。
 
+## [v0.0.6] - 2026-11-11
+### Fixed
+- **Neovim 启动报 `module 'nvim-treesitter.configs' not found`**（`home/common/editor.nix`）: nixpkgs 26.05 的 `nvim-treesitter` 跟踪上游重写的 `main` 分支，旧的 `require('nvim-treesitter.configs').setup({ ensure_installed = ..., highlight = ... })` 模块已整体移除。由于解析器已由 Nix 的 `withPlugins` 随包安装（无需 `ensure_installed`），高亮改用 Neovim 0.12 内置 API：FileType autocmd 里 `pcall(vim.treesitter.start)`，无解析器的文件类型静默跳过
+
 ## [v0.0.6] - 2026-11-10
 ### Fixed
 - **Neovim 启动报 `E492: 不是编辑器的命令: require('nvim-treesitter.configs')`**（`home/common/editor.nix`）: `programs.neovim.extraConfig` 的内容会被写入 Vimscript 文件（`init.vim`，由 `init.lua` 通过 `:source` 加载），而其中直接混入了 `require(...)` Lua 代码，Vimscript 上下文不认识 `require` 命令。修复：Vimscript 设置保留在 `extraConfig`，全部 Lua 代码（treesitter、LSP、autocmd）移入 `programs.neovim.extraLuaConfig`（该选项内容直接进入 `init.lua` 的 Lua 上下文）。顺带把 `nvim-treesitter` 换成 `nvim-treesitter.withPlugins`（18 个语法解析器随 Nix 二进制缓存一起安装），避免首次启动时 `ensure_installed` 从 github 下载/编译解析器（国内网络不可达，与此前移除 nvim-cmp 链同理）
