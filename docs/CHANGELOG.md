@@ -8,6 +8,7 @@
 
 ## [v0.0.6] - 2026-11-10
 ### Fixed
+- **`steam` 注释停用**（`home/hosts/desktop/default.nix`）: 与 discord 同理，steam 是 unfree 包且需从境外 CDN 下载大量运行时（Steam Runtime、重定向后的 depot），国内网络易超时并连带 `home-manager-generation` 全链失败。改为注释停用，保留 flatpak 替代方案说明
 - **`i18n.extraLocales` 缺少 charmap 后缀导致 `glibc-locales` 构建失败**（`modules/system/default.nix`）: 构建时报 `Error: unsupported locales detected: en_US.UTF-8 / zh_CN.UTF-8`。`extraLocales` 的每一项必须是 `locale/charmap` 格式（`en_US.UTF-8/UTF-8`），裸写 `en_US.UTF-8` 会被 glibc-locales 的 `supportedLocales` 校验拒绝。原注释「仅 locale 名，不含编码段」是错误认知，已修正为 `zh_CN.UTF-8/UTF-8` 与 `en_US.UTF-8/UTF-8`。连带失败项（`hm-session-vars.sh`、`hm_environment.d10homemanager.conf`）随 locale 修复一并通过
 - **`discord` 下载源在国内网络不可达导致构建失败**（`home/hosts/desktop/default.nix`）: `stable.dl2.discordapp.net` 连接超时（curl 重试 4 次各 21 秒后放弃），进而连带 `home-manager-path` → `activation-script` → `home-manager-generation` → `etc` → `nixos-system` 全链失败。这属于网络环境问题而非配置错误。修复：从 desktop 的 `home.packages` 移除 `discord`（保留注释说明原因与替代方案：flatpak 或官方 AppImage）
 
