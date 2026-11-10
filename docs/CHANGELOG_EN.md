@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > Convention: when the version number stays the same, each commit opens a new section with the current date. All changes made on the same day are grouped under that section, so commits can be traced back to their day even before the next release is cut.
 
 ## [v0.0.6] - 2026-11-10
+### Fixed
+- **Removed/invalid keys in the Hyprland 0.55 Lua config** (`home/common/hyprland.nix` / `home/common/theme-hyprland.nix`): After the Lua migration `hyprctl reload` reported 4 errors. Fixes: `general.no_wallpaper` was removed in 0.55 (wallpapers are handled by hyprpaper) — deleted; `decoration.blur.new_windows` was removed in 0.55 (blur applies to new windows by default) — deleted; `general.col.*_border = "rgba(34, 197, 94)"` used an invalid color format — Hyprland only accepts hexadecimal `rgb(rrggbb)` / `rgba(rrggbbaa)`, not comma-separated decimals — changed to `rgb(16c55e)` / `rgb(475569)` (same colors)
+
 ### Added
 - **`pywal.service` systemd user service** (`home/common/pywal.nix`): Generates a color scheme from the current wallpaper at login. Type `oneshot` with `RemainAfterExit=true`; tries `wal -R` to restore the previous scheme, falling back to `wal -i` from the current wallpaper. `wallpaper-watcher.service` depends on it via `Requires`/`After` so a color cache exists before the wallpaper watcher starts.
 

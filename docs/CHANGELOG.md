@@ -7,6 +7,9 @@
 > 约定：版本号不变时，每次提交均以**当日日期**开一个新的小节，当日所有改动聚合在该节下，便于按日期追踪未发布版本的变更。
 
 ## [v0.0.6] - 2026-11-10
+### Fixed
+- **Hyprland 0.55 Lua 配置中已移除/非法的键**（`home/common/hyprland.nix` / `home/common/theme-hyprland.nix`）: Lua 迁移后 `hyprctl reload` 报 4 个错。修复：`general.no_wallpaper` 在 0.55 已移除（壁纸归 hyprpaper 管理），删除；`decoration.blur.new_windows` 在 0.55 已移除（blur 对所有新窗口默认生效），删除；`general.col.*_border = "rgba(34, 197, 94)"` 颜色格式非法——Hyprland 只接受十六进制 `rgb(rrggbb)` / `rgba(rrggbbaa)`，不接受逗号分隔十进制，改为 `rgb(16c55e)` / `rgb(475569)`（色值不变）
+
 ### Added
 - **`pywal.service` systemd 用户服务**（`home/common/pywal.nix`）: 登录时自动从当前壁纸生成配色。oneshot 类型 + `RemainAfterExit=true`，优先 `wal -R` 恢复上次配色，失败则 `wal -i` 从当前壁纸提取。供 `wallpaper-watcher.service` 通过 `Requires`/`After` 依赖，确保壁纸监听启动前已有配色缓存
 

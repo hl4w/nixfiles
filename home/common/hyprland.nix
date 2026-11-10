@@ -56,7 +56,6 @@ in
           gaps_out = 10;
           border_size = 2;
           resize_on_border = true;
-          no_wallpaper = false;
         };
 
         input = {

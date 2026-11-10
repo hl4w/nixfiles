@@ -15,9 +15,10 @@
 {
   wayland.windowManager.hyprland.settings.config = {
     general = {
+      # Hyprland 颜色格式只接受十六进制：rgb(rrggbb) 或 rgba(rrggbbaa)
       col = {
-        active_border = "rgba(34, 197, 94)";
-        inactive_border = "rgba(71, 85, 105)";
+        active_border = "rgb(16c55e)";
+        inactive_border = "rgb(475569)";
       };
     };
 
@@ -27,7 +28,6 @@
         enabled = true;
         size = 3;
         passes = 2;
-        new_windows = true;
       };
       shadow = {
         enabled = true;
