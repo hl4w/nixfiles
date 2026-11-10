@@ -17,7 +17,28 @@
       # LSP 本身仍可用（nvim-lspconfig 保留），补全依靠 Neovim 0.12 内置
       # 的 vim.lsp.omnifunc（见下方 extraConfig）。
       #
-      nvim-treesitter
+      # treesitter 语法解析器随 Nix 一起安装（走 nixpkgs 二进制缓存），
+      # 避免运行时由 nvim-treesitter 从 github 下载/编译（国内网络不可达）
+      (nvim-treesitter.withPlugins (p: [
+        p.nix
+        p.lua
+        p.python
+        p.javascript
+        p.typescript
+        p.tsx
+        p.json
+        p.yaml
+        p.toml
+        p.markdown
+        p.markdown_inline
+        p.bash
+        p.rust
+        p.go
+        p.html
+        p.css
+        p.vim
+        p.vimdoc
+      ]))
       gruvbox-nvim
       lualine-nvim
       bufferline-nvim
