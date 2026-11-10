@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 > Convention: when the version number stays the same, each commit opens a new section with the current date. All changes made on the same day are grouped under that section, so commits can be traced back to their day even before the next release is cut.
 
+## [v0.0.6] - 2026-11-10
+### Fixed
+- **`i18n.extraLocales` missing charmap suffix broke `glibc-locales` build** (`modules/system/default.nix`): The build failed with `Error: unsupported locales detected: en_US.UTF-8 / zh_CN.UTF-8`. Each `extraLocales` entry must use the `locale/charmap` form (`en_US.UTF-8/UTF-8`); a bare `en_US.UTF-8` is rejected by glibc-locales' `supportedLocales` validation. The previous comment claiming "locale name only, no encoding part" was wrong; corrected to `zh_CN.UTF-8/UTF-8` and `en_US.UTF-8/UTF-8`. Dependent failures (`hm-session-vars.sh`, `hm_environment.d10homemanager.conf`) resolved together with the locale fix
+- **`discord` download source unreachable from mainland China broke the build** (`home/hosts/desktop/default.nix`): Connections to `stable.dl2.discordapp.net` timed out (curl retried 4 times, ~21s each, then gave up), cascading into failures across `home-manager-path` → `activation-script` → `home-manager-generation` → `etc` → `nixos-system`. This is a network-environment issue, not a configuration error. Fix: removed `discord` from the desktop host's `home.packages` (kept an explanatory comment with alternatives: flatpak or the official AppImage)
+
 ## [v0.0.6] - 2026-11-09
 ### Fixed
 - **`wayland.windowManager.niri` does not exist in HM release-26.05**: Verified the `modules/services/window-managers/` directory has `hyprland.nix` but no `niri.nix`. Rewrote `home/common/niri.nix` and `theme-niri.nix` to use `xdg.configFile."niri/config.kdl".text` to generate the KDL-format config directly (niri's native format); merged colors into `niri.nix` (KDL is a single file, can't be multi-module merged), deleted `theme-niri.nix`; updated `laptop.nix` imports

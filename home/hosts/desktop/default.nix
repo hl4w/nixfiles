@@ -7,7 +7,11 @@
     steam
     lutris
     # 通讯工具
-    discord
+    #
+    # discord 已移除：其下载源 stable.dl2.discordapp.net 在国内网络不可达，
+    # 导致构建时 curl 超时失败并连带 home-manager-generation 全链失败。
+    # 需要时可通过 flatpak 或官方 AppImage 安装。
+    #
     # 内容创作
     obs-studio
     blender
