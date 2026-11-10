@@ -12,8 +12,13 @@
   systemd.user.services.wallpaper-watcher = {
     Unit = {
       Description = "Wallpaper change watcher";
-      After = [ "graphical-session.target" "pywal.service" ];
-      Requires = [ "pywal.service" ];
+      After = [ "graphical-session.target" ];
+      # 注意: 之前写了 Requires = [ "pywal.service" ]，但仓库里从未定义
+      # pywal.service（既无 services.pywal.enable，也无 systemd.user.services.pywal），
+      # 导致 wallpaper-watcher.service 启动时 systemd 报
+      # "Unit pywal.service not found"。pywal 仅作为系统包安装
+      # （modules/desktops/unified-theme.nix 的 home.packages），
+      # 并不提供同名 systemd service，因此移除该依赖。
     };
     Service = {
       Type = "simple";
