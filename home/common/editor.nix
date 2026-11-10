@@ -36,7 +36,9 @@
       set smartindent
       set termguicolors
       colorscheme gruvbox
-
+    '';
+    # extraConfig 是 Vimscript，Lua 代码必须放在 extraLuaConfig
+    extraLuaConfig = ''
       require('nvim-treesitter.configs').setup({
         ensure_installed = {
           'nix',

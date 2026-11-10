@@ -8,6 +8,7 @@
 
 ## [v0.0.6] - 2026-11-10
 ### Fixed
+- **Neovim 启动报 `E492: 不是编辑器的命令: require('nvim-treesitter.configs')`**（`home/common/editor.nix`）: `programs.neovim.extraConfig` 的内容会被写入 Vimscript 文件（`init.vim`，由 `init.lua` 通过 `:source` 加载），而其中直接混入了 `require(...)` Lua 代码，Vimscript 上下文不认识 `require` 命令。修复：Vimscript 设置保留在 `extraConfig`，全部 Lua 代码（treesitter、LSP、autocmd）移入 `programs.neovim.extraLuaConfig`（该选项内容直接进入 `init.lua` 的 Lua 上下文）
 - **Hyprland 0.55 Lua 配置中已移除/非法的键**（`home/common/hyprland.nix` / `home/common/theme-hyprland.nix`）: Lua 迁移后 `hyprctl reload` 报 4 个错。修复：`general.no_wallpaper` 在 0.55 已移除（壁纸归 hyprpaper 管理），删除；`decoration.blur.new_windows` 在 0.55 已移除（blur 对所有新窗口默认生效），删除；`general.col.*_border = "rgba(34, 197, 94)"` 颜色格式非法——Hyprland 只接受十六进制 `rgb(rrggbb)` / `rgba(rrggbbaa)`，不接受逗号分隔十进制，改为 `rgb(16c55e)` / `rgb(475569)`（色值不变）
 
 ### Added
