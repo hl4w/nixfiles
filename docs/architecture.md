@@ -56,12 +56,13 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 │   │   ├── input.nix     # Fcitx5 + RIME（oh-my-rime）
 │   │   ├── cli.nix       # eza、bat、fd、rg、fzf、yazi（zoxide 集成）、fastfetch、btop、vlc
 │   │   ├── apps.nix      # GUI 应用
-│   │   ├── dev-lsp.nix   # LSP 服务器（包括 C/C++）
+│   │   ├── dev-lsp.nix   # LSP 服务器（Nix / C/C++ / Go / Python / Rust）
 │   │   ├── git.nix       # Git 配置
-│   │   ├── hyprland.nix  # Hyprland 详细配置（wayland.windowManager.hyprland）
+│   │   ├── hyprland.nix  # Hyprland 详细配置（Lua 格式，configType = "lua"）
 │   │   ├── niri.nix      # Niri 配置（KDL 格式，含配色；HM 26.05 无 niri 模块，用 xdg.configFile）
 │   │   ├── theme-gtk.nix   # 用户级主题（GTK/图标，无条件导入）
-│   │   ├── theme-hyprland.nix  # Hyprland 窗口配色（desktop 主机导入）
+│   │   ├── theme-hyprland.nix  # Hyprland 窗口配色（嵌套表写入 settings.config）
+│   │   ├── pywal.nix     # pywal 取色服务（登录时从壁纸生成配色缓存）
 │   │   └── wallpaper-watcher.nix  # 壁纸监听器用户服务
 │   └── hosts/            # 主机特定用户配置（用户级）
 │       ├── desktop/       # 桌面用户配置
@@ -150,16 +151,17 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 | 模块 | 描述 |
 |------|------|
 | `shell.nix` | Bash + Zsh + Starship 提示符（支持 pywal 动态配色） |
-| `editor.nix` | Neovim、Emacs（配置了 LSP 服务器：nil_ls、clangd、gopls、pyright、rust_analyzer） |
+| `editor.nix` | Neovim（treesitter 解析器由 `nvim-treesitter.withPlugins` 随包安装；LSP 用 `vim.lsp.config` / `vim.lsp.enable` 新 API 配置 nil_ls、clangd、gopls、pyright、rust_analyzer）、Emacs |
 | `input.nix` | Fcitx5 + RIME（oh-my-rime 配置） |
 | `cli.nix` | CLI 工具集：eza、bat、fd、rg、fzf、yazi（终端文件管理器，支持 zoxide 集成）、zoxide（智能目录导航）、fastfetch、btop、dust、duf、tokei、hyperfine、procs、starship |
 | `apps.nix` | GUI 应用（浏览器、办公、媒体） |
-| `dev-lsp.nix` | 开发工具和 LSP 服务器（C/C++: clangd/clang-tools/cmake/ninja/gdb/lldb；Go: go/gopls；Python: python3/pyright；Rust: rustc/rust-analyzer/rustfmt/cargo） |
+| `dev-lsp.nix` | 开发工具和 LSP 服务器（Nix: nil/nixpkgs-fmt；C/C++: clangd/clang-tools/cmake/ninja/gdb/lldb；Go: go/gopls；Python: python3/pyright；Rust: rustc/rust-analyzer/rustfmt/cargo） |
 | `git.nix` | Git 全局配置 |
-| `hyprland.nix` | Hyprland 详细配置（wayland.windowManager.hyprland：settings/keybinds/binds） |
+| `hyprland.nix` | Hyprland 详细配置（`configType = "lua"`：`settings.config` → `hl.config`、`settings.bind` → `hl.bind` + `hl.dsp.*`、`settings.window_rule` → `hl.window_rule`；HM 生成 `~/.config/hypr/hyprland.lua`） |
 | `niri.nix` | Niri 配置（KDL 格式，含配色；HM 26.05 无 wayland.windowManager.niri 模块，用 xdg.configFile 生成；laptop 主机导入） |
 | `theme-gtk.nix` | 用户级主题（GTK/图标，无条件导入） |
-| `theme-hyprland.nix` | Hyprland 窗口配色（desktop 主机导入，由 imports 顺序保证 option 存在） |
+| `theme-hyprland.nix` | Hyprland 窗口配色（以嵌套表写入 `settings.config` 的 `general.col` / `decoration`，与 `hyprland.nix` 深层合并；desktop 主机导入） |
+| `pywal.nix` | pywal 取色系统服务（oneshot + `RemainAfterExit`，优先 `wal -R` 恢复、失败回退 `wal -i`） |
 | `wallpaper-watcher.nix` | 壁纸变化监听器用户服务（自动更新配色） |
 
 ### 文档 (`docs/`)
@@ -492,12 +494,22 @@ nixConfig = {
   # 输出: nix (Lix, like Nix) 2.x.x
   ```
 
-### 鼠标侧键配置
+### 鼠标绑定与侧键
 
-本配置支持鼠标侧键（Button 8/9）在应用程序中实现后退/前进功能：
+Hyprland 的鼠标绑定写在同一份 Lua 配置的 `settings.bind` 中，通过第三参数 `{ mouse = true; }` 标记为鼠标事件（0.55 起 `bindm` 已并入 `hl.bind`）：
 
-- **实现模块**: `modules/hardware/mouse.nix` 和 `modules/desktops/hyprland.nix`
-- **处理策略**: 使用 `pass` 命令让鼠标事件传递给应用程序
+```nix
+bind = [
+  (kb "SUPER + mouse:272" "hl.dsp.window.drag()" { mouse = true; })
+  (kb "SUPER + mouse:273" "hl.dsp.window.resize()" { mouse = true; })
+  (kb "SUPER + mouse:274" "hl.dsp.window.float({ action = \"toggle\" })" null)
+];
+```
+
+即 `Super + 左键拖动` 移动窗口、`Super + 中键拖动` 调整大小、`Super + 右键` 切换浮动。
+
+- **实现模块**: `home/common/hyprland.nix`（用户级绑定）
+- **侧键（Button 8/9）**: 当前未绑定任何 dispatcher，Hyprland 不会拦截，事件直接透传给应用，Nemo / Firefox 的后退/前进开箱可用；如需改作其它动作，在 `settings.bind` 中增加 `"mouse:8"` / `"mouse:9"` 绑定即可
 
 - **鼠标按钮编号**:
   - Button 1: 左键
@@ -506,17 +518,6 @@ nixConfig = {
   - Button 4/5: 滚轮上下滚动
   - Button 6/7: 滚轮倾斜（部分鼠标）
   - Button 8/9: 侧键（后退/前进）
-
-- **Hyprland 配置**:
-  ```nix
-  binds = {
-    "mouse,1" = "movewindow";   # 左键移动窗口
-    "mouse,2" = "resizewindow"; # 中键调整大小
-    "mouse,3" = "togglefloating"; # 右键切换浮动
-    "mouse,8" = "pass";         # 侧键后（后退）- 传递给应用程序
-    "mouse,9" = "pass";         # 侧键前（前进）- 传递给应用程序
-  };
-  ```
 
 - **支持的应用**:
   - Nemo 文件管理器：后退/前进目录

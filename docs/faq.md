@@ -12,7 +12,7 @@ Flakes 提供可重现的构建、更好的依赖管理，以及更清晰的 Nix
 
 ### 支持哪些窗口管理器？
 
-- **Hyprland**: 动态平铺窗口管理器，使用 hyprlang 配置（`configType = "hyprlang"`）
+- **Hyprland**: 动态平铺窗口管理器，使用 Lua 配置（Hyprland 0.55+ 官方格式，`configType = "lua"`，生成 `~/.config/hypr/hyprland.lua`）
 - **Niri**: 现代可滚动平铺窗口管理器，推荐用于笔记本电脑
 
 ### 有哪些桌面 Shell 可用？
@@ -187,7 +187,7 @@ nix --version
 
 ### 如何配置 Hyprland / Niri？
 
-**Hyprland**：系统级启用位于 `modules/desktops/hyprland.nix`；按键绑定、窗口规则、gaps、动画等详细配置位于 `home/common/hyprland.nix`，使用 hyprlang 语法（`configType = "hyprlang"`）。
+**Hyprland**：系统级启用位于 `modules/desktops/hyprland.nix`；按键绑定、窗口规则、gaps、动画等详细配置位于 `home/common/hyprland.nix`，使用 Lua 语法（`configType = "lua"`，Home Manager 生成 `~/.config/hypr/hyprland.lua`）。对应关系：节配置写 `settings.config`（渲染为 `hl.config({...})`）、按键写 `settings.bind`（`hl.bind(...)` + `hl.dsp.*`）、窗口规则写 `settings.window_rule`（`hl.window_rule(...)`）、配色写 `home/common/theme-hyprland.nix`（`settings.config.decoration` 等，与前者深层合并）。
 
 **Niri**：系统级启用位于 `modules/desktops/niri.nix`；按键绑定等详细配置位于 `home/common/niri.nix`。
 
@@ -359,6 +359,7 @@ home-manager switch --flake .#user@host --verbose
 - SDDM 以 Wayland 模式运行
 - 查看日志：`~/.local/share/hyprland/`
 - 验证配置语法：`hyprctl config -h`（Hyprland 0.55+）
+- Lua 配置报 `unknown config key` / `invalid color`：删除该键（0.55 已移除）或改用十六进制颜色 `rgb(rrggbb)` / `rgba(rrggbbaa)`
 
 ### Niri 无法启动
 

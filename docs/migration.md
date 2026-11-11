@@ -238,6 +238,56 @@ services.displayManager.sddm = {
 };
 ```
 
+## Hyprland 0.55 Lua 配置迁移
+
+Hyprland 0.55 起官方配置格式为 **Lua**：只要 `$XDG_CONFIG_HOME/hypr/hyprland.lua` 存在，同目录的 `hyprland.conf` 就会被**完全忽略**；hyprlang 仅保留 1–2 个 release 的兼容期。Home Manager release-26.05 原生支持该格式（`configType` 选项，`home.stateVersion ≥ 26.05` 时默认 `lua`）。
+
+### 语法对照
+
+| hyprlang | Lua（HM `settings` → 生成调用） |
+|----------|--------------------------------|
+| `general { gaps_in = 5 }` | `config = { general = { gaps_in = 5; }; }` → `hl.config({...})` |
+| `bezier = overshoot,0.4,1,0.2,1` | `hl.curve("overshoot", { type = "bezier", points = {{0.4, 1}, {0.2, 1}} })` |
+| `animation = windows,1,7,overshoot` | `hl.animation({ leaf = "windows", enabled = true, speed = 7, bezier = "overshoot" })` |
+| `windowrulev2 = float,class:^(foot)$` | `window_rule = { match.class = "^(foot)$"; float = true; }` → `hl.window_rule({...})` |
+| `bind = SUPER, Q, killactive` | `bind = { _args = [ "SUPER + Q" <hl.dsp.window.close()> ]; }` |
+| `bindm = SUPER, mouse:272, movewindow` | `bind = { _args = [ "SUPER + mouse:272" <hl.dsp.window.drag()> { mouse = true; } ]; }` |
+
+要点：
+- 修饰键之间用 `" + "` 连接（`"SUPER + SHIFT + Q"`），合法修饰键为 `SHIFT` / `CTRL` / `ALT` / `SUPER` / `MOD1`–`MOD5`
+- dispatcher 变为 `hl.dsp.*`（`window.close` / `exec_cmd` / `window.move` / `window.resize` / `window.float` / `window.fullscreen` / `window.swap` / `focus` / `window.drag`）
+- 方向参数用全名 `left` / `down` / `up` / `right`
+- 颜色只接受十六进制 `rgb(rrggbb)` 或 `rgba(rrggbbaa)`，**不接受** `rgba(34, 197, 94)` 这种逗号分隔十进制
+- `bindm` 已废弃，鼠标绑定改为给 `hl.bind` 传第三参数 `{ mouse = true; }`
+- 0.55 已移除的键：`general:no_wallpaper`、`decoration:blur:new_windows`
+
+### 在 Home Manager 中的写法
+
+```nix
+wayland.windowManager.hyprland = {
+  enable = true;
+  configType = "lua";
+  settings = {
+    config = { general = { gaps_in = 5; }; };
+    bind = [
+      { _args = [ "SUPER + Q" (lib.generators.mkLuaInline "hl.dsp.window.close()") ]; }
+    ];
+    window_rule = [ { match.class = "^(foot|kitty)$"; float = true; } ];
+  };
+};
+```
+
+生成文件为 `~/.config/hypr/hyprland.lua`，同时生成 `~/.config/hypr/.luarc.json`（指向包内 Lua stubs，供编辑器补全）。
+
+### 验证
+
+```bash
+hyprctl reload        # 无输出即无配置错误
+hyprctl config -h     # 0.55+ 配置诊断入口
+```
+
+若需临时回退，可将 `configType` 改回 `"hyprlang"`（仅限官方兼容期内）。
+
 ## 启动配置
 
 ### UEFI 与 systemd-boot
@@ -346,6 +396,8 @@ theme-light
 - 检查 `xdg-desktop-portal-hyprland` 是否已安装
 - 确保 SDDM 以 Wayland 模式运行
 - 验证 `qt6Packages.qtwayland` 是否已安装
+- Lua 配置报错先看 `hyprctl reload` 输出：`unknown config key` 通常是该键在 0.55 已移除；`invalid color` 是颜色没写成 `rgb(rrggbb)` 格式
+- 确认生效的是 `~/.config/hypr/hyprland.lua`——只要该文件存在，`hyprland.conf` 就不会被加载
 
 ### Niri 问题
 

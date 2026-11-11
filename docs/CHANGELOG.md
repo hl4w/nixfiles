@@ -7,6 +7,15 @@
 > 约定：版本号不变时，每次提交均以**当日日期**开一个新的小节，当日所有改动聚合在该节下，便于按日期追踪未发布版本的变更。
 
 ## [v0.0.6] - 2026-11-11
+### Documentation
+- **全面同步文档到 Hyprland 0.55 Lua 配置与 Neovim 新 API**:
+  - `docs/shortcuts.md` / `shortcuts_en.md`: 键位表按实际配置重写——「窗口焦点移动」更正为「窗口移动」（实际 dispatcher 是 `hl.dsp.window.move`）；全屏由非法的 `Super + F11` 改为 `Super + Shift + Return`；删除已注释的伪全屏行；鼠标绑定更正为 `Super + 左/中/右键`；补充 Lua dispatcher 列与 Niri 实际键位（`Super + Shift + Return` 终端、`Super + D` 启动器）
+  - `docs/migration.md` / `migration_en.md`: 新增「Hyprland 0.55 Lua 配置迁移」章节，含 hyprlang → Lua 语法对照表、HM 写法示例、`hyprctl reload` / `hyprctl config -h` 验证方法与回退说明；「Hyprland 问题」补充 Lua 报错排查
+  - `docs/architecture.md` / `architecture_en.md`: 更新 `hyprland.nix`（Lua 配置）、`theme-hyprland.nix`（嵌套表合并）、`editor.nix`（withPlugins + `vim.lsp.config`）、`dev-lsp.nix`（补 Nix 工具）描述；目录树补 `pywal.nix`；「鼠标侧键配置」改为当前实际的 `settings.bind` + `{ mouse = true; }` 写法
+  - `docs/faq.md` / `faq_en.md`: Hyprland 配置格式、配置文件位置与 Lua 报错排查已更新
+  - `docs/glossary.md` / `glossary_en.md`: 新增「Lua 配置」「调度器（dispatcher）」「工作区」三个规范术语
+  - `README.md` / `README_en.md`: 特性列表标注 Hyprland 0.55 起 Lua 配置格式；`home/common` 目录说明更新为 `theme-gtk` / `theme-hyprland` / `pywal`
+
 ### Fixed
 - **nvim-lspconfig 弃用警告: `require('lspconfig')` framework is deprecated**（`home/common/editor.nix`）: 该框架将在 nvim-lspconfig v3.0.0 移除。5 个 server（nil_ls / clangd / gopls / pyright / rust_analyzer）的 `require('lspconfig').X.setup({...})` 迁移到 Neovim 0.11+ 内置 API：有自定义 settings 的用 `vim.lsp.config('name', {...})`（默认 cmd/root_dir 仍由 runtimepath 上的 nvim-lspconfig 插件提供），最后统一 `vim.lsp.enable({...})` 启用。omnifunc 由 Neovim 在 LspAttach 时自动设置，重复的 on_attach 样板（5×3 行）整体删除
 - **Nix LSP 二进制缺失**（`home/common/dev-lsp.nix`）: `nil_ls` 配置早已存在但 `nil` / `nixpkgs-fmt` 从未装进 `home.packages`，补装（其余 server 二进制 clang-tools/gopls/pyright/rust-analyzer 已在列表中）

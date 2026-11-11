@@ -30,6 +30,9 @@
 | 规范术语（中） | 英文规范术语 | 代码 / 标识符 | 说明 | 避免写法 |
 |---------------|-------------|--------------|------|----------|
 | 窗口管理器 | window manager | `programs.hyprland`、`programs.niri` | Hyprland / Niri | WM、窗口管理 |
+| Lua 配置 | Lua config | `configType = "lua"`、`~/.config/hypr/hyprland.lua` | Hyprland 0.55+ 官方配置格式，存在即忽略 `hyprland.conf` | lua 配置文件、Lua 脚本（指配置时） |
+| 调度器 | dispatcher | `hl.dsp.*`（如 `hl.dsp.window.close()`） | Hyprland Lua 中执行动作的函数对象 | 命令、动作命令 |
+| 工作区 | workspace | `hl.dsp.focus({ workspace = N })` | Hyprland / Niri 的虚拟桌面单元 | 桌面（指虚拟桌面时）、虚拟屏 |
 | 桌面 Shell | desktop shell | 选项值 `dms`、`noctalia` | 桌面面板/壳层组件类别 | Desktop Shell、Shell 组件 |
 | DMS Shell | DMS Shell | `dms-shell`（包/命令）、`programs.dms-shell`（模块）、`shell-dms.nix` | DankMaterialShell，轻量级桌面 Shell | DMS-Shell、DMS、dms shell |
 | Noctalia Shell | Noctalia Shell | `noctalia-shell`（包，v4）、`shell-noctalia.nix` | Noctalia 桌面 Shell（当前采用 v4） | Noctalia-Shell、Noctalia、noctalia shell |

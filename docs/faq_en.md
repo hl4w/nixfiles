@@ -12,7 +12,7 @@ Flakes provide reproducible builds, better dependency management, and a cleaner 
 
 ### What window managers are supported?
 
-- **Hyprland**: Dynamic tiling window manager with hyprlang configuration (`configType = "hyprlang"`)
+- **Hyprland**: Dynamic tiling window manager with Lua configuration (Hyprland 0.55+ official format, `configType = "lua"`, writes `~/.config/hypr/hyprland.lua`)
 - **Niri**: Modern scrollable-tiling window manager, recommended for laptops
 
 ### What desktop shells are available?
@@ -187,7 +187,7 @@ nix --version
 
 ### How do I configure Hyprland / Niri?
 
-**Hyprland**: System-level enablement lives in `modules/desktops/hyprland.nix`; keybindings, window rules, gaps, animations and other details live in `home/common/hyprland.nix` using hyprlang syntax (`configType = "hyprlang"`).
+**Hyprland**: System-level enablement lives in `modules/desktops/hyprland.nix`; keybindings, window rules, gaps, animations and other details live in `home/common/hyprland.nix` using Lua syntax (`configType = "lua"`; Home Manager generates `~/.config/hypr/hyprland.lua`). Mapping: section config goes in `settings.config` (renders `hl.config({...})`), keybindings in `settings.bind` (`hl.bind(...)` + `hl.dsp.*`), window rules in `settings.window_rule` (`hl.window_rule(...)`), and colors in `home/common/theme-hyprland.nix` (`settings.config.decoration` etc., deep-merged with the former).
 
 **Niri**: System-level enablement lives in `modules/desktops/niri.nix`; keybindings and other details live in `home/common/niri.nix`.
 
@@ -359,6 +359,7 @@ Ensure:
 - SDDM is running in Wayland mode
 - Check logs in `~/.local/share/hyprland/`
 - Validate config syntax (Hyprland 0.55+): `hyprctl config -h`
+- Lua config reporting `unknown config key` / `invalid color`: drop that key (removed in 0.55) or use hexadecimal colors `rgb(rrggbb)` / `rgba(rrggbbaa)`
 
 ### Niri won't start
 

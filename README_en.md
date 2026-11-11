@@ -8,7 +8,7 @@ A modern configuration repository built on NixOS 26.05, featuring a deeply tuned
 
 ### Desktop & Appearance
 
-- **Hyprland** / **Niri**: Wayland window managers [(details)](docs/architecture.md) [(shortcuts)](docs/shortcuts.md)
+- **Hyprland** / **Niri**: Wayland window managers (Hyprland uses the Lua config format since 0.55) [(details)](docs/architecture.md) [(shortcuts)](docs/shortcuts.md)
 - **Selectable desktop shell**: native support for DMS Shell and Noctalia Shell, freely combined with KDE / Hyprland polkit agents [(architecture)](docs/architecture.md)
 - **Unified theming**: GTK / Qt / Hyprland / Niri / Shell / SDDM / Fcitx5 all themed with Catppuccin [(architecture)](docs/architecture.md)
 - **Wallpaper auto-coloring**: pywal extracts colors from the wallpaper and a watcher service follows wallpaper changes [(architecture)](docs/architecture.md)
@@ -191,7 +191,7 @@ nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 │   └── system/               # System basics (fonts, Lix, ...)
 ├── home/                     # Home Manager user config (user level, Home Manager-only options)
 │   ├── common/               # Shared user modules (apps, cli, dev-lsp, editor, git, shell,
-│   │                         #   input, hyprland, niri, unified-theme, wallpaper-watcher)
+│   │                         #   input, hyprland, niri, theme-gtk, theme-hyprland, pywal, wallpaper-watcher)
 │   └── hosts/                # Host-specific user config (desktop / laptop / server)
 ├── scripts/                  # Install and maintenance scripts (Chinese and English variants)
 ├── templates/                # Template files

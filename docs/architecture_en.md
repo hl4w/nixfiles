@@ -56,12 +56,13 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 │   │   ├── input.nix     # Fcitx5 + RIME (oh-my-rime)
 │   │   ├── cli.nix       # eza, bat, fd, rg, fzf, yazi (zoxide integration), fastfetch, btop, vlc
 │   │   ├── apps.nix      # GUI applications
-│   │   ├── dev-lsp.nix   # LSP servers (including C/C++)
+│   │   ├── dev-lsp.nix   # LSP servers (Nix / C/C++ / Go / Python / Rust)
 │   │   ├── git.nix       # Git configuration
-│   │   ├── hyprland.nix  # Hyprland detailed config (wayland.windowManager.hyprland)
+│   │   ├── hyprland.nix  # Hyprland detailed config (Lua format, configType = "lua")
 │   │   ├── niri.nix      # Niri config (KDL format with colors; HM 26.05 has no niri module, uses xdg.configFile)
 │   │   ├── theme-gtk.nix   # User-level theme (GTK/icons, unconditionally imported)
-│   │   ├── theme-hyprland.nix  # Hyprland window colors (desktop host)
+│   │   ├── theme-hyprland.nix  # Hyprland window colors (nested tables in settings.config)
+│   │   ├── pywal.nix     # pywal color service (generates palette cache from wallpaper at login)
 │   │   └── wallpaper-watcher.nix  # Wallpaper watcher user service
 │   └── hosts/            # Host-specific user configurations (user-level)
 │       ├── desktop/       # Desktop user configuration
@@ -150,16 +151,17 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 | Module | Description |
 |--------|-------------|
 | `shell.nix` | Bash + Zsh + Starship prompt (with pywal dynamic coloring) |
-| `editor.nix` | Neovim, Emacs (with LSP servers configured: nil_ls, clangd, gopls, pyright, rust_analyzer) |
+| `editor.nix` | Neovim (treesitter parsers installed via `nvim-treesitter.withPlugins`; LSP configured with the new `vim.lsp.config` / `vim.lsp.enable` API for nil_ls, clangd, gopls, pyright, rust_analyzer), Emacs |
 | `input.nix` | Fcitx5 + RIME (oh-my-rime configuration) |
 | `cli.nix` | CLI tools: eza, bat, fd, rg, fzf, yazi (terminal file manager with zoxide integration), zoxide (smart directory navigation), fastfetch, btop, dust, duf, tokei, hyperfine, procs, starship |
 | `apps.nix` | GUI applications (browser, office, media) |
-| `dev-lsp.nix` | Development tools and LSP servers (C/C++: clangd/clang-tools/cmake/ninja/gdb/lldb; Go: go/gopls; Python: python3/pyright; Rust: rustc/rust-analyzer/rustfmt/cargo) |
+| `dev-lsp.nix` | Development tools and LSP servers (Nix: nil/nixpkgs-fmt; C/C++: clangd/clang-tools/cmake/ninja/gdb/lldb; Go: go/gopls; Python: python3/pyright; Rust: rustc/rust-analyzer/rustfmt/cargo) |
 | `git.nix` | Git global configuration |
-| `hyprland.nix` | Hyprland detailed config (wayland.windowManager.hyprland: settings/keybinds/binds) |
+| `hyprland.nix` | Hyprland detailed config (`configType = "lua"`: `settings.config` → `hl.config`, `settings.bind` → `hl.bind` + `hl.dsp.*`, `settings.window_rule` → `hl.window_rule`; HM writes `~/.config/hypr/hyprland.lua`) |
 | `niri.nix` | Niri config (KDL format with colors; HM 26.05 has no wayland.windowManager.niri module, generated via xdg.configFile; laptop host) |
 | `theme-gtk.nix` | User-level theme (GTK/icons, unconditionally imported) |
-| `theme-hyprland.nix` | Hyprland window colors (desktop host; imports order guarantees the option exists) |
+| `theme-hyprland.nix` | Hyprland window colors (nested tables under `settings.config`'s `general.col` / `decoration`, deep-merged with `hyprland.nix`; desktop host) |
+| `pywal.nix` | pywal color service (oneshot + `RemainAfterExit`; `wal -R` first, falling back to `wal -i`) |
 | `wallpaper-watcher.nix` | Wallpaper change watcher user service (auto-update colors) |
 
 ### Documentation (`docs/`)
@@ -494,10 +496,20 @@ This configuration uses **Lix** as an alternative implementation of the Nix pack
 
 ### Mouse Side Buttons Configuration
 
-This configuration supports mouse side buttons (Button 8/9) for back/forward navigation in applications:
+Hyprland mouse bindings live in the same Lua config under `settings.bind`, marked as mouse events via the third argument `{ mouse = true; }` (`bindm` was folded into `hl.bind` in 0.55):
 
-- **Implementation modules**: `modules/hardware/mouse.nix` and `modules/desktops/hyprland.nix`
-- **Handling strategy**: Use `pass` command to pass mouse events to applications
+```nix
+bind = [
+  (kb "SUPER + mouse:272" "hl.dsp.window.drag()" { mouse = true; })
+  (kb "SUPER + mouse:273" "hl.dsp.window.resize()" { mouse = true; })
+  (kb "SUPER + mouse:274" "hl.dsp.window.float({ action = \"toggle\" })" null)
+];
+```
+
+That is: `Super + left drag` moves a window, `Super + middle drag` resizes it, `Super + right click` toggles floating.
+
+- **Implementation module**: `home/common/hyprland.nix` (user-level bindings)
+- **Side buttons (Button 8/9)**: currently unbound, so Hyprland never intercepts them and the events pass straight through to applications — back/forward works out of the box in Nemo and Firefox. To remap them, add `"mouse:8"` / `"mouse:9"` bindings in `settings.bind`
 
 - **Mouse button numbering**:
   - Button 1: Left click
@@ -506,17 +518,6 @@ This configuration supports mouse side buttons (Button 8/9) for back/forward nav
   - Button 4/5: Scroll up/down
   - Button 6/7: Scroll tilt (some mice)
   - Button 8/9: Side buttons (back/forward)
-
-- **Hyprland configuration**:
-  ```nix
-  binds = {
-    "mouse,1" = "movewindow";   # Left click to move window
-    "mouse,2" = "resizewindow"; # Middle click to resize
-    "mouse,3" = "togglefloating"; # Right click to toggle floating
-    "mouse,8" = "pass";         # Side button back - pass to application
-    "mouse,9" = "pass";         # Side button forward - pass to application
-  };
-  ```
 
 - **Supported applications**:
   - Nemo file manager: Back/forward directories

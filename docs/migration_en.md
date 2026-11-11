@@ -238,6 +238,56 @@ services.displayManager.sddm = {
 };
 ```
 
+## Hyprland 0.55 Lua Config Migration
+
+Since Hyprland 0.55 the official config format is **Lua**: whenever `$XDG_CONFIG_HOME/hypr/hyprland.lua` exists, `hyprland.conf` in the same directory is **completely ignored**; hyprlang is only kept for a 1–2 release compatibility window. Home Manager release-26.05 supports this natively (the `configType` option; defaults to `lua` when `home.stateVersion >= 26.05`).
+
+### Syntax Mapping
+
+| hyprlang | Lua (HM `settings` → generated call) |
+|----------|-------------------------------------|
+| `general { gaps_in = 5 }` | `config = { general = { gaps_in = 5; }; }` → `hl.config({...})` |
+| `bezier = overshoot,0.4,1,0.2,1` | `hl.curve("overshoot", { type = "bezier", points = {{0.4, 1}, {0.2, 1}} })` |
+| `animation = windows,1,7,overshoot` | `hl.animation({ leaf = "windows", enabled = true, speed = 7, bezier = "overshoot" })` |
+| `windowrulev2 = float,class:^(foot)$` | `window_rule = { match.class = "^(foot)$"; float = true; }` → `hl.window_rule({...})` |
+| `bind = SUPER, Q, killactive` | `bind = { _args = [ "SUPER + Q" <hl.dsp.window.close()> ]; }` |
+| `bindm = SUPER, mouse:272, movewindow` | `bind = { _args = [ "SUPER + mouse:272" <hl.dsp.window.drag()> { mouse = true; } ]; }` |
+
+Key points:
+- Join modifiers with `" + "` (`"SUPER + SHIFT + Q"`); valid modifiers are `SHIFT` / `CTRL` / `ALT` / `SUPER` / `MOD1`–`MOD5`
+- Dispatchers become `hl.dsp.*` (`window.close` / `exec_cmd` / `window.move` / `window.resize` / `window.float` / `window.fullscreen` / `window.swap` / `focus` / `window.drag`)
+- Direction arguments use full names: `left` / `down` / `up` / `right`
+- Colors only accept hexadecimal `rgb(rrggbb)` or `rgba(rrggbbaa)` — **not** comma-separated decimals like `rgba(34, 197, 94)`
+- `bindm` is deprecated; mouse bindings pass a third argument `{ mouse = true; }` to `hl.bind`
+- Keys removed in 0.55: `general:no_wallpaper`, `decoration:blur:new_windows`
+
+### Writing It in Home Manager
+
+```nix
+wayland.windowManager.hyprland = {
+  enable = true;
+  configType = "lua";
+  settings = {
+    config = { general = { gaps_in = 5; }; };
+    bind = [
+      { _args = [ "SUPER + Q" (lib.generators.mkLuaInline "hl.dsp.window.close()") ]; }
+    ];
+    window_rule = [ { match.class = "^(foot|kitty)$"; float = true; } ];
+  };
+};
+```
+
+This writes `~/.config/hypr/hyprland.lua` plus `~/.config/hypr/.luarc.json` (pointing at the bundled Lua stubs for editor completion).
+
+### Verification
+
+```bash
+hyprctl reload        # no output means no config errors
+hyprctl config -h     # 0.55+ config diagnostics entry point
+```
+
+To roll back temporarily, set `configType` back to `"hyprlang"` (only within the official compatibility window).
+
 ## Boot Configuration
 
 ### UEFI with systemd-boot
@@ -346,6 +396,8 @@ Ensure your user is in the `wheel` group and has sudo access.
 - Check that `xdg-desktop-portal-hyprland` is installed
 - Ensure SDDM is running in Wayland mode
 - Verify `qt6Packages.qtwayland` is installed
+- For Lua config errors check `hyprctl reload` output first: `unknown config key` usually means the key was removed in 0.55; `invalid color` means the color isn't in `rgb(rrggbb)` form
+- Confirm the active file is `~/.config/hypr/hyprland.lua` — as long as it exists, `hyprland.conf` is never loaded
 
 ### Niri Issues
 

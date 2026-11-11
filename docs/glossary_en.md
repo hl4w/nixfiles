@@ -30,6 +30,9 @@ This glossary defines the canonical terminology used throughout HL4W documentati
 | Canonical term | Code / identifier | Notes | Avoid |
 |----------------|-------------------|-------|-------|
 | window manager | `programs.hyprland`, `programs.niri` | Hyprland / Niri | WM |
+| Lua config | `configType = "lua"`, `~/.config/hypr/hyprland.lua` | Hyprland 0.55+ official config format; when present `hyprland.conf` is ignored | lua config file, Lua script (when referring to config) |
+| dispatcher | `hl.dsp.*` (e.g. `hl.dsp.window.close()`) | Function object that performs actions in Hyprland Lua | command, action command |
+| workspace | `hl.dsp.focus({ workspace = N })` | Virtual desktop unit in Hyprland / Niri | desktop (when meaning virtual desktop) |
 | desktop shell | option values `dms`, `noctalia` | Category of panel/shell components | Desktop Shell, shell component |
 | DMS Shell | `dms-shell` (package/command), `programs.dms-shell` (module), `shell-dms.nix` | DankMaterialShell, lightweight desktop shell | DMS-Shell, DMS, dms shell |
 | Noctalia Shell | `noctalia-shell` (v4 package), `shell-noctalia.nix` | Noctalia desktop shell (v4 currently used) | Noctalia-Shell, Noctalia, noctalia shell |

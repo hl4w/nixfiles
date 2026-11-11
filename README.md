@@ -8,7 +8,7 @@
 
 ### 桌面与外观
 
-- **Hyprland** / **Niri**: Wayland 窗口管理器 [(详细说明)](docs/architecture.md) [(快捷键)](docs/shortcuts.md)
+- **Hyprland** / **Niri**: Wayland 窗口管理器（Hyprland 0.55 起使用 Lua 配置格式）[(详细说明)](docs/architecture.md) [(快捷键)](docs/shortcuts.md)
 - **桌面 Shell 可选**: 原生兼容 DMS Shell 与 Noctalia Shell，配合 KDE / Hyprland polkit 代理自由组合 [(架构文档)](docs/architecture.md)
 - **主题统一**: GTK / Qt / Hyprland / Niri / Shell / SDDM / Fcitx5 统一为 Catppuccin 配色 [(架构文档)](docs/architecture.md)
 - **壁纸自动取色**: 使用 pywal 从壁纸提取颜色，监听服务在壁纸变化时自动跟随 [(架构文档)](docs/architecture.md)
@@ -190,7 +190,7 @@ nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 │   └── system/               # 系统基础（fonts、Lix 等）
 ├── home/                     # Home Manager 用户配置（用户级，Home Manager 专属选项）
 │   ├── common/               # 通用用户模块（apps、cli、dev-lsp、editor、git、shell、
-│   │                         #   input、hyprland、niri、unified-theme、wallpaper-watcher）
+│   │                         #   input、hyprland、niri、theme-gtk、theme-hyprland、pywal、wallpaper-watcher）
 │   └── hosts/                # 主机特定用户配置（desktop / laptop / server）
 ├── scripts/                  # 安装与维护脚本（中英文各一套）
 ├── templates/                # 模板文件

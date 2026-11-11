@@ -7,6 +7,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > Convention: when the version number stays the same, each commit opens a new section with the current date. All changes made on the same day are grouped under that section, so commits can be traced back to their day even before the next release is cut.
 
 ## [v0.0.6] - 2026-11-11
+### Documentation
+- **Synced all docs to the Hyprland 0.55 Lua config and the new Neovim APIs**:
+  - `docs/shortcuts.md` / `shortcuts_en.md`: rewrote the keybinding tables to match the actual config — "focus movement" corrected to "window movement" (the real dispatcher is `hl.dsp.window.move`); fullscreen changed from the invalid `Super + F11` to `Super + Shift + Return`; removed the commented-out fake-fullscreen row; mouse bindings corrected to `Super + left/middle/right`; added a Lua dispatcher column and the actual Niri keybindings (`Super + Shift + Return` terminal, `Super + D` launcher)
+  - `docs/migration.md` / `migration_en.md`: added a "Hyprland 0.55 Lua Config Migration" section with a hyprlang → Lua syntax mapping table, an HM example, `hyprctl reload` / `hyprctl config -h` verification steps and rollback notes; extended "Hyprland Issues" with Lua error troubleshooting
+  - `docs/architecture.md` / `architecture_en.md`: updated descriptions for `hyprland.nix` (Lua config), `theme-hyprland.nix` (nested-table merge), `editor.nix` (withPlugins + `vim.lsp.config`) and `dev-lsp.nix` (added Nix tooling); added `pywal.nix` to the tree; rewrote "Mouse Side Buttons" to the actual `settings.bind` + `{ mouse = true; }` form
+  - `docs/faq.md` / `faq_en.md`: updated the Hyprland config format, config file location and Lua error troubleshooting
+  - `docs/glossary.md` / `glossary_en.md`: added the canonical terms "Lua config", "dispatcher" and "workspace"
+  - `README.md` / `README_en.md`: noted the Lua config format since Hyprland 0.55 in the feature list; updated the `home/common` directory description to `theme-gtk` / `theme-hyprland` / `pywal`
+
 ### Fixed
 - **nvim-lspconfig deprecation warning: `require('lspconfig')` framework is deprecated** (`home/common/editor.nix`): The framework will be removed in nvim-lspconfig v3.0.0. All 5 servers' (nil_ls / clangd / gopls / pyright / rust_analyzer) `require('lspconfig').X.setup({...})` migrated to Neovim 0.11+'s built-in API: servers with custom settings use `vim.lsp.config('name', {...})` (default cmd/root_dir still provided by the nvim-lspconfig plugin on runtimepath), then a single `vim.lsp.enable({...})` activates them all. omnifunc is set automatically by Neovim on LspAttach, so the duplicated on_attach boilerplate (5×3 lines) was deleted
 - **Missing Nix LSP binaries** (`home/common/dev-lsp.nix`): The `nil_ls` config existed for a while but `nil` / `nixpkgs-fmt` were never added to `home.packages` — installed now (the other server binaries clang-tools/gopls/pyright/rust-analyzer were already listed)
