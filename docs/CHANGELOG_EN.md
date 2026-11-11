@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > Convention: when the version number stays the same, each commit opens a new section with the current date. All changes made on the same day are grouped under that section, so commits can be traced back to their day even before the next release is cut.
 
 ## [v0.0.6] - 2026-11-11
+### Added
+- **VMware Workstation guest support** (`modules/services/virtualisation.nix`): Added `virtualisation.vmware.guest.enable = lib.mkDefault true` (open-vm-tools), providing vmtoolsd display auto-resize, shared clipboard, drag-and-drop and time sync for testing the desktop inside VMware VMs. The GL chain itself needs no changes: the kernel ships the `vmwgfx` module and `hardware.graphics.enable = true` provides Mesa (including the VMware svga Gallium driver), so Hyprland can use 3D acceleration directly — as long as "Display → Accelerate 3D graphics" is checked in the Workstation VM settings on the host. On non-VMware physical machines vmtoolsd exits on its own when no hypervisor is detected; the `mkDefault` can be overridden per host
+
 ### Documentation
 - **Synced all docs to the Hyprland 0.55 Lua config and the new Neovim APIs**:
   - `docs/shortcuts.md` / `shortcuts_en.md`: rewrote the keybinding tables to match the actual config — "focus movement" corrected to "window movement" (the real dispatcher is `hl.dsp.window.move`); fullscreen changed from the invalid `Super + F11` to `Super + Shift + Return`; removed the commented-out fake-fullscreen row; mouse bindings corrected to `Super + left/middle/right`; added a Lua dispatcher column and the actual Niri keybindings (`Super + Shift + Return` terminal, `Super + D` launcher)
