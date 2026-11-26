@@ -155,7 +155,7 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 | `fastfetch.nix` | fastfetch 配置（`xdg.configFile."fastfetch/config.jsonc"`，NixOS logo + OS/内核/窗口管理器/CPU/GPU/内存/磁盘等模块） |
 | `editor.nix` | Neovim（treesitter 解析器由 `nvim-treesitter.withPlugins` 随包安装；LSP 用 `vim.lsp.config` / `vim.lsp.enable` 新 API 配置 nil_ls、clangd、gopls、pyright、rust_analyzer）、Emacs |
 | `input.nix` | Fcitx5 + RIME（oh-my-rime 配置） |
-| `cli.nix` | CLI 工具集：eza、bat、fd、rg、fzf、yazi（终端文件管理器，支持 zoxide 集成）、zoxide（智能目录导航）、fastfetch、btop、dust、duf、tokei、hyperfine、procs、starship |
+| `cli.nix` | CLI 工具集：eza、bat、fd、rg、fzf、yazi（终端文件管理器，支持 zoxide 集成）、zoxide（智能目录导航）、fastfetch、btop、dust、duf、tokei、hyperfine、procs、starship，以及 `home-manager` 命令行（取自 flake input，版本与模块一致） |
 | `apps.nix` | GUI 应用（浏览器、办公、媒体） |
 | `dev-lsp.nix` | 开发工具和 LSP 服务器（Nix: nil/nixpkgs-fmt；C/C++: clangd/clang-tools/cmake/ninja/gdb/lldb；Go: go/gopls；Python: python3/pyright；Rust: rustc/rust-analyzer/rustfmt/cargo） |
 | `git.nix` | Git 全局配置 |

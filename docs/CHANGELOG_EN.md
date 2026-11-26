@@ -11,8 +11,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Custom fastfetch config** (`home/common/fastfetch.nix`, new module): Generates a JSONC config (fastfetch's native format, comments allowed) via `xdg.configFile."fastfetch/config.jsonc"`. Contents: built-in NixOS logo, ` ➜ ` key separator, module order title / os / host / kernel / uptime / packages → wm / de / shell / terminal → cpu / gpu / memory / swap / disk(`/`) → localip / locale / datetime / colors, grouped with `break`. Registered in `home/common/default.nix` imports
 - **Show fastfetch on the first terminal in zsh** (`home/common/shell.nix`): Added a fastfetch invocation in `programs.zsh.initContent`. Display timing is gated by the `$XDG_RUNTIME_DIR/.fastfetch-shown-$(id -u)` stamp file — that directory is created per login session by logind and wiped on logout, so only the **first** terminal window after each login prints system info; later windows and nested subshells stay clean. The `fastfetch` package was already installed via `home/common/cli.nix`; this only adds the display logic, silently skipping when the command is absent
 
+### Fixed
+- **`home-manager` command missing after deployment** (`home/common/cli.nix`): The repo only imported HM as a NixOS module (`home-manager.nixosModules.home-manager`) and never installed the CLI into the user environment. Now installs `inputs.home-manager.packages.${system}.home-manager` — taken from the flake input rather than nixpkgs so it stays strictly in sync with the module version (verified that HM release-26.05 exposes `packages.<system>.home-manager`). **Note**: the flake exports no `homeConfigurations`, so activation/rollback should still use `sudo nixos-rebuild switch --flake .#<hostname>`; `home-manager switch` will fail with no matching output
+- Verified `hyperfine`: already present in `home/common/cli.nix` (confirmed in nixpkgs 26.05 at `pkgs/by-name/hy/hyperfine`), no change needed
+
 ### Documentation
 - **Docs synced with the fastfetch module**: `docs/architecture.md` / `architecture_en.md` add `fastfetch.nix` to the `home/common` tree and module table, and note the first-terminal display behavior in the `shell.nix` description; `README.md` / `README_en.md` update the `home/common` directory listing
+- **`cli.nix` description now mentions the `home-manager` command** (`docs/architecture.md` / `architecture_en.md`)
 
 ## [v0.0.6] - 2026-11-11
 ### Added

@@ -155,7 +155,7 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 | `fastfetch.nix` | fastfetch config (`xdg.configFile."fastfetch/config.jsonc"`, NixOS logo + OS/kernel/WM/CPU/GPU/memory/disk modules) |
 | `editor.nix` | Neovim (treesitter parsers installed via `nvim-treesitter.withPlugins`; LSP configured with the new `vim.lsp.config` / `vim.lsp.enable` API for nil_ls, clangd, gopls, pyright, rust_analyzer), Emacs |
 | `input.nix` | Fcitx5 + RIME (oh-my-rime configuration) |
-| `cli.nix` | CLI tools: eza, bat, fd, rg, fzf, yazi (terminal file manager with zoxide integration), zoxide (smart directory navigation), fastfetch, btop, dust, duf, tokei, hyperfine, procs, starship |
+| `cli.nix` | CLI tools: eza, bat, fd, rg, fzf, yazi (terminal file manager with zoxide integration), zoxide (smart directory navigation), fastfetch, btop, dust, duf, tokei, hyperfine, procs, starship, plus the `home-manager` command (from the flake input, matching the module version) |
 | `apps.nix` | GUI applications (browser, office, media) |
 | `dev-lsp.nix` | Development tools and LSP servers (Nix: nil/nixpkgs-fmt; C/C++: clangd/clang-tools/cmake/ninja/gdb/lldb; Go: go/gopls; Python: python3/pyright; Rust: rustc/rust-analyzer/rustfmt/cargo) |
 | `git.nix` | Git global configuration |

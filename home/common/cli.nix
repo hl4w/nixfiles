@@ -1,6 +1,6 @@
 # 用户级 CLI 工具配置模块
 # 包含用户级安装的命令行工具和相关配置
-{ pkgs, config, ... }:
+{ pkgs, inputs, config, ... }:
 
 {
   # 用户级安装的 CLI 工具
@@ -20,6 +20,14 @@
     # ===== 系统工具 =====
     fastfetch # 快速系统信息展示工具
     btop     # 系统资源监控工具
+
+    # Home Manager 命令行
+    # 取自 flake input 而非 nixpkgs，保证与 nixosModules.home-manager 版本严格一致。
+    # 注意：本仓库把 HM 作为 NixOS 模块集成（home-manager.users.<name>），
+    # flake 未导出 homeConfigurations，所以激活/回滚应使用
+    #   sudo nixos-rebuild switch --flake .#<hostname>
+    # 而不是 home-manager switch —— 后者会报 "no homeConfigurations" 之类错误。
+    inputs.home-manager.packages.${pkgs.stdenv.hostPlatform.system}.home-manager
     
     # ===== 开发工具 =====
     tokei    # 代码统计工具
