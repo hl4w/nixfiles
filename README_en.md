@@ -97,8 +97,8 @@ reboot
 
 ```bash
 # 1. Clone the repository and cd into it
-git clone https://gitee.com/hl4w/nixfiles.git
-# git clone https://github.com/hl4w/nixfiles.git
+git clone --depth 1 https://gitee.com/hl4w/nixfiles.git
+# git clone --depth 1 https://github.com/hl4w/nixfiles.git
 cd nixfiles
 
 # 2. First run: generate flake.lock to pin dependencies (includes the oh-my-rime input)
@@ -124,7 +124,7 @@ sudo nixos-rebuild switch --flake .#<hostname>
 
 ```bash
 # 1. Clone repository
-git clone https://gitee.com/hl4w/nixfiles.git
+git clone --depth 1 https://gitee.com/hl4w/nixfiles.git
 cd nixfiles
 
 # 2. Generate flake.lock (pins dependencies, includes the oh-my-rime input)

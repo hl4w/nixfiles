@@ -50,9 +50,9 @@ On an existing NixOS system, use `install.sh` to generate the host configuration
 ```bash
 # Clone repository
 # Chinese users recommended to use Gitee mirror:
-git clone https://gitee.com/hl4w/nixfiles.git
+git clone --depth 1 https://gitee.com/hl4w/nixfiles.git
 # International users use GitHub:
-# git clone https://github.com/hl4w/nixfiles.git
+# git clone --depth 1 https://github.com/hl4w/nixfiles.git
 cd nixfiles
 
 # Generate flake.lock before the first run (includes the oh-my-rime input)

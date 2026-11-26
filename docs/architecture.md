@@ -553,7 +553,7 @@ sudo nixos-install --flake .#<hostname>
 
 ```bash
 # 克隆仓库并进入
-git clone https://gitee.com/hl4w/nixfiles.git && cd nixfiles
+git clone --depth 1 https://gitee.com/hl4w/nixfiles.git && cd nixfiles
 # 首次运行前生成 flake.lock（包含 oh-my-rime 输入）
 nix flake update
 

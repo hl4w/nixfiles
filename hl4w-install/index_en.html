@@ -246,7 +246,7 @@ sudo nixos-install --flake .#my-hostname</code></pre>
 
       <div class="step"><div class="step-num">1</div><div class="step-body">
         <strong>Clone the repo</strong>
-        <pre><code>git clone https://github.com/hl4w/nixfiles.git
+        <pre><code>git clone --depth 1 https://github.com/hl4w/nixfiles.git
 cd nixfiles
 
 # Generate flake.lock before the first run (pins deps, incl. oh-my-rime)
@@ -269,11 +269,8 @@ nix flake update</code></pre>
 ls hosts/my-hostname/hardware-configuration.nix || \
   sudo nixos-generate-config --show-hardware-config > hosts/my-hostname/hardware-configuration.nix
 
-# Deploy system config (first build is slow — expect 10–30 min)
-sudo nixos-rebuild switch --flake .#my-hostname
-
-# Deploy user config
-home-manager switch --flake .#myuser@my-hostname</code></pre>
+# Deploy system config (includes Home Manager user config; first build is slow — expect 10–30 min)
+sudo nixos-rebuild switch --flake .#my-hostname</code></pre>
       </div></div>
     </section>
 
@@ -283,7 +280,7 @@ home-manager switch --flake .#myuser@my-hostname</code></pre>
 
       <div class="step"><div class="step-num">1</div><div class="step-body">
         <strong>Clone + generate flake.lock</strong>
-        <pre><code>git clone https://github.com/hl4w/nixfiles.git && cd nixfiles
+        <pre><code>git clone --depth 1 https://github.com/hl4w/nixfiles.git && cd nixfiles
 nix flake update</code></pre>
       </div></div>
 
@@ -306,11 +303,8 @@ nixos-generate-config --show-hardware-config > hosts/my-hostname/hardware-config
         <pre><code># Test build (no deploy)
 nix build .#nixosConfigurations.my-hostname.config.system.build.toplevel
 
-# Deploy system
-sudo nixos-rebuild switch --flake .#my-hostname
-
-# Deploy user config
-home-manager switch --flake .#myuser@my-hostname</code></pre>
+# Deploy system (includes Home Manager user config)
+sudo nixos-rebuild switch --flake .#my-hostname</code></pre>
       </div></div>
     </section>
 
@@ -332,8 +326,7 @@ sudo nixos-rebuild switch --rollback
 # Rollback to a specific generation
 sudo nixos-rebuild switch --generation &lt;number&gt;
 
-# Home Manager rollback
-home-manager rollback</code></pre>
+# User config (home/) rolls back with the system generation — no separate HM rollback</code></pre>
     </section>
 
     <section id="post-install">
@@ -353,11 +346,8 @@ desktop.polkitAgent = "kde";             // kde / hyprland</code></pre>
 
     <section id="updating">
       <h2>Updating</h2>
-      <pre><code># After modifying system modules
+      <pre><code># After modifying system or user modules (user config is activated with the system build)
 sudo nixos-rebuild switch --flake .#&lt;hostname&gt;
-
-# After modifying user modules
-home-manager switch --flake .#&lt;username&gt;@&lt;hostname&gt;
 
 # Update flake inputs (nixpkgs, home-manager, etc.)
 nix flake update

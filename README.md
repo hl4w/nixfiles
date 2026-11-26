@@ -96,8 +96,8 @@ reboot
 
 ```bash
 # 1. 克隆仓库并 cd 进去
-git clone https://gitee.com/hl4w/nixfiles.git
-# git clone https://github.com/hl4w/nixfiles.git
+git clone --depth 1 https://gitee.com/hl4w/nixfiles.git
+# git clone --depth 1 https://github.com/hl4w/nixfiles.git
 cd nixfiles
 
 # 2. 首次运行，生成 flake.lock 锁定依赖版本（含 oh-my-rime 输入法框架）
@@ -123,7 +123,7 @@ install.sh 会替换 `flake.nix` 中的 `USERNAME = "youruser"` 占位符、在 
 
 ```bash
 # 1. 克隆仓库
-git clone https://gitee.com/hl4w/nixfiles.git
+git clone --depth 1 https://gitee.com/hl4w/nixfiles.git
 cd nixfiles
 
 # 2. 生成 flake.lock（锁定依赖版本，含 oh-my-rime 输入法框架）

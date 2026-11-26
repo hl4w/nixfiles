@@ -20,9 +20,9 @@ cp -r ~/.local/share ~/.local/share.backup
 ```bash
 # 克隆仓库
 # 国内用户推荐使用 Gitee 镜像：
-git clone https://gitee.com/hl4w/nixfiles.git
+git clone --depth 1 https://gitee.com/hl4w/nixfiles.git
 # 国外用户使用 GitHub：
-# git clone https://github.com/hl4w/nixfiles.git
+# git clone --depth 1 https://github.com/hl4w/nixfiles.git
 cd nixfiles
 
 # 生成 flake.lock（首次构建前必须执行，包含 oh-my-rime 输入）

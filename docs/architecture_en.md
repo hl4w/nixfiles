@@ -554,7 +554,7 @@ Existing system, host configuration only:
 
 ```bash
 # Clone the repository and cd into it
-git clone https://gitee.com/hl4w/nixfiles.git && cd nixfiles
+git clone --depth 1 https://gitee.com/hl4w/nixfiles.git && cd nixfiles
 # Generate flake.lock before the first build (includes the oh-my-rime input)
 nix flake update
 

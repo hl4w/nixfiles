@@ -478,9 +478,9 @@ sudo nixos-install --flake .#my-hostname</code></pre></div>
       <div class="step"><div class="step-num">1</div><div class="step-body">
         <strong>克隆仓库</strong>
         <div class="code-wrap"><pre><code># 国内镜像
-git clone https://gitee.com/hl4w/nixfiles.git
+git clone --depth 1 https://gitee.com/hl4w/nixfiles.git
 # 或 GitHub
-# git clone https://github.com/hl4w/nixfiles.git
+# git clone --depth 1 https://github.com/hl4w/nixfiles.git
 cd nixfiles
 
 # 首次运行，生成 flake.lock（锁定依赖版本，含 oh-my-rime）
@@ -503,11 +503,8 @@ nix flake update</code></pre></div>
 ls hosts/my-hostname/hardware-configuration.nix || \
   sudo nixos-generate-config --show-hardware-config > hosts/my-hostname/hardware-configuration.nix
 
-# 部署系统配置（首次构建较慢，可能需要 10-30 分钟）
-sudo nixos-rebuild switch --flake .#my-hostname
-
-# 部署用户配置
-home-manager switch --flake .#myuser@my-hostname</code></pre></div>
+# 部署系统配置（含 Home Manager 用户配置，首次构建较慢，可能需要 10-30 分钟）
+sudo nixos-rebuild switch --flake .#my-hostname</code></pre></div>
       </div></div>
     </section>
 
@@ -518,7 +515,7 @@ home-manager switch --flake .#myuser@my-hostname</code></pre></div>
 
       <div class="step"><div class="step-num">1</div><div class="step-body">
         <strong>克隆仓库 + 生成 flake.lock</strong>
-        <div class="code-wrap"><pre><code>git clone https://gitee.com/hl4w/nixfiles.git && cd nixfiles
+        <div class="code-wrap"><pre><code>git clone --depth 1 https://gitee.com/hl4w/nixfiles.git && cd nixfiles
 nix flake update</code></pre></div>
       </div></div>
 
@@ -542,11 +539,8 @@ nixos-generate-config --show-hardware-config > hosts/my-hostname/hardware-config
         <div class="code-wrap"><pre><code># 测试构建（不部署）
 nix build .#nixosConfigurations.my-hostname.config.system.build.toplevel
 
-# 部署系统
-sudo nixos-rebuild switch --flake .#my-hostname
-
-# 部署用户配置
-home-manager switch --flake .#myuser@my-hostname</code></pre></div>
+# 部署系统（含 Home Manager 用户配置）
+sudo nixos-rebuild switch --flake .#my-hostname</code></pre></div>
       </div></div>
     </section>
 
@@ -572,8 +566,7 @@ sudo nixos-rebuild switch --rollback
 # 指定系统代
 sudo nixos-rebuild switch --generation &lt;number&gt;
 
-# Home Manager 回滚
-home-manager rollback</code></pre></div>
+# 用户配置（home/）随系统代一起回滚，无需单独执行 Home Manager 回滚</code></pre></div>
     </section>
 
     <section id="post-install">
@@ -600,11 +593,8 @@ desktop.polkitAgent = "kde";         // kde / hyprland</code></pre></div>
 
     <section id="updating">
       <h2>系统更新</h2>
-      <div class="code-wrap"><pre><code># 更新系统模块后
+      <div class="code-wrap"><pre><code># 更新系统模块或用户模块后（用户配置随系统构建一起激活）
 sudo nixos-rebuild switch --flake .#&lt;hostname&gt;
-
-# 更新用户模块后
-home-manager switch --flake .#&lt;username&gt;@&lt;hostname&gt;
 
 # 更新 flake 输入（升级 nixpkgs 等依赖版本）
 nix flake update

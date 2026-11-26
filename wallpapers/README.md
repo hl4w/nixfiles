@@ -7,7 +7,7 @@ This directory contains wallpaper images for the NixOS configuration.
 For the complete wallpaper collection with more options, please clone the dedicated wallpaper repository:
 
 ```bash
-git clone https://github.com/hl4w/wallpaper.git
+git clone --depth 1 https://github.com/hl4w/wallpaper.git
 ```
 
 After cloning, copy the desired wallpapers to this directory or symlink the repository to `~/.wallpapers/` for automatic integration with the pywal color system.
