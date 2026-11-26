@@ -130,15 +130,18 @@
     '';
   };
 
+  # bat 配置说明：
+  # HM 会把每个键原样拼成 `--<key>=<value>`（布尔 true 变成无值开关），
+  # 因此键名必须是 bat 真实存在的 CLI 选项（kebab-case），且需要取值的选项
+  # 必须写成字符串。showFileNames / showGitChanges / showLineNumbers 都不是
+  # bat 的选项，它们对应 --style 的 header-filename / changes / numbers。
   programs.bat = {
     enable = true;
     config = {
       theme = "gruvbox-dark";
-      paging = true;
+      paging = "always";
       decorations = "always";
-      showLineNumbers = true;
-      showFileNames = true;
-      showGitChanges = true;
+      style = "numbers,changes,header-filename";
     };
   };
 }
