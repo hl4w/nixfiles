@@ -15,6 +15,7 @@
 - **zsh 首次打开终端时展示 fastfetch**（`home/common/shell.nix`）: 在 `programs.zsh.initContent` 中新增 fastfetch 调用。用 `$XDG_RUNTIME_DIR/.fastfetch-shown-$(id -u)` 标记文件控制显示时机——该目录由 logind 按登录会话创建、注销时清理，因此每次登录只有**第一个**终端窗口会打印系统信息，后续新开窗口与嵌套子 shell 均不重复。`fastfetch` 包本身早已在 `home/common/cli.nix` 中，此处仅补显示逻辑；命令不存在时静默跳过
 
 ### Changed
+- **Rofi 壁纸背景加半透明遮罩**（`home/common/rofi/config.rasi`）: 壁纸直接作为背景时列表文字在浅色区域难以辨认。改为：`background-image: @current-image` 从 mainbox 移到 `window` 层，`mainbox` 叠加 `rgba(30, 30, 46, 0.72)` 遮罩，`inputbar` / `button` 叠加 `rgba(24, 24, 37, 0.85)`。rofi 的绘制顺序是 window 背景图 → 子元素背景色，因此该方法能实现真正的半透明压暗（若把 `background-color` 与 `background-image` 写在同一个元素上，图片会盖住半透明色，遮罩无效）
 - **`programs.neovim.extraLuaConfig` 在 HM 26.05 重命名为 `initLua`**（`home/common/editor.nix`）: 求值时报 *The option `programs.neovim.extraLuaConfig' ... has been renamed to `programs.neovim.initLua'*。已改为 `initLua`（内容仍写入 `~/.config/nvim/init.lua`；未开启 `sideloadInitLua`，因此是真正的 init.lua 而非 `--cmd dofile` 旁加载）。`extraConfig` 在本版本**未**改名，继续承载 Vimscript 设置
 
 ### Fixed

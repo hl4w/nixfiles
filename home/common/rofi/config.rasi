@@ -14,6 +14,8 @@
  *      @current-image 变量（由 pywal.service 与 wallpaper-watcher 在取色
  *      后生成；该文件缺失时由 rofi.nix 的 activation 生成 current-image: none
  *      兜底，避免 rofi 报 Failed to import）。
+ *      背景图铺在 window 上，mainbox / inputbar 再用 @overlay 系列半透明色压暗，
+ *      既能看到壁纸又保证文字可读（rofi 先画 window 背景图，再画子元素背景色）。
  */
 
 @import "~/.cache/current_wallpaper.rasi"
@@ -45,6 +47,10 @@ configuration {
     muted:          #6c7086;
     accent:         #89b4fa;
     urgent:         #f38ba8;
+    /* 壁纸遮罩：叠在背景图之上，保证列表文字可读
+       （rofi 先绘制 window 的背景图，再绘制 mainbox 的半透明背景色） */
+    overlay:        rgba(30, 30, 46, 0.72);
+    overlay-alt:    rgba(24, 24, 37, 0.85);
 }
 
 /* -------------------------- */
@@ -55,7 +61,9 @@ window {
     border:           2px;
     border-color:     @accent;
     border-radius:    10px;
-    background-color: @background;
+    /* 背景图放在 window 上，mainbox 再用半透明色压暗（遮罩） */
+    background-color: transparent;
+    background-image: @current-image;
     color:            @foreground;
     transparency:     "real";
     location:         center;
@@ -76,8 +84,8 @@ mainbox {
     orientation:      horizontal;
     spacing:          0px;
     margin:           0px;
-    background-color: @background;
-    background-image: @current-image;
+    border-radius:    10px;
+    background-color: @overlay;
     children:         [ "imagebox", "listbox" ];
 }
 
@@ -117,7 +125,7 @@ inputbar {
     spacing:          10px;
     padding:          15px;
     border-radius:    10px;
-    background-color: @background-alt;
+    background-color: @overlay-alt;
     children:         [ "prompt", "entry" ];
 }
 
@@ -152,7 +160,7 @@ button {
     padding:          10px;
     border-radius:    10px;
     border:           0px;
-    background-color: @background-alt;
+    background-color: @overlay-alt;
     text-color:       @foreground;
     cursor:           pointer;
 }
