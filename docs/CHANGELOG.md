@@ -13,6 +13,9 @@
 - **fastfetch 自定义配置**（`home/common/fastfetch.nix`，新增模块）: 通过 `xdg.configFile."fastfetch/config.jsonc"` 生成 JSONC 配置（fastfetch 原生格式，支持注释）。内容：NixOS 内置 logo、` ➜ ` 键值分隔符，模块顺序为 title / os / host / kernel / uptime / packages → wm / de / shell / terminal → cpu / gpu / memory / swap / disk(`/`) → localip / locale / datetime / colors，按 `break` 分组排版。已在 `home/common/default.nix` 的 imports 中加入
 - **zsh 首次打开终端时展示 fastfetch**（`home/common/shell.nix`）: 在 `programs.zsh.initContent` 中新增 fastfetch 调用。用 `$XDG_RUNTIME_DIR/.fastfetch-shown-$(id -u)` 标记文件控制显示时机——该目录由 logind 按登录会话创建、注销时清理，因此每次登录只有**第一个**终端窗口会打印系统信息，后续新开窗口与嵌套子 shell 均不重复。`fastfetch` 包本身早已在 `home/common/cli.nix` 中，此处仅补显示逻辑；命令不存在时静默跳过
 
+### Changed
+- **`programs.neovim.extraLuaConfig` 在 HM 26.05 重命名为 `initLua`**（`home/common/editor.nix`）: 求值时报 *The option `programs.neovim.extraLuaConfig' ... has been renamed to `programs.neovim.initLua'*。已改为 `initLua`（内容仍写入 `~/.config/nvim/init.lua`；未开启 `sideloadInitLua`，因此是真正的 init.lua 而非 `--cmd dofile` 旁加载）。`extraConfig` 在本版本**未**改名，继续承载 Vimscript 设置
+
 ### Fixed
 - **`SUPER + P` 电源菜单无法打开**（`home/common/hyprland.nix` / `home/common/niri.nix`）: 原绑定是 `rofi -show powermenu`，但 rofi 没有内置 `powermenu` mode（其 `modi` 只有 drun/run/window/ssh/filebrowser 等），运行会报 *Mode powermenu is not found*。改为调用新增的 `powermenu` 脚本；同时应用启动器改用 `rofi -show drun -replace -i`（`-replace` 避免重复实例叠加、`-i` 忽略大小写）
 - **部署后 `home-manager` 命令不存在**（`home/common/cli.nix`）: 仓库只把 HM 作为 NixOS 模块引入（`home-manager.nixosModules.home-manager`），从未把命令行工具装进用户环境。现补装 `inputs.home-manager.packages.${system}.home-manager`——取自 flake input 而非 nixpkgs，保证与模块严格同版本（已核实 HM release-26.05 的 flake 暴露 `packages.<system>.home-manager`）。**注意**：flake 未导出 `homeConfigurations`，激活/回滚仍应使用 `sudo nixos-rebuild switch --flake .#<hostname>`，`home-manager switch` 没有对应输出会失败

@@ -15,7 +15,7 @@
       # 均缺少对应 unstable 版本的二进制缓存），而 github 在国内网络不可达，
       # 导致构建时 curl 超时并连带 home-manager-generation 全链失败。
       # LSP 本身仍可用（nvim-lspconfig 保留），补全依靠 Neovim 0.12 内置
-      # 的 vim.lsp.omnifunc（见下方 extraConfig）。
+      # 的 vim.lsp.omnifunc（Neovim 在 LspAttach 时自动设置）。
       #
       # treesitter 语法解析器随 Nix 一起安装（走 nixpkgs 二进制缓存），
       # 避免运行时由 nvim-treesitter 从 github 下载/编译（国内网络不可达）
@@ -58,8 +58,9 @@
       set termguicolors
       colorscheme gruvbox
     '';
-    # extraConfig 是 Vimscript，Lua 代码必须放在 extraLuaConfig
-    extraLuaConfig = ''
+    # HM 26.05: extraConfig 仍是 Vimscript；Lua 代码用 initLua
+    # （原 extraLuaConfig 已在本版本重命名为 initLua）
+    initLua = ''
       -- nixpkgs 26.05 的 nvim-treesitter 跟踪上游重写的 main 分支，
       -- 旧的 require('nvim-treesitter.configs').setup() 模块已被移除。
       -- 解析器由 Nix 的 withPlugins 随包安装（见上方 plugins 列表），
