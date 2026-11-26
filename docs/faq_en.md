@@ -521,8 +521,9 @@ sudo nixos-rebuild switch --rollback
 # Rollback to a specific generation
 sudo nixos-rebuild switch --generation <number>
 
-# Home Manager rollback
-home-manager rollback
+# User configuration (home/) rolls back together with the system generation —
+# no separate Home Manager rollback is needed
+# List Home Manager generations (read-only): home-manager generations
 ```
 
 ### How do I clean old generations?

@@ -521,8 +521,8 @@ sudo nixos-rebuild switch --rollback
 # 指定回滚到某个系统代
 sudo nixos-rebuild switch --generation <number>
 
-# Home Manager 回滚
-home-manager rollback
+# 用户配置（home/）随系统代一起回滚，无需单独执行 Home Manager 回滚
+# 查看 Home Manager 代（只读）: home-manager generations
 ```
 
 ### 如何清理旧系统代？

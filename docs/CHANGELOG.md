@@ -29,6 +29,7 @@
 - **文档同步 fastfetch 模块**: `docs/architecture.md` / `architecture_en.md` 的 `home/common` 目录树与模块表新增 `fastfetch.nix`，`shell.nix` 描述补充首次终端展示行为；`README.md` / `README_en.md` 的 `home/common` 目录说明同步
 - **`cli.nix` 描述补充 `home-manager` 命令**（`docs/architecture.md` / `architecture_en.md`）
 - **文档部署命令更正为与集成架构一致**: `README.md` / `README_en.md`、`docs/shortcuts.md` / `shortcuts_en.md`、`docs/migration.md` / `migration_en.md`、`docs/faq.md` / `faq_en.md`、`docs/architecture.md` / `architecture_en.md` 中所有 `home-manager switch --flake .#<username>@<hostname>` 更正为 `sudo nixos-rebuild switch --flake .#<hostname>`（本仓库将 Home Manager 作为 NixOS 模块集成，flake 只导出 `nixosConfigurations`）；`docs/faq.md` / `faq_en.md` 新增问答，说明该报错的原因与 `home-manager` 命令的查询用途
+- **FAQ 回滚说明更正**: `docs/faq.md` / `faq_en.md` 中的 `home-manager rollback` 在集成模式下不存在（HM 没有独立代），删除该命令并说明「用户配置（`home/`）随系统代一起回滚」，仅保留 `home-manager generations` 只读查询
 
 ## [v0.0.6] - 2026-11-11
 ### Added

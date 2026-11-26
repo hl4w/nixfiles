@@ -29,6 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Docs synced with the fastfetch module**: `docs/architecture.md` / `architecture_en.md` add `fastfetch.nix` to the `home/common` tree and module table, and note the first-terminal display behavior in the `shell.nix` description; `README.md` / `README_en.md` update the `home/common` directory listing
 - **`cli.nix` description now mentions the `home-manager` command** (`docs/architecture.md` / `architecture_en.md`)
 - **Deployment commands in the docs corrected to match the integrated architecture**: every `home-manager switch --flake .#<username>@<hostname>` in `README.md` / `README_en.md`, `docs/shortcuts.md` / `shortcuts_en.md`, `docs/migration.md` / `migration_en.md`, `docs/faq.md` / `faq_en.md` and `docs/architecture.md` / `architecture_en.md` now reads `sudo nixos-rebuild switch --flake .#<hostname>` (this repo integrates Home Manager as a NixOS module and the flake exports only `nixosConfigurations`); `docs/faq.md` / `faq_en.md` gained a new Q&A explaining the error and the query-only role of the `home-manager` CLI
+- **FAQ rollback guidance corrected**: `home-manager rollback` in `docs/faq.md` / `faq_en.md` does not exist in the integrated mode (HM has no standalone generations). The command was removed in favour of "user configuration (`home/`) rolls back with the system generation", keeping `home-manager generations` as a read-only query
 
 ## [v0.0.6] - 2026-11-11
 ### Added
