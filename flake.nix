@@ -55,6 +55,17 @@
       # url = "github:Mintimate/oh-my-rime/main";
       flake = false;  # 非 flake 仓库，仅作为源码输入给 modules 使用
     };
+
+    # ------------------------------------------------------------
+    # WowType 智能拼音输入法（fcitx5 引擎，官方提供 flake）
+    # - release 分支跟正式版；锁定某版可写 github:Gloridust/WowType/v0.3.10
+    # - inputs.nixpkgs.follows = "nixpkgs" 保证与系统共用同一份 fcitx5，
+    #   否则 addon 与 fcitx5 版本可能不匹配
+    # ------------------------------------------------------------
+    wowtype = {
+      url = "github:Gloridust/WowType/release";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   # ============================================================

@@ -48,7 +48,7 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 │   │   ├── security.nix  # Firewall, security settings
 │   │   └── virtualisation.nix # Docker, Libvirt
 │   └── input-method/     # Input method configuration
-│       └── default.nix   # Fcitx5 + RIME input method (Wayland only)
+│       └── default.nix   # Fcitx5 + RIME + WowType input method (Wayland only)
 ├── home/                 # Home Manager configurations
 │   ├── common/           # Shared user configurations
 │   │   ├── shell.nix     # Zsh, Starship
@@ -133,7 +133,7 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 | `services/virtualisation.nix` | Docker and Libvirt configuration (optional) |
 | `boot/default.nix` | UEFI boot with systemd-boot, keep 3 boot entries, quiet boot parameters |
 | `boot/plymouth.nix` | Plymouth boot animation configuration (with systemd initrd) |
-| `input-method/default.nix` | Fcitx5 + RIME input method (Wayland only) with Catppuccin theme |
+| `input-method/default.nix` | Fcitx5 + RIME input method (Wayland only) with Catppuccin theme; also integrates the WowType sentence-based pinyin engine (`inputs.wowtype`, installed as a fcitx5 addon — run `wowtype-config --add-to-group` once to add it to the input method list) |
 | `desktops/desktop.nix` | Desktop environment configuration module (dynamic window manager and shell selection) |
 | `desktops/hyprland.nix` | Hyprland system-level install (programs.hyprland) |
 | `desktops/niri.nix` | Niri system-level install (programs.niri) |
@@ -195,6 +195,7 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 |-------|-----|-------------|
 | `nixpkgs` | `github:NixOS/nixpkgs/nixos-26.05` | NixOS 26.05 stable |
 | `home-manager` | `github:nix-community/home-manager/release-26.05` | Home Manager, synced with nixpkgs version |
+| `wowtype` | `github:Gloridust/WowType/release` | WowType smart pinyin input method (fcitx5 engine). `inputs.nixpkgs.follows = "nixpkgs"` keeps it on the same fcitx5 as the system; pin a version with a tag such as `github:Gloridust/WowType/v0.3.10` and upgrade via `nix flake update wowtype` |
 | `oh-my-rime` | `git+https://cnb.cool/Mintimate/rime/oh-my-rime` | RIME input method configuration framework (`flake = false`, source-only input). Defaults to the CNB official mirror, which is reliably reachable from mainland China (default branch `main`); to go back to the GitHub upstream, enable the commented `github:Mintimate/oh-my-rime/main` under `inputs.oh-my-rime`, comment out the mirror URL, then run `nix flake update oh-my-rime` to refresh the lock entry |
 
 ### Global Configuration (nixConfig)

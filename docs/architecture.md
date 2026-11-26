@@ -48,7 +48,7 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 │   │   ├── security.nix  # 防火墙、安全设置
 │   │   └── virtualisation.nix # Docker、Libvirt
 │   └── input-method/     # 输入法配置
-│       └── default.nix   # Fcitx5 + RIME 输入法（仅 Wayland）
+│       └── default.nix   # Fcitx5 + RIME + WowType 输入法（仅 Wayland）
 ├── home/                 # Home Manager 配置
 │   ├── common/           # 共享用户配置
 │   │   ├── shell.nix     # Zsh、Starship
@@ -133,7 +133,7 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 | `services/virtualisation.nix` | Docker 和 Libvirt 配置（可选） |
 | `boot/default.nix` | UEFI 启动，使用 systemd-boot，保留 3 个启动项，静默启动参数 |
 | `boot/plymouth.nix` | Plymouth 启动动画配置（配合 systemd initrd） |
-| `input-method/default.nix` | Fcitx5 + RIME 输入法（仅 Wayland），含 Catppuccin 主题 |
+| `input-method/default.nix` | Fcitx5 + RIME 输入法（仅 Wayland），含 Catppuccin 主题；另集成 WowType 整句拼音引擎（`inputs.wowtype`，装为 fcitx5 addon，首次需执行 `wowtype-config --add-to-group` 加入输入法列表） |
 | `desktops/desktop.nix` | 桌面环境配置模块（动态选择窗口管理器和桌面 shell） |
 | `desktops/hyprland.nix` | Hyprland 系统级安装（programs.hyprland） |
 | `desktops/niri.nix` | Niri 系统级安装（programs.niri） |
@@ -195,6 +195,7 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 |------|-----|------|
 | `nixpkgs` | `github:NixOS/nixpkgs/nixos-26.05` | NixOS 26.05 稳定版 |
 | `home-manager` | `github:nix-community/home-manager/release-26.05` | Home Manager 与 nixpkgs 版本同步 |
+| `wowtype` | `github:Gloridust/WowType/release` | WowType 智能拼音输入法（fcitx5 引擎）。`inputs.nixpkgs.follows = "nixpkgs"` 保证与系统共用同一份 fcitx5；锁版本可改用具体 tag，如 `github:Gloridust/WowType/v0.3.10`，升级执行 `nix flake update wowtype` |
 | `oh-my-rime` | `git+https://cnb.cool/Mintimate/rime/oh-my-rime` | RIME 输入法配置框架（`flake = false`，仅作为源码输入）。默认使用 CNB 官方镜像，国内访问稳定（默认分支 `main`）；如需切回 GitHub 上游，启用 `inputs.oh-my-rime` 下已注释的 `github:Mintimate/oh-my-rime/main` 并注释掉镜像地址，再执行 `nix flake update oh-my-rime` 刷新锁文件 |
 
 ### 全局配置 (nixConfig)
