@@ -89,10 +89,11 @@ nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 sudo nixos-rebuild switch --flake .#<hostname>
 ```
 
-### 步骤 8：更新 Home Manager
+### 步骤 8：更新 Home Manager 用户配置
 
 ```bash
-home-manager switch --flake .#<username>@<hostname>
+# Home Manager 作为 NixOS 模块运行，用户配置随系统重建一并激活
+sudo nixos-rebuild switch --flake .#<hostname>
 ```
 
 ## 升级到新版本 NixOS
@@ -128,11 +129,8 @@ nix flake update nixpkgs
 # 测试构建
 nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 
-# 部署到系统
+# 部署到系统（含 Home Manager 用户配置）
 sudo nixos-rebuild switch --flake .#<hostname>
-
-# 更新 Home Manager
-home-manager switch --flake .#<username>@<hostname>
 ```
 
 ## 包变更
@@ -436,7 +434,7 @@ nix show-config | grep substituters
 - [ ] 用户配置文件已迁移到 Home Manager 模块
 - [ ] 构建成功：`nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel`
 - [ ] 系统已部署：`sudo nixos-rebuild switch --flake .#<hostname>`
-- [ ] Home Manager 已更新：`home-manager switch --flake .#<username>@<hostname>`
+- [ ] Home Manager 用户配置已随系统重建激活：`sudo nixos-rebuild switch --flake .#<hostname>`
 - [ ] 窗口管理器正确启动
 - [ ] 输入法正常工作（Fcitx5 + RIME）
 - [ ] 音频正常工作（PipeWire）

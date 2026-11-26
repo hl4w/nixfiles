@@ -89,10 +89,11 @@ nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 sudo nixos-rebuild switch --flake .#<hostname>
 ```
 
-### Step 8: Update Home Manager
+### Step 8: Update the Home Manager user configuration
 
 ```bash
-home-manager switch --flake .#<username>@<hostname>
+# Home Manager runs as a NixOS module, so the user configuration is activated with the system rebuild
+sudo nixos-rebuild switch --flake .#<hostname>
 ```
 
 ## Upgrading to New NixOS Version
@@ -128,11 +129,8 @@ nix flake update nixpkgs
 # Test build
 nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 
-# Deploy to system
+# Deploy to system (includes the Home Manager user configuration)
 sudo nixos-rebuild switch --flake .#<hostname>
-
-# Update Home Manager
-home-manager switch --flake .#<username>@<hostname>
 ```
 
 ## Package Changes
@@ -436,7 +434,7 @@ If mirrors are not showing, add them to `flake.nix` and `modules/system/default.
 - [ ] User dotfiles migrated to Home Manager modules
 - [ ] Build succeeds: `nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel`
 - [ ] System deployed: `sudo nixos-rebuild switch --flake .#<hostname>`
-- [ ] Home Manager updated: `home-manager switch --flake .#<username>@<hostname>`
+- [ ] Home Manager user configuration activated with the system rebuild: `sudo nixos-rebuild switch --flake .#<hostname>`
 - [ ] Window manager starts correctly
 - [ ] Input method works (Fcitx5 + RIME)
 - [ ] Audio works (PipeWire)

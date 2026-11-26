@@ -132,4 +132,4 @@ To modify shortcuts, edit the corresponding window manager configuration files:
 
 Hyprland key syntax joins modifiers with `" + "` (e.g. `"SUPER + SHIFT + Q"`); valid modifiers are `SHIFT` / `CTRL` / `ALT` / `SUPER` / `MOD1`–`MOD5`.
 
-Apply changes with `home-manager switch --flake .#<username>@<hostname>`.
+Apply changes with `sudo nixos-rebuild switch --flake .#<hostname>` (Home Manager runs as a NixOS module, so the user configuration is activated with the system rebuild).

@@ -28,6 +28,7 @@
 - **文档同步 Rofi 模块**: `docs/shortcuts.md` / `shortcuts_en.md` 更新启动器与电源菜单的实际命令，并新增「Rofi 启动器」小节（配置文件、外观、模组、电源菜单实现）；`docs/architecture.md` / `architecture_en.md` 的 `home/common` 目录树与模块表新增 `rofi.nix`；`README.md` / `README_en.md` 的 `home/common` 目录说明同步
 - **文档同步 fastfetch 模块**: `docs/architecture.md` / `architecture_en.md` 的 `home/common` 目录树与模块表新增 `fastfetch.nix`，`shell.nix` 描述补充首次终端展示行为；`README.md` / `README_en.md` 的 `home/common` 目录说明同步
 - **`cli.nix` 描述补充 `home-manager` 命令**（`docs/architecture.md` / `architecture_en.md`）
+- **文档部署命令更正为与集成架构一致**: `README.md` / `README_en.md`、`docs/shortcuts.md` / `shortcuts_en.md`、`docs/migration.md` / `migration_en.md`、`docs/faq.md` / `faq_en.md`、`docs/architecture.md` / `architecture_en.md` 中所有 `home-manager switch --flake .#<username>@<hostname>` 更正为 `sudo nixos-rebuild switch --flake .#<hostname>`（本仓库将 Home Manager 作为 NixOS 模块集成，flake 只导出 `nixosConfigurations`）；`docs/faq.md` / `faq_en.md` 新增问答，说明该报错的原因与 `home-manager` 命令的查询用途
 
 ## [v0.0.6] - 2026-11-11
 ### Added

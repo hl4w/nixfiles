@@ -569,8 +569,8 @@ nix flake update
 # 更新系统（修改 modules/ 目录后使用）
 sudo nixos-rebuild switch --flake .#<hostname>
 
-# 更新 Home Manager 用户配置（修改 home/ 目录后使用）
-home-manager switch --flake .#<username>@<hostname>
+# 更新 Home Manager 用户配置（修改 home/ 目录后使用；Home Manager 作为 NixOS 模块运行，随系统重建一并激活）
+sudo nixos-rebuild switch --flake .#<hostname>
 
 # 更新 flake 输入（升级依赖版本如 nixpkgs）
 nix flake update

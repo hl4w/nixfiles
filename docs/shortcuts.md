@@ -132,4 +132,4 @@
 
 Hyprland 键位语法为修饰键之间用 `" + "` 连接（如 `"SUPER + SHIFT + Q"`），合法修饰键为 `SHIFT` / `CTRL` / `ALT` / `SUPER` / `MOD1`–`MOD5`。
 
-修改后执行 `home-manager switch --flake .#<username>@<hostname>` 生效。
+修改后执行 `sudo nixos-rebuild switch --flake .#<hostname>` 生效（Home Manager 作为 NixOS 模块运行，用户配置随系统重建一并激活）。

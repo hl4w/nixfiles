@@ -570,8 +570,8 @@ After installation, if you modify any Nix modules, you can directly update the s
 # Update system (use after modifying modules/ directory)
 sudo nixos-rebuild switch --flake .#<hostname>
 
-# Update Home Manager user configuration (use after modifying home/ directory)
-home-manager switch --flake .#<username>@<hostname>
+# Update Home Manager user configuration (use after modifying home/ directory; Home Manager runs as a NixOS module, activated with the system rebuild)
+sudo nixos-rebuild switch --flake .#<hostname>
 
 # Update flake inputs (upgrade dependency versions like nixpkgs)
 nix flake update

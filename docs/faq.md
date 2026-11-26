@@ -345,11 +345,23 @@ nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 
 ```bash
 # 查看详细错误
-home-manager switch --flake .#user@host 2>&1 | tail -30
+sudo nixos-rebuild switch --flake .#<hostname> 2>&1 | tail -30
 
 # 启用 verbose 模式
-home-manager switch --flake .#user@host --verbose
+sudo nixos-rebuild switch --flake .#<hostname> --verbose
 ```
+
+### 执行 home-manager switch 报错 does not provide attribute 'homeConfigurations."user@host".activationPackage'
+
+本项目将 Home Manager 作为 NixOS 模块集成：`flake.nix` 只导出 `nixosConfigurations`，不导出 `homeConfigurations`，因此 `home-manager switch --flake .#<username>@<hostname>` 找不到对应输出。
+
+正确做法是重建系统，用户配置（`home/`）会随系统一并激活：
+
+```bash
+sudo nixos-rebuild switch --flake .#<hostname>
+```
+
+`home-manager` 命令在本项目中仅用于查询，例如 `home-manager --version`、`home-manager generations`、`home-manager news`。如需 Home Manager 独立管理模式，需要在 `flake.nix` 中额外导出 `homeConfigurations`，本项目未采用该方式。
 
 ### Hyprland 无法启动
 
@@ -457,8 +469,8 @@ UEFI 启动与 systemd-boot 在 `modules/boot/default.nix` 中配置：
 # 更新系统配置（修改 modules/ 后使用）
 sudo nixos-rebuild switch --flake .#<hostname>
 
-# 更新 Home Manager 用户配置（修改 home/ 后使用）
-home-manager switch --flake .#<username>@<hostname>
+# 更新 Home Manager 用户配置（修改 home/ 后使用；Home Manager 作为 NixOS 模块，随系统重建生效）
+sudo nixos-rebuild switch --flake .#<hostname>
 
 # 更新 flake 输入（升级 nixpkgs 等依赖版本）
 nix flake update
@@ -474,9 +486,9 @@ nix flake update
 sudo nixos-rebuild switch --flake .#<hostname>
 ```
 
-**修改用户配置** (`home/` 目录)：
+**修改用户配置** (`home/` 目录，随系统重建生效)：
 ```bash
-home-manager switch --flake .#<username>@<hostname>
+sudo nixos-rebuild switch --flake .#<hostname>
 ```
 
 **同时更新系统和用户配置**：

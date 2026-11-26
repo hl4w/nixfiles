@@ -113,11 +113,8 @@ chmod +x scripts/install.sh
 # 4. install.sh 完成后，确认硬件配置已生成
 ls hosts/<hostname>/hardware-configuration.nix || sudo nixos-generate-config --show-hardware-config > hosts/<hostname>/hardware-configuration.nix
 
-# 5. 部署系统配置（首次构建较慢）
+# 5. 部署系统配置（含 Home Manager 用户配置，首次构建较慢）
 sudo nixos-rebuild switch --flake .#<hostname>
-
-# 6. 部署用户配置（可选，首次可能需要等上一步完成）
-home-manager switch --flake .#<username>@<hostname>
 ```
 
 install.sh 会替换 `flake.nix` 中的 `USERNAME = "youruser"` 占位符、在 `nixosConfigurations` 中插入新主机、更新 `home/common/git.nix` 中的 Git 用户名与邮箱、`nix flake lock` 生成锁文件、`nixos-generate-config --root /`（已有系统）生成硬件配置，最后 `nix flake check` 验证语法。
@@ -148,10 +145,9 @@ touch home/hosts/<hostname>.nix
 # 7. 把新建文件加入 Git 索引（Nix 对 git 仓库只读取已跟踪文件，否则报 not tracked by Git）
 git add flake.nix hosts/<hostname> home/hosts/<hostname>.nix
 
-# 8. 测试构建、部署系统、更新用户配置
+# 8. 测试构建并部署系统（用户配置随系统重建一并激活）
 nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 sudo nixos-rebuild switch --flake .#<hostname>
-home-manager switch --flake .#<username>@<hostname>
 ```
 
 [(详细安装指南)](docs/migration.md)
@@ -230,11 +226,8 @@ nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 ## 日常管理
 
 ```bash
-# 应用系统模块（modules/）改动
+# 应用系统模块（modules/）与用户配置（home/）改动
 sudo nixos-rebuild switch --flake .#<hostname>
-
-# 应用用户配置（home/）改动
-home-manager switch --flake .#<username>@<hostname>
 
 # 更新全部 flake 输入（nixpkgs、home-manager、oh-my-rime 等）
 nix flake update

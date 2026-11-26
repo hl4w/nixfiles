@@ -114,11 +114,8 @@ chmod +x scripts/install.sh
 # 4. After install.sh finishes, confirm the hardware configuration exists
 ls hosts/<hostname>/hardware-configuration.nix || sudo nixos-generate-config --show-hardware-config > hosts/<hostname>/hardware-configuration.nix
 
-# 5. Deploy the system configuration (the first build is slower)
+# 5. Deploy the system configuration (includes the Home Manager user configuration; the first build is slower)
 sudo nixos-rebuild switch --flake .#<hostname>
-
-# 6. Deploy the user configuration (optional; may need to wait for the previous step)
-home-manager switch --flake .#<username>@<hostname>
 ```
 
 `install.sh` replaces the `USERNAME = "youruser"` placeholder in `flake.nix`, inserts a new host into `nixosConfigurations`, updates the Git username and email in `home/common/git.nix`, generates `flake.lock` with `nix flake lock`, writes the hardware configuration via `nixos-generate-config --root /` (existing system), and finishes with `nix flake check` to validate syntax.
@@ -149,10 +146,9 @@ touch home/hosts/<hostname>.nix
 # 7. Stage the new files (Nix only reads tracked files in a git repo, otherwise "not tracked by Git")
 git add flake.nix hosts/<hostname> home/hosts/<hostname>.nix
 
-# 8. Test build, deploy the system, update the user profile
+# 8. Test build and deploy the system (the user profile is activated with the system rebuild)
 nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 sudo nixos-rebuild switch --flake .#<hostname>
-home-manager switch --flake .#<username>@<hostname>
 ```
 
 [(Detailed installation guide)](docs/migration_en.md)
@@ -231,11 +227,8 @@ Every script ships in two variants (`*.sh` in Chinese, `*_en.sh` in English).
 ## Daily Operations
 
 ```bash
-# Apply system module (modules/) changes
+# Apply system module (modules/) and user configuration (home/) changes
 sudo nixos-rebuild switch --flake .#<hostname>
-
-# Apply user configuration (home/) changes
-home-manager switch --flake .#<username>@<hostname>
 
 # Update all flake inputs (nixpkgs, home-manager, oh-my-rime, ...)
 nix flake update

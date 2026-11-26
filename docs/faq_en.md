@@ -345,11 +345,23 @@ nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 
 ```bash
 # Detailed output
-home-manager switch --flake .#user@host 2>&1 | tail -30
+sudo nixos-rebuild switch --flake .#<hostname> 2>&1 | tail -30
 
 # Verbose mode
-home-manager switch --flake .#user@host --verbose
+sudo nixos-rebuild switch --flake .#<hostname> --verbose
 ```
+
+### `home-manager switch` fails with does not provide attribute 'homeConfigurations."user@host".activationPackage'
+
+This project integrates Home Manager as a NixOS module: `flake.nix` only exports `nixosConfigurations`, not `homeConfigurations`, so `home-manager switch --flake .#<username>@<hostname>` finds no matching output.
+
+The correct approach is to rebuild the system; the user configuration (`home/`) is activated along with it:
+
+```bash
+sudo nixos-rebuild switch --flake .#<hostname>
+```
+
+In this project the `home-manager` CLI is query-only, e.g. `home-manager --version`, `home-manager generations`, `home-manager news`. Standalone Home Manager mode would require additionally exporting `homeConfigurations` from `flake.nix`, which this project does not use.
 
 ### Hyprland won't start
 
@@ -457,8 +469,8 @@ UEFI boot with systemd-boot is configured in `modules/boot/default.nix`:
 # Update system config (after modifying modules/)
 sudo nixos-rebuild switch --flake .#<hostname>
 
-# Update Home Manager user config (after modifying home/)
-home-manager switch --flake .#<username>@<hostname>
+# Update Home Manager user config (after modifying home/; Home Manager runs as a NixOS module, applied with the system rebuild)
+sudo nixos-rebuild switch --flake .#<hostname>
 
 # Update flake inputs (upgrade nixpkgs and other deps)
 nix flake update
@@ -474,9 +486,9 @@ nix flake update
 sudo nixos-rebuild switch --flake .#<hostname>
 ```
 
-**Modify user configuration** (`home/` directory):
+**Modify user configuration** (`home/` directory, applied with the system rebuild):
 ```bash
-home-manager switch --flake .#<username>@<hostname>
+sudo nixos-rebuild switch --flake .#<hostname>
 ```
 
 **Update both system and user configuration**:
