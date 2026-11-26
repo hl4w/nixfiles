@@ -369,7 +369,8 @@ if [ -d .git ]; then
     info "检测到已有仓库，执行 git pull..."
     git pull --ff-only
 else
-    git clone "$REPO_URL" .
+    # --depth 1：只取最新一次提交，安装阶段无需历史，可显著加快国内网络克隆
+    git clone --depth 1 "$REPO_URL" .
 fi
 
 # 运行安装脚本（使用数组传参，避免 eval 注入）

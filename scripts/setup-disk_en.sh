@@ -370,7 +370,9 @@ if [ -d .git ]; then
     info "Existing repository detected, running git pull..."
     git pull --ff-only
 else
-    git clone "$REPO_URL" .
+    # --depth 1: fetch only the latest commit; install needs no history and this
+    # speeds up cloning noticeably on slow networks
+    git clone --depth 1 "$REPO_URL" .
 fi
 
 # Run install script (array arguments, no eval injection risk)
