@@ -6,6 +6,10 @@
 
 > 约定：版本号不变时，每次提交均以**当日日期**开一个新的小节，当日所有改动聚合在该节下，便于按日期追踪未发布版本的变更。
 
+## [v0.0.6] - 2026-11-26
+### Added
+- **zsh 首次打开终端时展示 fastfetch**（`home/common/shell.nix`）: 在 `programs.zsh.initContent` 中新增 fastfetch 调用。用 `$XDG_RUNTIME_DIR/.fastfetch-shown-$(id -u)` 标记文件控制显示时机——该目录由 logind 按登录会话创建、注销时清理，因此每次登录只有**第一个**终端窗口会打印系统信息，后续新开窗口与嵌套子 shell 均不重复。`fastfetch` 包本身早已在 `home/common/cli.nix` 中，此处仅补显示逻辑；命令不存在时静默跳过
+
 ## [v0.0.6] - 2026-11-11
 ### Added
 - **VMware Workstation 虚拟机支持**（`modules/services/virtualisation.nix`）: 新增 `virtualisation.vmware.guest.enable = lib.mkDefault true`（open-vm-tools），提供 vmtoolsd 分辨率自适应、剪贴板共享、拖放、时间同步，方便在 VMware 虚拟机中测试桌面。GL 链路本身无需改动：内核自带 `vmwgfx` 模块 + `hardware.graphics.enable = true` 的 Mesa（含 VMware svga Gallium 驱动），Hyprland 可直接走 3D 加速；前提是宿主机 Workstation 勾选「显示器 → Accelerate 3D graphics」。非 VMware 物理机上 vmtoolsd 检测不到 hypervisor 会自行退出，可用 `mkDefault` 在主机配置中覆盖关闭

@@ -50,6 +50,17 @@
       alias wp-random='${pkgs.writeScript "wallpaper-color" (builtins.readFile ./../../scripts/wallpaper-color.sh)} -d'
       alias wp-apply='${pkgs.writeScript "wallpaper-color" (builtins.readFile ./../../scripts/wallpaper-color.sh)} -a'
       alias wp-list='${pkgs.writeScript "wallpaper-color" (builtins.readFile ./../../scripts/wallpaper-color.sh)} -l'
+
+      # 首次打开终端时展示系统信息（fastfetch）
+      # 用 XDG_RUNTIME_DIR 下的标记文件判断：该目录按登录会话创建、
+      # 注销时由 logind 清理，因此每次登录只有第一个终端窗口会显示，
+      # 之后再开新窗口或嵌套子 shell 都不会重复打印。
+      _ff_stamp="''${XDG_RUNTIME_DIR:-/tmp}/.fastfetch-shown-$(id -u)"
+      if command -v fastfetch >/dev/null 2>&1 && [[ ! -e "$_ff_stamp" ]]; then
+        fastfetch
+        : > "$_ff_stamp"
+      fi
+      unset _ff_stamp
     '';
   };
 

@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 > Convention: when the version number stays the same, each commit opens a new section with the current date. All changes made on the same day are grouped under that section, so commits can be traced back to their day even before the next release is cut.
 
+## [v0.0.6] - 2026-11-26
+### Added
+- **Show fastfetch on the first terminal in zsh** (`home/common/shell.nix`): Added a fastfetch invocation in `programs.zsh.initContent`. Display timing is gated by the `$XDG_RUNTIME_DIR/.fastfetch-shown-$(id -u)` stamp file — that directory is created per login session by logind and wiped on logout, so only the **first** terminal window after each login prints system info; later windows and nested subshells stay clean. The `fastfetch` package was already installed via `home/common/cli.nix`; this only adds the display logic, silently skipping when the command is absent
+
 ## [v0.0.6] - 2026-11-11
 ### Added
 - **VMware Workstation guest support** (`modules/services/virtualisation.nix`): Added `virtualisation.vmware.guest.enable = lib.mkDefault true` (open-vm-tools), providing vmtoolsd display auto-resize, shared clipboard, drag-and-drop and time sync for testing the desktop inside VMware VMs. The GL chain itself needs no changes: the kernel ships the `vmwgfx` module and `hardware.graphics.enable = true` provides Mesa (including the VMware svga Gallium driver), so Hyprland can use 3D acceleration directly — as long as "Display → Accelerate 3D graphics" is checked in the Workstation VM settings on the host. On non-VMware physical machines vmtoolsd exits on its own when no hypervisor is detected; the `mkDefault` can be overridden per host
