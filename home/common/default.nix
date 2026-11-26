@@ -8,6 +8,7 @@
 
   imports = [
     ./shell.nix
+    ./fastfetch.nix
     ./editor.nix
     ./cli.nix
     ./git.nix

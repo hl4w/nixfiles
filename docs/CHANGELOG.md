@@ -8,7 +8,11 @@
 
 ## [v0.0.6] - 2026-11-26
 ### Added
+- **fastfetch 自定义配置**（`home/common/fastfetch.nix`，新增模块）: 通过 `xdg.configFile."fastfetch/config.jsonc"` 生成 JSONC 配置（fastfetch 原生格式，支持注释）。内容：NixOS 内置 logo、` ➜ ` 键值分隔符，模块顺序为 title / os / host / kernel / uptime / packages → wm / de / shell / terminal → cpu / gpu / memory / swap / disk(`/`) → localip / locale / datetime / colors，按 `break` 分组排版。已在 `home/common/default.nix` 的 imports 中加入
 - **zsh 首次打开终端时展示 fastfetch**（`home/common/shell.nix`）: 在 `programs.zsh.initContent` 中新增 fastfetch 调用。用 `$XDG_RUNTIME_DIR/.fastfetch-shown-$(id -u)` 标记文件控制显示时机——该目录由 logind 按登录会话创建、注销时清理，因此每次登录只有**第一个**终端窗口会打印系统信息，后续新开窗口与嵌套子 shell 均不重复。`fastfetch` 包本身早已在 `home/common/cli.nix` 中，此处仅补显示逻辑；命令不存在时静默跳过
+
+### Documentation
+- **文档同步 fastfetch 模块**: `docs/architecture.md` / `architecture_en.md` 的 `home/common` 目录树与模块表新增 `fastfetch.nix`，`shell.nix` 描述补充首次终端展示行为；`README.md` / `README_en.md` 的 `home/common` 目录说明同步
 
 ## [v0.0.6] - 2026-11-11
 ### Added

@@ -8,7 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [v0.0.6] - 2026-11-26
 ### Added
+- **Custom fastfetch config** (`home/common/fastfetch.nix`, new module): Generates a JSONC config (fastfetch's native format, comments allowed) via `xdg.configFile."fastfetch/config.jsonc"`. Contents: built-in NixOS logo, ` ➜ ` key separator, module order title / os / host / kernel / uptime / packages → wm / de / shell / terminal → cpu / gpu / memory / swap / disk(`/`) → localip / locale / datetime / colors, grouped with `break`. Registered in `home/common/default.nix` imports
 - **Show fastfetch on the first terminal in zsh** (`home/common/shell.nix`): Added a fastfetch invocation in `programs.zsh.initContent`. Display timing is gated by the `$XDG_RUNTIME_DIR/.fastfetch-shown-$(id -u)` stamp file — that directory is created per login session by logind and wiped on logout, so only the **first** terminal window after each login prints system info; later windows and nested subshells stay clean. The `fastfetch` package was already installed via `home/common/cli.nix`; this only adds the display logic, silently skipping when the command is absent
+
+### Documentation
+- **Docs synced with the fastfetch module**: `docs/architecture.md` / `architecture_en.md` add `fastfetch.nix` to the `home/common` tree and module table, and note the first-terminal display behavior in the `shell.nix` description; `README.md` / `README_en.md` update the `home/common` directory listing
 
 ## [v0.0.6] - 2026-11-11
 ### Added

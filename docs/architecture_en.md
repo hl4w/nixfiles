@@ -60,6 +60,7 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 │   │   ├── git.nix       # Git configuration
 │   │   ├── hyprland.nix  # Hyprland detailed config (Lua format, configType = "lua")
 │   │   ├── niri.nix      # Niri config (KDL format with colors; HM 26.05 has no niri module, uses xdg.configFile)
+│   │   ├── fastfetch.nix # fastfetch config (JSONC, shown in the first terminal after login)
 │   │   ├── theme-gtk.nix   # User-level theme (GTK/icons, unconditionally imported)
 │   │   ├── theme-hyprland.nix  # Hyprland window colors (nested tables in settings.config)
 │   │   ├── pywal.nix     # pywal color service (generates palette cache from wallpaper at login)
@@ -150,7 +151,8 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 
 | Module | Description |
 |--------|-------------|
-| `shell.nix` | Bash + Zsh + Starship prompt (with pywal dynamic coloring) |
+| `shell.nix` | Bash + Zsh + Starship prompt (with pywal dynamic coloring; zsh shows fastfetch in the first terminal after login) |
+| `fastfetch.nix` | fastfetch config (`xdg.configFile."fastfetch/config.jsonc"`, NixOS logo + OS/kernel/WM/CPU/GPU/memory/disk modules) |
 | `editor.nix` | Neovim (treesitter parsers installed via `nvim-treesitter.withPlugins`; LSP configured with the new `vim.lsp.config` / `vim.lsp.enable` API for nil_ls, clangd, gopls, pyright, rust_analyzer), Emacs |
 | `input.nix` | Fcitx5 + RIME (oh-my-rime configuration) |
 | `cli.nix` | CLI tools: eza, bat, fd, rg, fzf, yazi (terminal file manager with zoxide integration), zoxide (smart directory navigation), fastfetch, btop, dust, duf, tokei, hyperfine, procs, starship |

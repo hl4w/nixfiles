@@ -189,7 +189,7 @@ nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 │   ├── services/             # 服务（network、security、virtualisation）
 │   └── system/               # 系统基础（fonts、Lix 等）
 ├── home/                     # Home Manager 用户配置（用户级，Home Manager 专属选项）
-│   ├── common/               # 通用用户模块（apps、cli、dev-lsp、editor、git、shell、
+│   ├── common/               # 通用用户模块（apps、cli、dev-lsp、editor、git、shell、fastfetch、
 │   │                         #   input、hyprland、niri、theme-gtk、theme-hyprland、pywal、wallpaper-watcher）
 │   └── hosts/                # 主机特定用户配置（desktop / laptop / server）
 ├── scripts/                  # 安装与维护脚本（中英文各一套）

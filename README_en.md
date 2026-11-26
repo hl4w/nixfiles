@@ -190,7 +190,7 @@ nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel
 │   ├── services/             # Services (network, security, virtualisation)
 │   └── system/               # System basics (fonts, Lix, ...)
 ├── home/                     # Home Manager user config (user level, Home Manager-only options)
-│   ├── common/               # Shared user modules (apps, cli, dev-lsp, editor, git, shell,
+│   ├── common/               # Shared user modules (apps, cli, dev-lsp, editor, git, shell, fastfetch,
 │   │                         #   input, hyprland, niri, theme-gtk, theme-hyprland, pywal, wallpaper-watcher)
 │   └── hosts/                # Host-specific user config (desktop / laptop / server)
 ├── scripts/                  # Install and maintenance scripts (Chinese and English variants)
