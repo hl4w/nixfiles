@@ -9,6 +9,7 @@
   imports = [
     ./shell.nix
     ./fastfetch.nix
+    ./rofi.nix
     ./editor.nix
     ./cli.nix
     ./git.nix

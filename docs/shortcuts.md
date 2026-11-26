@@ -18,11 +18,11 @@
 |--------|------|----------------|
 | `Super + Q` | 关闭活动窗口 | `hl.dsp.window.close()` |
 | `Super + E` | 打开文件管理器 | `hl.dsp.exec_cmd("nemo")` |
-| `Super + R` | 打开应用启动器 | `hl.dsp.exec_cmd("rofi -show drun")` |
+| `Super + R` | 打开应用启动器 | `hl.dsp.exec_cmd("rofi -show drun -replace -i")` |
 | `Super + Return` | 打开终端 | `hl.dsp.exec_cmd("foot")` |
 | `Super + C` | 打开编辑器 | `hl.dsp.exec_cmd("codium")` |
 | `Super + B` | 打开浏览器 | `hl.dsp.exec_cmd("firefox")` |
-| `Super + P` | 打开电源菜单 | `hl.dsp.exec_cmd("rofi -show powermenu")` |
+| `Super + P` | 打开电源菜单 | `hl.dsp.exec_cmd("powermenu")` |
 
 ### 窗口移动（方向键 = hjkl）
 
@@ -78,12 +78,12 @@
 | 快捷键 | 功能 | 执行动作 |
 |--------|------|----------|
 | `Super + Shift + Return` | 打开终端 | `spawn "foot"` |
-| `Super + D` | 打开应用启动器 | `spawn "rofi -show drun"` |
+| `Super + D` | 打开应用启动器 | `spawn "rofi -show drun -replace -i"` |
 | `Super + E` | 打开文件管理器 | `spawn "nemo"` |
 | `Super + B` | 打开浏览器 | `spawn "firefox"` |
 | `Super + Q` | 关闭窗口 | `close-window` |
 | `Super + C` | 打开编辑器 | `spawn "codium"` |
-| `Super + P` | 打开电源菜单 | `spawn "rofi -show powermenu"` |
+| `Super + P` | 打开电源菜单 | `spawn "powermenu"` |
 | `Super + Shift + E` | 电源菜单（Niri 内置动作） | `power-menu` |
 | `Super + Shift + Q` | 退出 Niri | `quit` |
 
@@ -113,6 +113,13 @@
 | Nemo 文件管理器 | `nemo` |
 
 合并后的规则为一条：`match.class = "^(foot|kitty|alacritty|rofi|nemo)$"`、`float = true`。
+
+### Rofi 启动器
+
+- **配置文件**：`home/common/rofi/config.rasi`（声明式写入 `~/.config/rofi/config.rasi`，模块为 `home/common/rofi.nix`）
+- **外观**：Catppuccin Mocha 配色，900px 宽、10px 圆角、2px 强调色边框，横向双栏（左侧输入框 + 模式切换，右侧列表 8 行），鼠标悬停即选中
+- **模组**：`drun`（桌面应用，显示 Papirus-Dark 图标）、`run`（执行命令）
+- **电源菜单**：`powermenu` 脚本（`home/common/rofi.nix` 内 `writeShellScriptBin` 生成），用 `rofi -dmenu` 提供「注销 / 重启 / 关机」。rofi 没有内置 `powermenu` mode，`rofi -show powermenu` 会报 *Mode powermenu is not found*
 
 ### 自定义快捷键
 

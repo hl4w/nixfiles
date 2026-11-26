@@ -134,11 +134,11 @@ in
         # 窗口 / 程序
         (kb "SUPER + Q" "hl.dsp.window.close()" null)
         (kb "SUPER + E" "hl.dsp.exec_cmd(\"nemo\")" null)
-        (kb "SUPER + R" "hl.dsp.exec_cmd(\"rofi -show drun\")" null)
+        (kb "SUPER + R" "hl.dsp.exec_cmd(\"rofi -show drun -replace -i\")" null)
         (kb "SUPER + RETURN" "hl.dsp.exec_cmd(\"foot\")" null)
         (kb "SUPER + C" "hl.dsp.exec_cmd(\"codium\")" null)
         (kb "SUPER + B" "hl.dsp.exec_cmd(\"firefox\")" null)
-        (kb "SUPER + P" "hl.dsp.exec_cmd(\"rofi -show powermenu\")" null)
+        (kb "SUPER + P" "hl.dsp.exec_cmd(\"powermenu\")" null)
 
         # 窗口移动（方向参数需全名 left/down/up/right）
         (kb "SUPER + H" "hl.dsp.window.move({ direction = \"left\" })" null)

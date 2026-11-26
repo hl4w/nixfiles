@@ -8,14 +8,18 @@
 
 ## [v0.0.6] - 2026-11-26
 ### Added
+- **Rofi 启动器配置**（`home/common/rofi.nix` + `home/common/rofi/config.rasi`）: 此前仓库只装了 `pkgs.rofi`，没有任何主题配置。参考 gitea-nixfiles25 的 `home/rofi/config.rasi` 移植：Catppuccin Mocha 配色、900px 宽、10px 圆角、2px 强调色边框、横向双栏（左侧输入框与模式切换、右侧 8 行列表）、hover 选中、`drun` + `run` 双模组、Papirus-Dark 图标。相对原配置做了三处优化：(1) 原实现用 `home.activation` 里的 `cp -rf configs/* ~/.config/rofi/` 命令式拷贝，改为 `xdg.configFile` 声明式安装；(2) 去掉对 `~/.config/settings/rofi-font.rasi`、`rofi-border.rasi`、`~/.cache/current_wallpaper.rasi`、`~/.cache/wal/colors-rofi-pywal` 的 `@import`（目标缺失时 rofi 会报 Failed to import / 颜色变量未定义），字体、边框、配色全部内联；(3) 字体由未安装的 Fira Sans 换成仓库已装的 JetBrainsMono Nerd Font，并修正原文件的编码乱码
+- **`powermenu` 电源菜单脚本**（`home/common/rofi.nix`）: 用 `writeShellScriptBin` 生成，`rofi -dmenu` 提供「注销 / 重启 / 关机」，分别执行 `loginctl terminate-user`、`systemctl reboot`、`systemctl poweroff`
 - **fastfetch 自定义配置**（`home/common/fastfetch.nix`，新增模块）: 通过 `xdg.configFile."fastfetch/config.jsonc"` 生成 JSONC 配置（fastfetch 原生格式，支持注释）。内容：NixOS 内置 logo、` ➜ ` 键值分隔符，模块顺序为 title / os / host / kernel / uptime / packages → wm / de / shell / terminal → cpu / gpu / memory / swap / disk(`/`) → localip / locale / datetime / colors，按 `break` 分组排版。已在 `home/common/default.nix` 的 imports 中加入
 - **zsh 首次打开终端时展示 fastfetch**（`home/common/shell.nix`）: 在 `programs.zsh.initContent` 中新增 fastfetch 调用。用 `$XDG_RUNTIME_DIR/.fastfetch-shown-$(id -u)` 标记文件控制显示时机——该目录由 logind 按登录会话创建、注销时清理，因此每次登录只有**第一个**终端窗口会打印系统信息，后续新开窗口与嵌套子 shell 均不重复。`fastfetch` 包本身早已在 `home/common/cli.nix` 中，此处仅补显示逻辑；命令不存在时静默跳过
 
 ### Fixed
+- **`SUPER + P` 电源菜单无法打开**（`home/common/hyprland.nix` / `home/common/niri.nix`）: 原绑定是 `rofi -show powermenu`，但 rofi 没有内置 `powermenu` mode（其 `modi` 只有 drun/run/window/ssh/filebrowser 等），运行会报 *Mode powermenu is not found*。改为调用新增的 `powermenu` 脚本；同时应用启动器改用 `rofi -show drun -replace -i`（`-replace` 避免重复实例叠加、`-i` 忽略大小写）
 - **部署后 `home-manager` 命令不存在**（`home/common/cli.nix`）: 仓库只把 HM 作为 NixOS 模块引入（`home-manager.nixosModules.home-manager`），从未把命令行工具装进用户环境。现补装 `inputs.home-manager.packages.${system}.home-manager`——取自 flake input 而非 nixpkgs，保证与模块严格同版本（已核实 HM release-26.05 的 flake 暴露 `packages.<system>.home-manager`）。**注意**：flake 未导出 `homeConfigurations`，激活/回滚仍应使用 `sudo nixos-rebuild switch --flake .#<hostname>`，`home-manager switch` 没有对应输出会失败
 - 核实 `hyperfine`：已存在于 `home/common/cli.nix`（nixpkgs 26.05 的 `pkgs/by-name/hy/hyperfine` 确认在库），无需改动
 
 ### Documentation
+- **文档同步 Rofi 模块**: `docs/shortcuts.md` / `shortcuts_en.md` 更新启动器与电源菜单的实际命令，并新增「Rofi 启动器」小节（配置文件、外观、模组、电源菜单实现）；`docs/architecture.md` / `architecture_en.md` 的 `home/common` 目录树与模块表新增 `rofi.nix`；`README.md` / `README_en.md` 的 `home/common` 目录说明同步
 - **文档同步 fastfetch 模块**: `docs/architecture.md` / `architecture_en.md` 的 `home/common` 目录树与模块表新增 `fastfetch.nix`，`shell.nix` 描述补充首次终端展示行为；`README.md` / `README_en.md` 的 `home/common` 目录说明同步
 - **`cli.nix` 描述补充 `home-manager` 命令**（`docs/architecture.md` / `architecture_en.md`）
 

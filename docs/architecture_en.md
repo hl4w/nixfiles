@@ -61,6 +61,7 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 │   │   ├── hyprland.nix  # Hyprland detailed config (Lua format, configType = "lua")
 │   │   ├── niri.nix      # Niri config (KDL format with colors; HM 26.05 has no niri module, uses xdg.configFile)
 │   │   ├── fastfetch.nix # fastfetch config (JSONC, shown in the first terminal after login)
+│   │   ├── rofi.nix      # Rofi launcher (declarative config.rasi + powermenu script)
 │   │   ├── theme-gtk.nix   # User-level theme (GTK/icons, unconditionally imported)
 │   │   ├── theme-hyprland.nix  # Hyprland window colors (nested tables in settings.config)
 │   │   ├── pywal.nix     # pywal color service (generates palette cache from wallpaper at login)
@@ -153,6 +154,7 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 |--------|-------------|
 | `shell.nix` | Bash + Zsh + Starship prompt (with pywal dynamic coloring; zsh shows fastfetch in the first terminal after login) |
 | `fastfetch.nix` | fastfetch config (`xdg.configFile."fastfetch/config.jsonc"`, NixOS logo + OS/kernel/WM/CPU/GPU/memory/disk modules) |
+| `rofi.nix` | Rofi launcher (`xdg.configFile."rofi/config.rasi"` pointing at `home/common/rofi/config.rasi`; the `powermenu` script uses `rofi -dmenu` for log out / reboot / shutdown) |
 | `editor.nix` | Neovim (treesitter parsers installed via `nvim-treesitter.withPlugins`; LSP configured with the new `vim.lsp.config` / `vim.lsp.enable` API for nil_ls, clangd, gopls, pyright, rust_analyzer), Emacs |
 | `input.nix` | Fcitx5 + RIME (oh-my-rime configuration) |
 | `cli.nix` | CLI tools: eza, bat, fd, rg, fzf, yazi (terminal file manager with zoxide integration), zoxide (smart directory navigation), fastfetch, btop, dust, duf, tokei, hyperfine, procs, starship, plus the `home-manager` command (from the flake input, matching the module version) |

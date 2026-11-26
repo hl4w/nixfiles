@@ -43,12 +43,12 @@
     // ===== 快捷键 =====
     binds {
         Mod+Shift+Return { spawn "foot"; }
-        Mod+d { spawn "rofi -show drun"; }
+        Mod+d { spawn "rofi -show drun -replace -i"; }
         Mod+e { spawn "nemo"; }
         Mod+b { spawn "firefox"; }
         Mod+q { close-window; }
         Mod+c { spawn "codium"; }
-        Mod+p { spawn "rofi -show powermenu"; }
+        Mod+p { spawn "powermenu"; }
         Mod+Shift+q { quit; }
         Mod+Shift+e { power-menu; }
     }

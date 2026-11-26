@@ -61,6 +61,7 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 │   │   ├── hyprland.nix  # Hyprland 详细配置（Lua 格式，configType = "lua"）
 │   │   ├── niri.nix      # Niri 配置（KDL 格式，含配色；HM 26.05 无 niri 模块，用 xdg.configFile）
 │   │   ├── fastfetch.nix # fastfetch 配置（JSONC，首次登录终端展示系统信息）
+│   │   ├── rofi.nix      # Rofi 启动器（config.rasi 声明式安装 + powermenu 电源菜单脚本）
 │   │   ├── theme-gtk.nix   # 用户级主题（GTK/图标，无条件导入）
 │   │   ├── theme-hyprland.nix  # Hyprland 窗口配色（嵌套表写入 settings.config）
 │   │   ├── pywal.nix     # pywal 取色服务（登录时从壁纸生成配色缓存）
@@ -153,6 +154,7 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 |------|------|
 | `shell.nix` | Bash + Zsh + Starship 提示符（支持 pywal 动态配色；zsh 首次登录终端展示 fastfetch） |
 | `fastfetch.nix` | fastfetch 配置（`xdg.configFile."fastfetch/config.jsonc"`，NixOS logo + OS/内核/窗口管理器/CPU/GPU/内存/磁盘等模块） |
+| `rofi.nix` | Rofi 启动器（`xdg.configFile."rofi/config.rasi"` 引用 `home/common/rofi/config.rasi`；`powermenu` 脚本用 `rofi -dmenu` 提供注销/重启/关机） |
 | `editor.nix` | Neovim（treesitter 解析器由 `nvim-treesitter.withPlugins` 随包安装；LSP 用 `vim.lsp.config` / `vim.lsp.enable` 新 API 配置 nil_ls、clangd、gopls、pyright、rust_analyzer）、Emacs |
 | `input.nix` | Fcitx5 + RIME（oh-my-rime 配置） |
 | `cli.nix` | CLI 工具集：eza、bat、fd、rg、fzf、yazi（终端文件管理器，支持 zoxide 集成）、zoxide（智能目录导航）、fastfetch、btop、dust、duf、tokei、hyperfine、procs、starship，以及 `home-manager` 命令行（取自 flake input，版本与模块一致） |
