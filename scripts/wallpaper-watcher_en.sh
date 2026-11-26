@@ -98,6 +98,12 @@ apply_colors() {
                 warn "pywal color extraction failed: $wallpaper"
                 return 0
             fi
+
+            # Sync the rofi background image variable file (read by config.rasi via @import)
+            _wp=$(head -n 1 "${WAL_CACHE}/wal" 2>/dev/null | tr -d '"' || true)
+            if [ -n "$_wp" ] && [ -f "$_wp" ]; then
+                printf '* { current-image: url("%s", height); }\n' "$_wp" > "${HOME}/.cache/current_wallpaper.rasi"
+            fi
             
             # Update extra configs
             update_starship

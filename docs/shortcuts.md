@@ -118,6 +118,7 @@
 
 - **配置文件**：`home/common/rofi/config.rasi`（声明式写入 `~/.config/rofi/config.rasi`，模块为 `home/common/rofi.nix`）
 - **外观**：Catppuccin Mocha 配色，900px 宽、10px 圆角、2px 强调色边框，横向双栏（左侧输入框 + 模式切换，右侧列表 8 行），鼠标悬停即选中
+- **背景**：自动使用当前壁纸——`~/.cache/current_wallpaper.rasi` 里的 `@current-image` 变量由 `pywal.service`（登录时）和 `wallpaper-watcher.service`（壁纸变更时）生成；文件不存在时由 `rofi.nix` 的 activation 写入 `current-image: none` 兜底，避免 rofi 报 `Failed to import`
 - **模组**：`drun`（桌面应用，显示 Papirus-Dark 图标）、`run`（执行命令）
 - **电源菜单**：`powermenu` 脚本（`home/common/rofi.nix` 内 `writeShellScriptBin` 生成），用 `rofi -dmenu` 提供「注销 / 重启 / 关机」。rofi 没有内置 `powermenu` mode，`rofi -show powermenu` 会报 *Mode powermenu is not found*
 

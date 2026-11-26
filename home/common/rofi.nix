@@ -4,7 +4,7 @@
 #   - 原实现用 home.activation 里的 `cp -rf configs/* ~/.config/rofi/`（命令式拷贝，
 #     不参与 Nix 求值、不可回滚），这里改为 xdg.configFile 声明式管理；
 #   - 主题源文件保留在 home/common/rofi/config.rasi，可直接编辑后 rebuild 生效。
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 let
   # 电源菜单。
@@ -31,4 +31,17 @@ in
   xdg.configFile."rofi/config.rasi".source = ./rofi/config.rasi;
 
   home.packages = [ powermenu ];
+
+  # 兜底：config.rasi 里 @import "~/.cache/current_wallpaper.rasi"，
+  # 该文件正常由 pywal.service / wallpaper-watcher 在取色后生成；
+  # 若从未成功取色（如首次部署尚未登录桌面），@import 目标缺失会让
+  # rofi 打印 Failed to import 且 @current-image 未定义。
+  # 这里在 activation 时补一个 `current-image: none;` 的空实现。
+  home.activation.rofiWallpaperRasi = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    rasi="$HOME/.cache/current_wallpaper.rasi"
+    if [ ! -f "$rasi" ]; then
+      mkdir -p "$HOME/.cache"
+      printf '* { current-image: none; }\n' > "$rasi"
+    fi
+  '';
 }

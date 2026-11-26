@@ -154,7 +154,7 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 |------|------|
 | `shell.nix` | Bash + Zsh + Starship 提示符（支持 pywal 动态配色；zsh 首次登录终端展示 fastfetch） |
 | `fastfetch.nix` | fastfetch 配置（`xdg.configFile."fastfetch/config.jsonc"`，NixOS logo + OS/内核/窗口管理器/CPU/GPU/内存/磁盘等模块） |
-| `rofi.nix` | Rofi 启动器（`xdg.configFile."rofi/config.rasi"` 引用 `home/common/rofi/config.rasi`；`powermenu` 脚本用 `rofi -dmenu` 提供注销/重启/关机） |
+| `rofi.nix` | Rofi 启动器（`xdg.configFile."rofi/config.rasi"` 引用 `home/common/rofi/config.rasi`；`powermenu` 脚本用 `rofi -dmenu` 提供注销/重启/关机；activation 兜底生成 `~/.cache/current_wallpaper.rasi`） |
 | `editor.nix` | Neovim（treesitter 解析器由 `nvim-treesitter.withPlugins` 随包安装；LSP 用 `vim.lsp.config` / `vim.lsp.enable` 新 API 配置 nil_ls、clangd、gopls、pyright、rust_analyzer）、Emacs |
 | `input.nix` | Fcitx5 + RIME（oh-my-rime 配置） |
 | `cli.nix` | CLI 工具集：eza、bat、fd、rg、fzf、yazi（终端文件管理器，支持 zoxide 集成）、zoxide（智能目录导航）、fastfetch、btop、dust、duf、tokei、hyperfine、procs、starship，以及 `home-manager` 命令行（取自 flake input，版本与模块一致） |
@@ -165,7 +165,7 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 | `niri.nix` | Niri 配置（KDL 格式，含配色；HM 26.05 无 wayland.windowManager.niri 模块，用 xdg.configFile 生成；laptop 主机导入） |
 | `theme-gtk.nix` | 用户级主题（GTK/图标，无条件导入） |
 | `theme-hyprland.nix` | Hyprland 窗口配色（以嵌套表写入 `settings.config` 的 `general.col` / `decoration`，与 `hyprland.nix` 深层合并；desktop 主机导入） |
-| `pywal.nix` | pywal 取色系统服务（oneshot + `RemainAfterExit`，优先 `wal -R` 恢复、失败回退 `wal -i`） |
+| `pywal.nix` | pywal 取色系统服务（oneshot + `RemainAfterExit`，优先 `wal -R` 恢复、失败回退 `wal -i`；取色后同步生成 rofi 背景变量文件 `~/.cache/current_wallpaper.rasi`） |
 | `wallpaper-watcher.nix` | 壁纸变化监听器用户服务（自动更新配色） |
 
 ### 文档 (`docs/`)

@@ -97,6 +97,12 @@ apply_colors() {
                 warn "pywal 取色失败: $wallpaper"
                 return 0
             fi
+
+            # 同步 rofi 背景图变量文件（config.rasi 通过 @import 读取）
+            _wp=$(head -n 1 "${WAL_CACHE}/wal" 2>/dev/null | tr -d '"' || true)
+            if [ -n "$_wp" ] && [ -f "$_wp" ]; then
+                printf '* { current-image: url("%s", height); }\n' "$_wp" > "${HOME}/.cache/current_wallpaper.rasi"
+            fi
             
             # 更新额外配置
             update_starship

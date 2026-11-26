@@ -154,7 +154,7 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 |--------|-------------|
 | `shell.nix` | Bash + Zsh + Starship prompt (with pywal dynamic coloring; zsh shows fastfetch in the first terminal after login) |
 | `fastfetch.nix` | fastfetch config (`xdg.configFile."fastfetch/config.jsonc"`, NixOS logo + OS/kernel/WM/CPU/GPU/memory/disk modules) |
-| `rofi.nix` | Rofi launcher (`xdg.configFile."rofi/config.rasi"` pointing at `home/common/rofi/config.rasi`; the `powermenu` script uses `rofi -dmenu` for log out / reboot / shutdown) |
+| `rofi.nix` | Rofi launcher (`xdg.configFile."rofi/config.rasi"` pointing at `home/common/rofi/config.rasi`; the `powermenu` script uses `rofi -dmenu` for log out / reboot / shutdown; an activation writes a `~/.cache/current_wallpaper.rasi` fallback) |
 | `editor.nix` | Neovim (treesitter parsers installed via `nvim-treesitter.withPlugins`; LSP configured with the new `vim.lsp.config` / `vim.lsp.enable` API for nil_ls, clangd, gopls, pyright, rust_analyzer), Emacs |
 | `input.nix` | Fcitx5 + RIME (oh-my-rime configuration) |
 | `cli.nix` | CLI tools: eza, bat, fd, rg, fzf, yazi (terminal file manager with zoxide integration), zoxide (smart directory navigation), fastfetch, btop, dust, duf, tokei, hyperfine, procs, starship, plus the `home-manager` command (from the flake input, matching the module version) |
@@ -165,7 +165,7 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 | `niri.nix` | Niri config (KDL format with colors; HM 26.05 has no wayland.windowManager.niri module, generated via xdg.configFile; laptop host) |
 | `theme-gtk.nix` | User-level theme (GTK/icons, unconditionally imported) |
 | `theme-hyprland.nix` | Hyprland window colors (nested tables under `settings.config`'s `general.col` / `decoration`, deep-merged with `hyprland.nix`; desktop host) |
-| `pywal.nix` | pywal color service (oneshot + `RemainAfterExit`; `wal -R` first, falling back to `wal -i`) |
+| `pywal.nix` | pywal color service (oneshot + `RemainAfterExit`; `wal -R` first, falling back to `wal -i`; after extraction it also writes the rofi background variable file `~/.cache/current_wallpaper.rasi`) |
 | `wallpaper-watcher.nix` | Wallpaper change watcher user service (auto-update colors) |
 
 ### Documentation (`docs/`)

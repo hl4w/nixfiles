@@ -492,7 +492,13 @@ main() {
     # 使用 pywal 提取颜色
     info "从壁纸提取颜色: $(basename "$wallpaper")"
     wal -i "$wallpaper"
-    
+
+    # 同步 rofi 背景图变量文件（config.rasi 通过 @import 读取）
+    _wp=$(head -n 1 "${WAL_CACHE}/wal" 2>/dev/null | tr -d '"' || true)
+    if [ -n "$_wp" ] && [ -f "$_wp" ]; then
+        printf '* { current-image: url("%s", height); }\n' "$_wp" > "${HOME}/.cache/current_wallpaper.rasi"
+    fi
+
     # 应用配色
     apply_colors
     

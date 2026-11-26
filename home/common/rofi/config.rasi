@@ -4,15 +4,19 @@
  * 参考 gitea-nixfiles25 的 home/rofi/configs/config.rasi（横向双栏布局），
  * 做了以下调整以便声明式管理、且不依赖仓库外文件：
  *   1. 去掉 @import "~/.config/settings/rofi-font.rasi"、
- *      "~/.config/settings/rofi-border.rasi"、"~/.cache/current_wallpaper.rasi"、
- *      "~/.cache/wal/colors-rofi-pywal" —— 字体/边框/配色全部内联。
- *      原配置任一 import 目标缺失时 rofi 会打印 "Failed to import"，颜色变量
- *      未定义还会导致界面空白，因此不引入外部依赖。
+ *      "~/.config/settings/rofi-border.rasi"、"~/.cache/wal/colors-rofi-pywal"
+ *      —— 字体/边框/配色全部内联。这些路径依赖仓库外的文件，
+ *      任一缺失时 rofi 会打印 "Failed to import"，颜色变量未定义还会导致界面空白。
  *   2. 配色改为 Catppuccin Mocha 固定值，与 GTK / 终端主题保持一致。
  *   3. 字体换成仓库已安装的 JetBrainsMono Nerd Font（原 Fira Sans 未安装）。
  *   4. 修正原文件中的编码乱码（分隔符与提示符）。
- *   5. 去掉壁纸背景（background-image），改为纯色背景。
+ *   5. 背景改用当前壁纸：读取 ~/.cache/current_wallpaper.rasi 中的
+ *      @current-image 变量（由 pywal.service 与 wallpaper-watcher 在取色
+ *      后生成；该文件缺失时由 rofi.nix 的 activation 生成 current-image: none
+ *      兜底，避免 rofi 报 Failed to import）。
  */
+
+@import "~/.cache/current_wallpaper.rasi"
 
 /* -------------------------- */
 /* Configuration              */
@@ -72,7 +76,8 @@ mainbox {
     orientation:      horizontal;
     spacing:          0px;
     margin:           0px;
-    background-color: transparent;
+    background-color: @background;
+    background-image: @current-image;
     children:         [ "imagebox", "listbox" ];
 }
 
