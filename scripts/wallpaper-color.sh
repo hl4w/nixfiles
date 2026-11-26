@@ -493,10 +493,18 @@ main() {
     info "从壁纸提取颜色: $(basename "$wallpaper")"
     wal -i "$wallpaper"
 
-    # 同步 rofi 背景图变量文件（config.rasi 通过 @import 读取）
+    # 生成 rofi 背景：先缩放到 75% 再 blur 50x30 得到模糊版
+    # （参考 gitea-nixfiles25 的 wallpaper.sh），失败则退回原图
     _wp=$(head -n 1 "${WAL_CACHE}/wal" 2>/dev/null | tr -d '"' || true)
     if [ -n "$_wp" ] && [ -f "$_wp" ]; then
-        printf '* { current-image: url("%s", height); }\n' "$_wp" > "${HOME}/.cache/current_wallpaper.rasi"
+        _blur="${HOME}/.cache/blurred_wallpaper.png"
+        if command -v magick >/dev/null 2>&1 \
+            && magick "$_wp" -resize 75% "$_blur" 2>/dev/null \
+            && magick "$_blur" -blur 50x30 "$_blur" 2>/dev/null; then
+            printf '* { current-image: url("%s", height); }\n' "$_blur" > "${HOME}/.cache/current_wallpaper.rasi"
+        else
+            printf '* { current-image: url("%s", height); }\n' "$_wp" > "${HOME}/.cache/current_wallpaper.rasi"
+        fi
     fi
 
     # 应用配色

@@ -99,10 +99,18 @@ apply_colors() {
                 return 0
             fi
 
-            # Sync the rofi background image variable file (read by config.rasi via @import)
+            # Build the rofi background: resize to 75% then blur 50x30 for the
+            # blurred variant (matching wallpaper.sh in gitea-nixfiles25)
             _wp=$(head -n 1 "${WAL_CACHE}/wal" 2>/dev/null | tr -d '"' || true)
             if [ -n "$_wp" ] && [ -f "$_wp" ]; then
-                printf '* { current-image: url("%s", height); }\n' "$_wp" > "${HOME}/.cache/current_wallpaper.rasi"
+                _blur="${HOME}/.cache/blurred_wallpaper.png"
+                if command -v magick >/dev/null 2>&1 \
+                    && magick "$_wp" -resize 75% "$_blur" 2>/dev/null \
+                    && magick "$_blur" -blur 50x30 "$_blur" 2>/dev/null; then
+                    printf '* { current-image: url("%s", height); }\n' "$_blur" > "${HOME}/.cache/current_wallpaper.rasi"
+                else
+                    printf '* { current-image: url("%s", height); }\n' "$_wp" > "${HOME}/.cache/current_wallpaper.rasi"
+                fi
             fi
             
             # Update extra configs

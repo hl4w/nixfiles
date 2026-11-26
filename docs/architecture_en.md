@@ -165,7 +165,7 @@ HL4W NixOS configuration follows a modular, host-specific structure that allows 
 | `niri.nix` | Niri config (KDL format with colors; HM 26.05 has no wayland.windowManager.niri module, generated via xdg.configFile; laptop host) |
 | `theme-gtk.nix` | User-level theme (GTK/icons, unconditionally imported) |
 | `theme-hyprland.nix` | Hyprland window colors (nested tables under `settings.config`'s `general.col` / `decoration`, deep-merged with `hyprland.nix`; desktop host) |
-| `pywal.nix` | pywal color service (oneshot + `RemainAfterExit`; `wal -R` first, falling back to `wal -i`; after extraction it also writes the rofi background variable file `~/.cache/current_wallpaper.rasi`) |
+| `pywal.nix` | pywal color service (oneshot + `RemainAfterExit`; `wal -R` first, falling back to `wal -i`; after extraction it generates the blurred background `~/.cache/blurred_wallpaper.png` (75% + blur 50x30) and writes the rofi background variable file `~/.cache/current_wallpaper.rasi`) |
 | `wallpaper-watcher.nix` | Wallpaper change watcher user service (auto-update colors) |
 
 ### Documentation (`docs/`)

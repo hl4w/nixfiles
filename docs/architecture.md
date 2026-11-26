@@ -165,7 +165,7 @@ HL4W NixOS 配置采用模块化、主机特定的结构，允许从单个仓库
 | `niri.nix` | Niri 配置（KDL 格式，含配色；HM 26.05 无 wayland.windowManager.niri 模块，用 xdg.configFile 生成；laptop 主机导入） |
 | `theme-gtk.nix` | 用户级主题（GTK/图标，无条件导入） |
 | `theme-hyprland.nix` | Hyprland 窗口配色（以嵌套表写入 `settings.config` 的 `general.col` / `decoration`，与 `hyprland.nix` 深层合并；desktop 主机导入） |
-| `pywal.nix` | pywal 取色系统服务（oneshot + `RemainAfterExit`，优先 `wal -R` 恢复、失败回退 `wal -i`；取色后同步生成 rofi 背景变量文件 `~/.cache/current_wallpaper.rasi`） |
+| `pywal.nix` | pywal 取色系统服务（oneshot + `RemainAfterExit`，优先 `wal -R` 恢复、失败回退 `wal -i`；取色后生成模糊背景 `~/.cache/blurred_wallpaper.png`（75% + blur 50x30）并写入 rofi 背景变量文件 `~/.cache/current_wallpaper.rasi`） |
 | `wallpaper-watcher.nix` | 壁纸变化监听器用户服务（自动更新配色） |
 
 ### 文档 (`docs/`)

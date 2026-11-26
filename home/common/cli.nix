@@ -16,6 +16,7 @@
     yazi     # 快速终端文件管理器（用 Rust 编写）
     dust     # 磁盘使用分析工具
     duf      # 磁盘空间查看工具
+    imagemagick # 图像处理（壁纸脚本生成 rofi 模糊背景依赖 magick 命令）
     
     # ===== 系统工具 =====
     fastfetch # 快速系统信息展示工具

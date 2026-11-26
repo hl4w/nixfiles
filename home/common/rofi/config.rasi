@@ -16,6 +16,8 @@
  *      兜底，避免 rofi 报 Failed to import）。
  *      背景图铺在 window 上，mainbox / inputbar 再用 @overlay 系列半透明色压暗，
  *      既能看到壁纸又保证文字可读（rofi 先画 window 背景图，再画子元素背景色）。
+ *      该图片默认是模糊版（~/.cache/blurred_wallpaper.png，缩放 75% + blur 50x30），
+ *      由 pywal 侧生成后写入 rasi。
  */
 
 @import "~/.cache/current_wallpaper.rasi"
